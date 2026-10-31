@@ -1,0 +1,9 @@
+*
+!Dockerfile
+!pyproject.toml
+!uv.lock
+!README.md
+!blr_air/
+!blr_air/**
+**/__pycache__
+**/*.pyc

@@ -1,0 +1,16 @@
+services:
+  agent:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATA_DIR: /data
+      AGENT_PORT: "8001"
+    ports:
+      - "127.0.0.1:8001:8001"
+    volumes:
+      - agent-data:/data
+    stop_grace_period: 30s
+
+volumes:
+  agent-data:

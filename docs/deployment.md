@@ -1,0 +1,59 @@
+# Run continuously with a stable identity
+
+The mailbox process must remain running. A laptop going to sleep makes the agent unavailable. Use a server you control or a container host with persistent storage. Only one process should use a given seed at a time.
+
+## Local setup and registration
+
+```sh
+uv sync --frozen
+uv run blr-air init
+uv run blr-air doctor
+uv run blr-air-agent
+```
+
+`init` creates `.env` with mode 0600. Back it up securely. Do not put it in Git or a container image. `AGENT_SEED_PHRASE` determines the agent address. `CALLER_SEED` identifies the separate demo planner. `ASI1_API_KEY` is optional and can be added without changing either identity.
+
+Follow the startup Inspector link, then **Connect → Mailbox → Finish**. Verify the address matches `doctor` and the Agentverse dashboard says Active. Publish the supplied profile README and claim an available handle. Mailbox registration and ASI:One routing require your authenticated account; process logs alone do not establish either.
+
+## Docker Compose on an always-on machine
+
+Copy the project and the same private `.env` to the host. Stop the original process before starting the replacement.
+
+```sh
+docker compose up -d --build
+docker compose logs --tail 100 agent
+curl -fsS http://127.0.0.1:8001/healthz
+docker compose exec agent blr-air stats
+```
+
+The service restarts automatically and stores usage plus uAgents state in `agent-data`. It runs as a non-root user. Port 8001 is exposed only on the host's loopback interface. Mailbox traffic is outbound, so no public endpoint or tunnel is required. When registering from a remote host, use SSH local forwarding for the Inspector:
+
+```sh
+ssh -L 8001:127.0.0.1:8001 your-server
+```
+
+Run only one copy of the identity. Check **Active** in Agentverse after migration. For a private local transport test that does not register publicly:
+
+```sh
+docker compose run --rm --service-ports agent --local
+```
+
+Stop the normal service first if it is using the same port or identity. `docker compose down` preserves the named volume; `down -v` destroys counters and state. The seed remains in `.env` outside the volume, so back up both separately.
+
+## Health and recovery
+
+- `/healthz` proves that the process is serving requests. It does not certify Open-Meteo, mailbox connectivity, discoverability or API balance.
+- If ASI:One returns 402 or times out, documented English prompts still use local parsing. Fix billing/key configuration for freeform language support.
+- If Open-Meteo fails, users receive an explicit retry message. There are bounded retries and a five-minute cache, without a fabricated or stale fallback.
+- After a restart, requests work immediately; the cache is rebuilt and usage counters persist.
+- The direct uAgents server binds all interfaces. Docker Compose limits exposure to loopback; for a non-container host, use its firewall to keep the Inspector and service port private.
+- Keep the process alive through judging. Use the host's own uptime monitoring and verify Active status in Agentverse regularly.
+
+## Updating
+
+```sh
+git pull --ff-only
+docker compose up -d --build
+```
+
+Preserve `.env` and the volume. To roll back, check out the previous code commit and rebuild. Do not regenerate the agent seed.
