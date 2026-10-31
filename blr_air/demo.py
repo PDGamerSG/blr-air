@@ -28,6 +28,9 @@ class DemoProvider:
                     12 + abs(local_hour - 9),
                     10 if local_hour < 14 else 65,
                     24 + max(0, 5 - abs(local_hour - 14)),
+                    apparent_temperature=26 + max(0, 5 - abs(local_hour - 14)),
+                    uv_index=max(0, 8 - 2 * abs(local_hour - 12)),
+                    wind_speed=8,
                 )
             )
         return Forecast(
@@ -36,4 +39,11 @@ class DemoProvider:
             "Asia/Kolkata",
             now,
             is_demo=True,
+            daylight=tuple(
+                (
+                    (start + timedelta(days=day)).replace(hour=6).astimezone(UTC),
+                    (start + timedelta(days=day)).replace(hour=18).astimezone(UTC),
+                )
+                for day in range(4)
+            ),
         )

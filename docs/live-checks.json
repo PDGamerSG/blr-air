@@ -1,0 +1,738 @@
+{
+  "started_at": "2026-10-31T08:51:55.755987+00:00",
+  "scope": "Local development verification; not outside-user or Agentverse evidence",
+  "checks": [
+    {
+      "name": "asi_live_multilingual_no_fallback",
+      "status": "passed",
+      "details": {
+        "model": "asi1-mini",
+        "language": "Hindi",
+        "fallback_forbidden": true,
+        "parsed": {
+          "place": "HSR Layout",
+          "activity": "cycle",
+          "hours": 2,
+          "day": "tomorrow",
+          "period": "morning",
+          "places": [],
+          "max_aqi": null,
+          "max_rain": null,
+          "max_temperature": null,
+          "max_uv": null,
+          "max_wind": null,
+          "daylight_only": false
+        }
+      },
+      "duration_seconds": 1.233
+    },
+    {
+      "name": "open_meteo_recommendations_and_constraints",
+      "status": "passed",
+      "details": {
+        "cases": [
+          {
+            "request": {
+              "place": "HSR Layout",
+              "activity": "run",
+              "hours": 1,
+              "day": "next48",
+              "period": "any",
+              "places": [],
+              "max_aqi": null,
+              "max_rain": null,
+              "max_temperature": null,
+              "max_uv": null,
+              "max_wind": null,
+              "daylight_only": false
+            },
+            "location": "HSR Layout, Bengaluru",
+            "timezone": "Asia/Kolkata",
+            "window": {
+              "start": "2026-11-02T08:00:00+05:30",
+              "end": "2026-11-02T09:00:00+05:30",
+              "us_aqi": 84,
+              "pm2_5": 24.2,
+              "rain_probability": 6,
+              "temperature": 23.1,
+              "max_aqi": 84,
+              "score": 105.1,
+              "apparent_temperature": 26.1,
+              "uv_index": 2.35,
+              "wind_speed": 3.6,
+              "daylight": true,
+              "aqi_category": "Moderate"
+            },
+            "fetched_at": "2026-10-31T08:51:57.602097+00:00",
+            "source": "Open-Meteo Air Quality (CAMS) and Weather Forecast",
+            "complete_forecast_hours": 96
+          },
+          {
+            "request": {
+              "place": "Koramangala",
+              "activity": "cycle",
+              "hours": 2,
+              "day": "tomorrow",
+              "period": "morning",
+              "places": [],
+              "max_aqi": null,
+              "max_rain": null,
+              "max_temperature": null,
+              "max_uv": null,
+              "max_wind": null,
+              "daylight_only": false
+            },
+            "location": "Koramangala, Bengaluru",
+            "timezone": "Asia/Kolkata",
+            "window": {
+              "start": "2026-11-01T07:00:00+05:30",
+              "end": "2026-11-01T09:00:00+05:30",
+              "us_aqi": 101,
+              "pm2_5": 36.45,
+              "rain_probability": 4,
+              "temperature": 23.1,
+              "max_aqi": 103,
+              "score": 122.975,
+              "apparent_temperature": 25.6,
+              "uv_index": 2.45,
+              "wind_speed": 7.2,
+              "daylight": true,
+              "aqi_category": "Unhealthy for sensitive groups"
+            },
+            "fetched_at": "2026-10-31T08:51:57.755054+00:00",
+            "source": "Open-Meteo Air Quality (CAMS) and Weather Forecast",
+            "complete_forecast_hours": 96
+          },
+          {
+            "request": {
+              "place": "Melbourne, Australia",
+              "activity": "kids",
+              "hours": 2,
+              "day": "tomorrow",
+              "period": "morning",
+              "places": [],
+              "max_aqi": null,
+              "max_rain": null,
+              "max_temperature": null,
+              "max_uv": null,
+              "max_wind": null,
+              "daylight_only": false
+            },
+            "location": "Melbourne, Victoria, Australia",
+            "timezone": "Australia/Melbourne",
+            "window": {
+              "start": "2026-11-01T07:00:00+11:00",
+              "end": "2026-11-01T09:00:00+11:00",
+              "us_aqi": 25,
+              "pm2_5": 2.8499999999999996,
+              "rain_probability": 0,
+              "temperature": 13.7,
+              "max_aqi": 25,
+              "score": 26.424999999999997,
+              "apparent_temperature": 12.5,
+              "uv_index": 1.0,
+              "wind_speed": 8.8,
+              "daylight": true,
+              "aqi_category": "Good"
+            },
+            "fetched_at": "2026-10-31T08:51:58.495134+00:00",
+            "source": "Open-Meteo Air Quality (CAMS) and Weather Forecast",
+            "complete_forecast_hours": 96
+          },
+          {
+            "request": {
+              "place": "New York, US",
+              "activity": "walk",
+              "hours": 1,
+              "day": "tomorrow",
+              "period": "afternoon",
+              "places": [],
+              "max_aqi": null,
+              "max_rain": null,
+              "max_temperature": null,
+              "max_uv": null,
+              "max_wind": null,
+              "daylight_only": false
+            },
+            "location": "New York, United States",
+            "timezone": "America/New_York",
+            "window": {
+              "start": "2026-11-01T12:00:00-05:00",
+              "end": "2026-11-01T13:00:00-05:00",
+              "us_aqi": 53,
+              "pm2_5": 8.6,
+              "rain_probability": 0,
+              "temperature": 14.5,
+              "max_aqi": 53,
+              "score": 57.3,
+              "apparent_temperature": 11.6,
+              "uv_index": 3.5,
+              "wind_speed": 7.7,
+              "daylight": true,
+              "aqi_category": "Moderate"
+            },
+            "fetched_at": "2026-10-31T08:51:58.786300+00:00",
+            "source": "Open-Meteo Air Quality (CAMS) and Weather Forecast",
+            "complete_forecast_hours": 96
+          },
+          {
+            "request": {
+              "place": "Paris, France",
+              "activity": "commute",
+              "hours": 2,
+              "day": "tomorrow",
+              "period": "evening",
+              "places": [],
+              "max_aqi": null,
+              "max_rain": null,
+              "max_temperature": null,
+              "max_uv": null,
+              "max_wind": null,
+              "daylight_only": false
+            },
+            "location": "Paris, Île-de-France Region, France",
+            "timezone": "Europe/Paris",
+            "window": {
+              "start": "2026-11-01T17:00:00+01:00",
+              "end": "2026-11-01T19:00:00+01:00",
+              "us_aqi": 68.5,
+              "pm2_5": 16.95,
+              "rain_probability": 0,
+              "temperature": 11.2,
+              "max_aqi": 69,
+              "score": 76.975,
+              "apparent_temperature": 8.9,
+              "uv_index": 0.45,
+              "wind_speed": 9.8,
+              "daylight": false,
+              "aqi_category": "Moderate"
+            },
+            "fetched_at": "2026-10-31T08:51:59.075062+00:00",
+            "source": "Open-Meteo Air Quality (CAMS) and Weather Forecast",
+            "complete_forecast_hours": 96
+          }
+        ],
+        "all_three_open_meteo_apis": "HTTP 200",
+        "cache_hit": true
+      },
+      "duration_seconds": 2.089
+    },
+    {
+      "name": "invalid_place_and_duration",
+      "status": "passed",
+      "details": {
+        "duration_error": "Choose a 1-hour or 2-hour outdoor window.",
+        "place_error": "I couldn't find 'Zzxqvnotarealcity729'. Try a city, 'city, country', or a Bengaluru locality such as HSR Layout or Whitefield."
+      },
+      "duration_seconds": 0.576
+    },
+    {
+      "name": "docker_signed_typed_request_and_counters",
+      "status": "passed",
+      "details": {
+        "health": {
+          "status": "ok",
+          "address": "agent1q2z89ttne7p57zq7r473lrc5jan899raacv6sjqj9eymk7kdqzkwkxhcwg3",
+          "mode": "mailbox",
+          "version": "0.1.0"
+        },
+        "request_signature_verified": true,
+        "response_signature_present": false,
+        "response": {
+          "status": "ok",
+          "summary": "12.9116, 77.6389 · Asia/Kolkata\nCurrent model at 31 Oct 13:30: US AQI 107 (Unhealthy for sensitive groups), PM2.5 28.8 µg/m³.\nBest available 2-hour window to run: Sun 01 Nov 2026, 08:00–10:00 (+0530).\nAverage US AQI 99; PM2.5 35.9 µg/m³. Peak hourly rain chance 3%; temperature up to 24.6°C.\nWorst hourly AQI: 99 (Moderate).\nRanked by air pollution, rain and heat among complete windows between 05:00–21:00 local.\nBackup windows:\n- Sun 01 Nov 06:00–08:00 (+0530), avg AQI 104, peak rain 4%\n- Sun 01 Nov 10:00–12:00 (+0530), avg AQI 99, peak rain 16%\nFeels like up to 27.3°C; peak UV 4.5; wind up to 6.3 km/h; fully in daylight.\nUV index is 3 or above: plan shade and sun protection.\nData: Open-Meteo Air Quality (CAMS) and Weather Forecast. Retrieved 31 Oct 2026 08:52 UTC.\nModel forecasts, not CPCB station readings or medical advice.\nTry next: 'best 2-hour cycling window in Koramangala tomorrow morning'.",
+          "start": "2026-11-01T08:00:00+05:30",
+          "end": "2026-11-01T10:00:00+05:30",
+          "timezone": "Asia/Kolkata",
+          "us_aqi": 99.0,
+          "pm2_5": 35.85,
+          "rain_probability": 3.0,
+          "temperature": 24.6,
+          "max_aqi": 99.0,
+          "fetched_at": "2026-10-31T08:52:01.060912+00:00",
+          "source": "Open-Meteo Air Quality (CAMS) and Weather Forecast",
+          "error_code": null
+        },
+        "counters_before": {
+          "queries": 2,
+          "successful_queries": 2,
+          "failed_queries": 0,
+          "chat_queries": 0,
+          "typed_queries": 2,
+          "unique_senders": 2
+        },
+        "counters_after": {
+          "queries": 3,
+          "successful_queries": 3,
+          "failed_queries": 0,
+          "chat_queries": 0,
+          "typed_queries": 3,
+          "unique_senders": 3
+        }
+      },
+      "duration_seconds": 2.182
+    },
+    {
+      "name": "full_signed_chat_plan_callbacks_and_counters",
+      "status": "passed",
+      "details": {
+        "mode": "isolated-local",
+        "all_callback_signatures_verified": true,
+        "acknowledgement_then_text_then_end_session": true,
+        "duplicate_end_only_ack_do_not_loop": true,
+        "invalid_duration_reply": "Choose 1 or 2 hours in the next 48 hours, today or tomorrow; morning, afternoon and evening are supported.",
+        "invalid_place_reply": "I couldn't find 'Zzxqvnotarealcity729'. Try a city, 'city, country', or a Bengaluru locality such as HSR Layout or Whitefield.",
+        "counters": {
+          "queries": 9,
+          "successful_queries": 6,
+          "failed_queries": 3,
+          "chat_queries": 3,
+          "typed_queries": 6,
+          "unique_senders": 1
+        },
+        "raw_sender_not_persisted": true,
+        "invalid_wire_duration_rejected_and_queue_survives": true,
+        "plans": [
+          {
+            "request": {
+              "places": [
+                "HSR Layout"
+              ],
+              "hours": 2,
+              "activity": "walk",
+              "day": "next48",
+              "period": "any",
+              "max_aqi": 500.0,
+              "max_rain": 100.0,
+              "max_temperature": 70.0,
+              "max_uv": 30.0,
+              "max_wind": 200.0,
+              "daylight_only": true
+            },
+            "response": {
+              "status": "ok",
+              "summary": "Best place: HSR Layout\nEach place is compared at its own best time, using the same pollution/rain/heat score.\n1. HSR Layout, Bengaluru · Asia/Kolkata: Mon 02 Nov 08:00–10:00 (+0530), avg AQI 84, PM2.5 23.8 µg/m³, peak rain 8%, temperature 24.6°C. Worst AQI: Moderate.\n  Backup: Mon 02 Nov 10:00–12:00 (+0530), avg AQI 82, peak rain 18%.\n  Backup: Sun 01 Nov 08:00–10:00 (+0530), avg AQI 99, peak rain 3%.\n  Feels like up to 27.8°C; peak UV 3.6; wind up to 3.6 km/h; fully in daylight.\n  Data: Open-Meteo Air Quality (CAMS) and Weather Forecast. Retrieved 31 Oct 2026 08:52 UTC.\nModel forecasts, not CPCB station readings or medical advice.",
+              "winner": "HSR Layout",
+              "partial": false,
+              "tied_places": [],
+              "results": [
+                {
+                  "place": "HSR Layout",
+                  "status": "ok",
+                  "summary": "HSR Layout, Bengaluru · Asia/Kolkata\nCurrent model at 31 Oct 13:30: US AQI 107 (Unhealthy for sensitive groups), PM2.5 28.8 µg/m³.\nBest available 2-hour window to walk: Mon 02 Nov 2026, 08:00–10:00 (+0530).\nAverage US AQI 84; PM2.5 23.8 µg/m³. Peak hourly rain chance 8%; temperature up to 24.6°C.\nWorst hourly AQI: 84 (Moderate).\nRanked by air pollution, rain and heat among complete windows between 05:00–21:00 local.\nBackup windows:\n- Mon 02 Nov 10:00–12:00 (+0530), avg AQI 82, peak rain 18%\n- Sun 01 Nov 08:00–10:00 (+0530), avg AQI 99, peak rain 3%\nFeels like up to 27.8°C; peak UV 3.6; wind up to 3.6 km/h; fully in daylight.\nAll selected windows meet your requested limits and lie entirely between sunrise and sunset.\nUV index is 3 or above: plan shade and sun protection.\nData: Open-Meteo Air Quality (CAMS) and Weather Forecast. Retrieved 31 Oct 2026 08:52 UTC.\nModel forecasts, not CPCB station readings or medical advice.\nTry next: 'best 2-hour cycling window in Koramangala tomorrow morning'.",
+                  "rank": 1,
+                  "resolved_name": "HSR Layout, Bengaluru",
+                  "timezone": "Asia/Kolkata",
+                  "window": {
+                    "start": "2026-11-02T08:00:00+05:30",
+                    "end": "2026-11-02T10:00:00+05:30",
+                    "us_aqi": 83.5,
+                    "pm2_5": 23.799999999999997,
+                    "rain_probability": 8.0,
+                    "temperature": 24.6,
+                    "max_aqi": 84.0,
+                    "score": 105.9,
+                    "aqi_category": "Moderate",
+                    "apparent_temperature": 27.8,
+                    "uv_index": 3.6,
+                    "wind_speed": 3.6,
+                    "daylight": true
+                  },
+                  "backups": [
+                    {
+                      "start": "2026-11-02T10:00:00+05:30",
+                      "end": "2026-11-02T12:00:00+05:30",
+                      "us_aqi": 82.0,
+                      "pm2_5": 21.55,
+                      "rain_probability": 18.0,
+                      "temperature": 27.8,
+                      "max_aqi": 82.0,
+                      "score": 114.525,
+                      "aqi_category": "Moderate",
+                      "apparent_temperature": 31.1,
+                      "uv_index": 7.7,
+                      "wind_speed": 5.4,
+                      "daylight": true
+                    },
+                    {
+                      "start": "2026-11-01T08:00:00+05:30",
+                      "end": "2026-11-01T10:00:00+05:30",
+                      "us_aqi": 99.0,
+                      "pm2_5": 35.85,
+                      "rain_probability": 3.0,
+                      "temperature": 24.6,
+                      "max_aqi": 99.0,
+                      "score": 119.175,
+                      "aqi_category": "Moderate",
+                      "apparent_temperature": 27.3,
+                      "uv_index": 4.55,
+                      "wind_speed": 6.3,
+                      "daylight": true
+                    }
+                  ],
+                  "source": "Open-Meteo Air Quality (CAMS) and Weather Forecast",
+                  "fetched_at": "2026-10-31T08:52:04.191699+00:00",
+                  "error_code": null
+                }
+              ],
+              "error_code": null
+            }
+          },
+          {
+            "request": {
+              "places": [
+                "HSR Layout",
+                "Whitefield"
+              ],
+              "hours": 1,
+              "activity": "walk",
+              "day": "next48",
+              "period": "any",
+              "max_aqi": null,
+              "max_rain": null,
+              "max_temperature": null,
+              "max_uv": null,
+              "max_wind": null,
+              "daylight_only": true
+            },
+            "response": {
+              "status": "ok",
+              "summary": "Best place: HSR Layout\nEach place is compared at its own best time, using the same pollution/rain/heat score.\nScore tie: HSR Layout, Whitefield. The first requested place is shown first; forecasts do not distinguish them.\n1. HSR Layout, Bengaluru · Asia/Kolkata: Mon 02 Nov 08:00–09:00 (+0530), avg AQI 84, PM2.5 24.2 µg/m³, peak rain 6%, temperature 23.1°C. Worst AQI: Moderate.\n  Backup: Mon 02 Nov 09:00–10:00 (+0530), avg AQI 83, peak rain 8%.\n  Backup: Mon 02 Nov 07:00–08:00 (+0530), avg AQI 85, peak rain 6%.\n  Feels like up to 26.1°C; peak UV 2.4; wind up to 3.6 km/h; fully in daylight.\n  Data: Open-Meteo Air Quality (CAMS) and Weather Forecast. Retrieved 31 Oct 2026 08:52 UTC.\n2. Whitefield, Bengaluru · Asia/Kolkata: Mon 02 Nov 08:00–09:00 (+0530), avg AQI 84, PM2.5 24.2 µg/m³, peak rain 6%, temperature 23.0°C. Worst AQI: Moderate.\n  Backup: Mon 02 Nov 09:00–10:00 (+0530), avg AQI 83, peak rain 8%.\n  Backup: Mon 02 Nov 07:00–08:00 (+0530), avg AQI 85, peak rain 6%.\n  Feels like up to 26.2°C; peak UV 2.4; wind up to 3.2 km/h; fully in daylight.\n  Data: Open-Meteo Air Quality (CAMS) and Weather Forecast. Retrieved 31 Oct 2026 08:52 UTC.\nModel forecasts, not CPCB station readings or medical advice.",
+              "winner": "HSR Layout",
+              "partial": false,
+              "tied_places": [
+                "HSR Layout",
+                "Whitefield"
+              ],
+              "results": [
+                {
+                  "place": "HSR Layout",
+                  "status": "ok",
+                  "summary": "HSR Layout, Bengaluru · Asia/Kolkata\nCurrent model at 31 Oct 13:30: US AQI 107 (Unhealthy for sensitive groups), PM2.5 28.8 µg/m³.\nBest available 1-hour window to walk: Mon 02 Nov 2026, 08:00–09:00 (+0530).\nAverage US AQI 84; PM2.5 24.2 µg/m³. Peak hourly rain chance 6%; temperature up to 23.1°C.\nWorst hourly AQI: 84 (Moderate).\nRanked by air pollution, rain and heat among complete windows between 05:00–21:00 local.\nBackup windows:\n- Mon 02 Nov 09:00–10:00 (+0530), avg AQI 83, peak rain 8%\n- Mon 02 Nov 07:00–08:00 (+0530), avg AQI 85, peak rain 6%\nFeels like up to 26.1°C; peak UV 2.4; wind up to 3.6 km/h; fully in daylight.\nAll selected windows meet your requested limits and lie entirely between sunrise and sunset.\nData: Open-Meteo Air Quality (CAMS) and Weather Forecast. Retrieved 31 Oct 2026 08:52 UTC.\nModel forecasts, not CPCB station readings or medical advice.\nTry next: 'best 2-hour cycling window in Koramangala tomorrow morning'.",
+                  "rank": 1,
+                  "resolved_name": "HSR Layout, Bengaluru",
+                  "timezone": "Asia/Kolkata",
+                  "window": {
+                    "start": "2026-11-02T08:00:00+05:30",
+                    "end": "2026-11-02T09:00:00+05:30",
+                    "us_aqi": 84.0,
+                    "pm2_5": 24.2,
+                    "rain_probability": 6.0,
+                    "temperature": 23.1,
+                    "max_aqi": 84.0,
+                    "score": 105.1,
+                    "aqi_category": "Moderate",
+                    "apparent_temperature": 26.1,
+                    "uv_index": 2.35,
+                    "wind_speed": 3.6,
+                    "daylight": true
+                  },
+                  "backups": [
+                    {
+                      "start": "2026-11-02T09:00:00+05:30",
+                      "end": "2026-11-02T10:00:00+05:30",
+                      "us_aqi": 83.0,
+                      "pm2_5": 23.4,
+                      "rain_probability": 8.0,
+                      "temperature": 24.6,
+                      "max_aqi": 83.0,
+                      "score": 106.7,
+                      "aqi_category": "Moderate",
+                      "apparent_temperature": 27.8,
+                      "uv_index": 3.6,
+                      "wind_speed": 1.0,
+                      "daylight": true
+                    },
+                    {
+                      "start": "2026-11-02T07:00:00+05:30",
+                      "end": "2026-11-02T08:00:00+05:30",
+                      "us_aqi": 85.0,
+                      "pm2_5": 27.5,
+                      "rain_probability": 6.0,
+                      "temperature": 21.4,
+                      "max_aqi": 85.0,
+                      "score": 107.75,
+                      "aqi_category": "Moderate",
+                      "apparent_temperature": 24.7,
+                      "uv_index": 0.7,
+                      "wind_speed": 3.0,
+                      "daylight": true
+                    }
+                  ],
+                  "source": "Open-Meteo Air Quality (CAMS) and Weather Forecast",
+                  "fetched_at": "2026-10-31T08:52:04.191699+00:00",
+                  "error_code": null
+                },
+                {
+                  "place": "Whitefield",
+                  "status": "ok",
+                  "summary": "Whitefield, Bengaluru · Asia/Kolkata\nCurrent model at 31 Oct 13:30: US AQI 107 (Unhealthy for sensitive groups), PM2.5 28.8 µg/m³.\nBest available 1-hour window to walk: Mon 02 Nov 2026, 08:00–09:00 (+0530).\nAverage US AQI 84; PM2.5 24.2 µg/m³. Peak hourly rain chance 6%; temperature up to 23.0°C.\nWorst hourly AQI: 84 (Moderate).\nRanked by air pollution, rain and heat among complete windows between 05:00–21:00 local.\nBackup windows:\n- Mon 02 Nov 09:00–10:00 (+0530), avg AQI 83, peak rain 8%\n- Mon 02 Nov 07:00–08:00 (+0530), avg AQI 85, peak rain 6%\nFeels like up to 26.2°C; peak UV 2.4; wind up to 3.2 km/h; fully in daylight.\nAll selected windows meet your requested limits and lie entirely between sunrise and sunset.\nData: Open-Meteo Air Quality (CAMS) and Weather Forecast. Retrieved 31 Oct 2026 08:52 UTC.\nModel forecasts, not CPCB station readings or medical advice.\nTry next: 'best 2-hour cycling window in Koramangala tomorrow morning'.",
+                  "rank": 2,
+                  "resolved_name": "Whitefield, Bengaluru",
+                  "timezone": "Asia/Kolkata",
+                  "window": {
+                    "start": "2026-11-02T08:00:00+05:30",
+                    "end": "2026-11-02T09:00:00+05:30",
+                    "us_aqi": 84.0,
+                    "pm2_5": 24.2,
+                    "rain_probability": 6.0,
+                    "temperature": 23.0,
+                    "max_aqi": 84.0,
+                    "score": 105.1,
+                    "aqi_category": "Moderate",
+                    "apparent_temperature": 26.2,
+                    "uv_index": 2.35,
+                    "wind_speed": 3.2,
+                    "daylight": true
+                  },
+                  "backups": [
+                    {
+                      "start": "2026-11-02T09:00:00+05:30",
+                      "end": "2026-11-02T10:00:00+05:30",
+                      "us_aqi": 83.0,
+                      "pm2_5": 23.4,
+                      "rain_probability": 8.0,
+                      "temperature": 24.9,
+                      "max_aqi": 83.0,
+                      "score": 106.7,
+                      "aqi_category": "Moderate",
+                      "apparent_temperature": 28.0,
+                      "uv_index": 3.6,
+                      "wind_speed": 1.7,
+                      "daylight": true
+                    },
+                    {
+                      "start": "2026-11-02T07:00:00+05:30",
+                      "end": "2026-11-02T08:00:00+05:30",
+                      "us_aqi": 85.0,
+                      "pm2_5": 27.5,
+                      "rain_probability": 6.0,
+                      "temperature": 20.9,
+                      "max_aqi": 85.0,
+                      "score": 107.75,
+                      "aqi_category": "Moderate",
+                      "apparent_temperature": 24.7,
+                      "uv_index": 0.7,
+                      "wind_speed": 0.8,
+                      "daylight": true
+                    }
+                  ],
+                  "source": "Open-Meteo Air Quality (CAMS) and Weather Forecast",
+                  "fetched_at": "2026-10-31T08:52:06.764673+00:00",
+                  "error_code": null
+                }
+              ],
+              "error_code": null
+            }
+          }
+        ],
+        "hard_limit_no_plan": {
+          "status": "error",
+          "summary": "No complete outdoor window matches this request in the next 48 hours. Try 1 hour, another part of the day, or explicitly adjust your limits. Missing data cannot satisfy a limit; limits are never relaxed automatically.",
+          "winner": null,
+          "partial": false,
+          "tied_places": [],
+          "results": [],
+          "error_code": "no_plan"
+        },
+        "v1_schema_digests_unchanged": true,
+        "v1_request_passed_after_plan_requests": true
+      },
+      "duration_seconds": 5.122
+    }
+  ],
+  "http": [
+    {
+      "method": "POST",
+      "host": "api.asi1.ai",
+      "path": "/v1/chat/completions",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "air-quality-api.open-meteo.com",
+      "path": "/v1/air-quality",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "api.open-meteo.com",
+      "path": "/v1/forecast",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "api.open-meteo.com",
+      "path": "/v1/forecast",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "air-quality-api.open-meteo.com",
+      "path": "/v1/air-quality",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "geocoding-api.open-meteo.com",
+      "path": "/v1/search",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "api.open-meteo.com",
+      "path": "/v1/forecast",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "air-quality-api.open-meteo.com",
+      "path": "/v1/air-quality",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "geocoding-api.open-meteo.com",
+      "path": "/v1/search",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "api.open-meteo.com",
+      "path": "/v1/forecast",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "air-quality-api.open-meteo.com",
+      "path": "/v1/air-quality",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "geocoding-api.open-meteo.com",
+      "path": "/v1/search",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "api.open-meteo.com",
+      "path": "/v1/forecast",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "air-quality-api.open-meteo.com",
+      "path": "/v1/air-quality",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "geocoding-api.open-meteo.com",
+      "path": "/v1/search",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "127.0.0.1",
+      "path": "/healthz",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "127.0.0.1",
+      "path": "/submit",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "host": "127.0.0.1",
+      "path": "/healthz",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "127.0.0.1",
+      "path": "/submit",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "127.0.0.1",
+      "path": "/submit",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "127.0.0.1",
+      "path": "/submit",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "127.0.0.1",
+      "path": "/submit",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "127.0.0.1",
+      "path": "/submit",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "127.0.0.1",
+      "path": "/submit",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "127.0.0.1",
+      "path": "/submit",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "127.0.0.1",
+      "path": "/submit",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "127.0.0.1",
+      "path": "/submit",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "127.0.0.1",
+      "path": "/submit",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "127.0.0.1",
+      "path": "/submit",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "127.0.0.1",
+      "path": "/submit",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "host": "127.0.0.1",
+      "path": "/submit",
+      "status": 200
+    }
+  ],
+  "limitations": [
+    "Health is process liveness, not public Agentverse registration.",
+    "The SDK's synchronous HTTP response envelope is unsigned; requests are signed."
+  ],
+  "finished_at": "2026-10-31T08:52:06.958197+00:00",
+  "status": "passed"
+}

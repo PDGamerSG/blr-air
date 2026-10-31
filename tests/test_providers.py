@@ -40,6 +40,19 @@ def test_missing_current_is_not_replaced_with_future_forecast():
     assert merge_forecasts(aq, wx, datetime.now(UTC)).current is None
 
 
+def test_enriches_forecasts_with_uv_feels_like_wind_and_sunlight():
+    aq, wx = payloads()
+    wx["hourly"].update(
+        apparent_temperature=[28, None, 26], uv_index=[3, 4, 1], wind_speed_10m=[8, 10, 12]
+    )
+    wx["daily"] = {"sunrise": [1793408400], "sunset": [1793444400]}
+    forecast = merge_forecasts(aq, wx, datetime.now(UTC))
+    assert forecast.hours[0].apparent_temperature == 28
+    assert forecast.hours[0].uv_index == 3
+    assert forecast.hours[0].wind_speed == 8
+    assert len(forecast.daylight) == 1
+
+
 @pytest.mark.parametrize("field,value", [("us_aqi", float("nan")), ("pm2_5", -2)])
 def test_discards_nonfinite_and_negative_pollution(field, value):
     aq, wx = payloads()
@@ -93,6 +106,30 @@ async def test_unknown_place_never_falls_back_to_bengaluru():
     ) as client:
         with pytest.raises(LocationError):
             await OpenMeteo(client).locate("no-such-place-xyz")
+
+
+async def test_country_alias_uk_matches_geocoders_gb_code():
+    async with httpx.AsyncClient(
+        transport=httpx.MockTransport(
+            lambda request: httpx.Response(
+                200,
+                json={
+                    "results": [
+                        {
+                            "name": "London",
+                            "country": "United Kingdom",
+                            "country_code": "GB",
+                            "latitude": 51.5,
+                            "longitude": -0.12,
+                            "timezone": "Europe/London",
+                        }
+                    ]
+                },
+            )
+        )
+    ) as client:
+        result = await OpenMeteo(client).locate("London, UK")
+    assert result.timezone == "Europe/London"
 
 
 async def test_retries_transient_provider_error_but_stops_after_three_attempts():

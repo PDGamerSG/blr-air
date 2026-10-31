@@ -137,3 +137,161 @@ async def test_incomplete_asi_extraction_cannot_overwrite_supplied_city(content)
     ) as client:
         result = await parse_request("run in Delhi", client, api_key="test-key")
     assert result.place == "Delhi"
+
+
+@pytest.mark.parametrize(
+    "text,places",
+    [
+        ("compare HSR Layout and Koramangala for a run", ["HSR Layout", "Koramangala"]),
+        ("best window in Whitefield vs Indiranagar", ["Whitefield", "Indiranagar"]),
+    ],
+)
+def test_parses_local_place_comparisons(text, places):
+    assert parse_local(text).places == places
+
+
+async def test_asi_can_return_multiple_places():
+    async with httpx.AsyncClient(
+        transport=httpx.MockTransport(
+            lambda request: httpx.Response(
+                200,
+                json={
+                    "choices": [
+                        {
+                            "message": {
+                                "content": '{"place":"HSR Layout",'
+                                '"places":["HSR Layout","Whitefield"],'
+                                '"hours":1,"activity":"run","day":"next48","period":"any"}'
+                            }
+                        }
+                    ]
+                },
+            )
+        )
+    ) as client:
+        result = await parse_request(
+            "compare HSR Layout and Whitefield", client, api_key="test-key"
+        )
+    assert result.places == ["HSR Layout", "Whitefield"]
+
+
+def test_extracts_user_limits_without_geocoding_constraint_words():
+    q = parse_local(
+        "run in Paris with AQI at most 100, rain at most 20%, "
+        "feels like at most 30C, UV at most 3, wind at most 20 km/h, daylight only"
+    )
+    assert q.place == "Paris"
+    assert (q.max_aqi, q.max_rain, q.max_temperature, q.max_uv, q.max_wind) == (100, 20, 30, 3, 20)
+    assert q.daylight_only is True
+
+
+def test_comparison_can_use_global_city_and_country_names():
+    q = parse_local("compare Paris, France and London, UK for a walk tomorrow")
+    assert q.places == ["Paris, France", "London, UK"]
+    assert q.day == "tomorrow"
+
+
+async def test_asi_cannot_drop_explicit_local_limits():
+    async with httpx.AsyncClient(
+        transport=httpx.MockTransport(
+            lambda request: httpx.Response(
+                200,
+                json={
+                    "choices": [
+                        {
+                            "message": {
+                                "content": '{"place":"Paris","hours":1,"activity":"run",'
+                                '"day":"next48","period":"any"}'
+                            }
+                        }
+                    ]
+                },
+            )
+        )
+    ) as client:
+        q = await parse_request("run in Paris with AQI at most 50", client, api_key="test")
+    assert q.max_aqi == 50
+
+
+@pytest.mark.parametrize("wording", ["AQI less than 50", "maximum AQI 50", "AQI no more than 50"])
+def test_common_maximum_phrasings_never_silently_drop_a_limit(wording):
+    assert parse_local(f"run in HSR Layout with {wording}").max_aqi == 50
+
+
+def test_repeated_limits_choose_stricter_bound():
+    assert parse_local("run in HSR Layout with AQI under 100 and AQI under 50").max_aqi == 50
+
+
+def test_unparsed_numeric_limit_is_rejected_instead_of_ignored():
+    with pytest.raises(AirError):
+        parse_local("run in HSR Layout with AQI between 50 and 80")
+
+
+async def test_asi_comparison_cannot_be_contaminated_by_limit_clause():
+    async with httpx.AsyncClient(
+        transport=httpx.MockTransport(
+            lambda request: httpx.Response(
+                200,
+                json={
+                    "choices": [
+                        {
+                            "message": {
+                                "content": '{"place":"HSR Layout",'
+                                '"places":["HSR Layout","Whitefield"],'
+                                '"hours":1,"activity":"run","day":"next48","period":"any","max_aqi":50}'
+                            }
+                        }
+                    ]
+                },
+            )
+        )
+    ) as client:
+        result = await parse_request(
+            "compare HSR Layout and Whitefield AQI under 50", client, api_key="test"
+        )
+    assert result.places == ["HSR Layout", "Whitefield"]
+
+
+def test_local_three_locality_comparison_accepts_comma_list():
+    result = parse_local("compare HSR Layout, Whitefield and Koramangala for a run")
+    assert result.places == ["HSR Layout", "Whitefield", "Koramangala"]
+
+
+@pytest.mark.parametrize(
+    "text,field,expected",
+    [
+        ("feels like under 50 F", "max_temperature", 10),
+        ("temperature at most 86°F", "max_temperature", 30),
+        ("maximum temperature 30 Celsius", "max_temperature", 30),
+        ("wind under 10 mph", "max_wind", 16.09344),
+        ("wind at most 5 m/s", "max_wind", 18),
+    ],
+)
+def test_converts_explicit_user_units(text, field, expected):
+    q = parse_local("run in New York with " + text)
+    assert getattr(q, field) == pytest.approx(expected)
+
+
+async def test_asi_fahrenheit_conversion_is_not_overridden_with_celsius_number():
+    async with httpx.AsyncClient(
+        transport=httpx.MockTransport(
+            lambda request: httpx.Response(
+                200,
+                json={
+                    "choices": [
+                        {
+                            "message": {
+                                "content": '{"place":"New York","hours":1,"activity":"run",'
+                                '"day":"next48",'
+                                '"period":"any","max_temperature":10}'
+                            }
+                        }
+                    ]
+                },
+            )
+        )
+    ) as client:
+        q = await parse_request(
+            "run in New York with feels like under 50 F", client, api_key="test"
+        )
+    assert q.max_temperature == 10

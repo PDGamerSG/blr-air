@@ -18,6 +18,9 @@ Ask when the air is cleaner and rain/heat are lower for going outside. Get curre
 - Bengaluru localities including HSR Layout, Koramangala, Whitefield, Indiranagar, Electronic City, Jayanagar, Bellandur, Hebbal, Cubbon Park and Lalbagh.
 - Global city geocoding; use city and country to disambiguate.
 - Typed agent-to-agent interface for planners.
+- Up to two non-overlapping backup windows for each recommendation.
+- Compare two or three places, ranked at each place's own best eligible time. Ties and unavailable places are disclosed.
+- User-set per-hour limits for AQI, rain, feels-like temperature, UV and wind; optional daylight-only windows.
 
 ## Usage instructions
 
@@ -29,17 +32,23 @@ best 2-hour cycling window in Koramangala
 when is the air cleanest in Whitefield
 take kids outside in Melbourne tomorrow morning
 best window to walk in Paris, France today
+compare HSR Layout and Whitefield for a run tomorrow morning
+run in HSR Layout with AQI at most 100, rain at most 30%, daylight only
 ```
 
 The answer identifies the resolved location and timezone. AQI/PM2.5 are averages over the recommended window; rain chance and temperature are hourly maxima. Ranking balances air pollution, rain and heat. It is not a guarantee of safety.
+
+Optional limits must hold for every hour; missing data cannot satisfy a limit and limits are never relaxed automatically. Feels-like temperature is °C and wind is km/h. Daylight-only requires the whole block to fit between forecast sunrise and sunset as well as the 05:00–21:00 activity window. UV, wind and feels-like context is shown when available.
 
 ## Use cases and agent API
 
 Runners and cyclists selecting a time, parents considering outdoor play, and commuters considering rain and pollution. Agents send `WindowRequest{latitude, longitude, hours, activity, day, period}` to protocol **blr-air-window v0.1.0**. Required fields are latitude and longitude; defaults are 1 hour, walk, next48, any period. `WindowResponse` contains status, summary, start/end, timezone, AQI/PM2.5, peak rain/temperature, worst AQI, source and retrieval time. Errors return status `error` with an error code and no fabricated measurements.
 
+The separate **blr-air-plan v0.1.0** protocol accepts `PlanRequest{places, hours, activity, day, period, max_aqi, max_rain, max_temperature, max_uv, max_wind, daylight_only}`. `places` is one to three city/locality names; optional limits default to unset. `PlanResponse` supplies winner, ties, partial-result flag and a result per place containing numeric best/backup windows, timezone, source and retrieval time. Original coordinate request/response schemas remain compatible.
+
 ## Limitations and known issues
 
-Open-Meteo/CAMS air quality is a model forecast, not CPCB station readings or street-level measurements. Not medical advice. Supported periods use fixed local hours, not sunrise/sunset. Exact clock-time filters, dates beyond the next 48 hours, alerts and historical data are not supported. Geocoding can be ambiguous; add country or use coordinates through the typed API. Complete forecast data must be available. A service outage gives a retry message. With no ASI:One API key configured, documented English requests work through local parsing; freeform multilingual understanding requires ASI:One.
+Open-Meteo/CAMS air quality is a model forecast, not CPCB station readings or street-level measurements. Not medical advice. Supported periods use fixed local hours; daylight-only is an extra sunrise/sunset filter. Exact clock-time filters, dates beyond the next 48 hours, push alerts and historical data are not supported. Comparisons evaluate each place at its own best time, not one shared instant. Geocoding can be ambiguous; add country or use coordinates through the original typed API. Complete forecast data must be available. A service outage gives a retry message. With no ASI:One API key configured, documented English requests work through local parsing; freeform multilingual understanding requires ASI:One. Calendar export and optional Sarvam audio-file input/output are local CLI features, not attachments or voice messages in this chat agent.
 
 ## Metadata and credits
 

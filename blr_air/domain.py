@@ -1,12 +1,13 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 Activity = Literal["run", "cycle", "walk", "commute", "kids"]
 Day = Literal["next48", "today", "tomorrow"]
 Period = Literal["any", "morning", "afternoon", "evening"]
+PlaceName = Annotated[str, Field(min_length=2, max_length=160)]
 
 
 class AirError(Exception):
@@ -32,6 +33,20 @@ class RequestSpec(BaseModel):
     hours: int = Field(default=1, ge=1, le=2, strict=True)
     day: Day = "next48"
     period: Period = "any"
+    places: list[PlaceName] = Field(default_factory=list, max_length=3)
+    max_aqi: float | None = Field(default=None, ge=0, le=500, allow_inf_nan=False)
+    max_rain: float | None = Field(default=None, ge=0, le=100, allow_inf_nan=False)
+    max_temperature: float | None = Field(default=None, ge=-80, le=70, allow_inf_nan=False)
+    max_uv: float | None = Field(default=None, ge=0, le=30, allow_inf_nan=False)
+    max_wind: float | None = Field(default=None, ge=0, le=200, allow_inf_nan=False)
+    daylight_only: bool = Field(default=False, strict=True)
+
+    @field_validator("places")
+    @classmethod
+    def distinct_places(cls, places):
+        if len({place.casefold() for place in places}) != len(places):
+            raise ValueError("Comparison places must be distinct.")
+        return places
 
 
 @dataclass(frozen=True)
@@ -49,6 +64,9 @@ class Hour:
     pm2_5: float
     rain_probability: float
     temperature: float
+    apparent_temperature: float | None = None
+    uv_index: float | None = None
+    wind_speed: float | None = None
 
 
 @dataclass(frozen=True)
@@ -65,6 +83,7 @@ class Forecast:
     timezone: str
     fetched_at: datetime
     is_demo: bool = False
+    daylight: tuple[tuple[datetime, datetime], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -77,3 +96,7 @@ class Window:
     temperature: float
     max_aqi: float
     score: float
+    apparent_temperature: float | None = None
+    uv_index: float | None = None
+    wind_speed: float | None = None
+    daylight: bool | None = None

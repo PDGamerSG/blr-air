@@ -2,6 +2,22 @@
 
 Local checks performed on **31 October 2026**, using Python 3.12.14, uAgents 0.26.1 and uagents-core 0.4.12.
 
+## Expanded end-to-end check
+
+The expanded build passes **165 automated tests**, scoped Ruff lint/format and package build. Added comparison, non-overlapping backups, per-hour hard limits, sunlight/UV/wind/apparent-temperature context, calendar export and Sarvam voice-file input/output. Independent review findings were fixed with regression tests, including unit conversions and preservation of explicit limits and compared places.
+
+[Machine-readable live evidence](live-checks.json) records five passing check groups: actual ASI Hindi parsing with fallback forbidden, all three Open-Meteo endpoints and five cities/timezones, invalid inputs, Docker typed messages and counters, and signed chat/planning callbacks. Callbacks include acknowledgement, text, EndSession, deduplication/no-loop checks, numeric backup windows, impossible-limit rejection, and original wire-schema compatibility.
+
+The live tests found a dependency bug: malformed Pydantic-v1 wire input escaped uAgents' Pydantic-v2 exception handler and killed its message queue, while health remained OK. The compatibility fix was tested by an invalid signed request followed by a successful valid request on the same agent process.
+
+Sarvam `saaras:v4` and `bulbul:v4-flash` passed authenticated synthesis/transcription. A full local CLI run transcribed a spoken Bengaluru request, parsed it through ASI:One, fetched a live recommendation, and saved a 24-kHz spoken WAV. Calendar export of a live daylight-only two-hour HSR window also succeeded. Local artifacts are ignored by Git under `artifacts/`; they contain developer-generated demonstrations, not outside-user proof.
+
+The final combined run also passed: local WAV input, ASI parsing, HSR Layout/Whitefield comparison with AQI ≤100, rain ≤30% and daylight-only, calendar export, and a **33.78-second, 24-kHz spoken answer**. Both places tied at score 117 for 1 November 08:00–09:00 Asia/Kolkata, with two qualifying backup windows each; the answer disclosed the tie. The comparison JSON, single-event calendar and WAV were checked locally under `artifacts/final-*`.
+
+The separately supplied Anthropic credential was tested with a minimal Messages API call and returned **HTTP 401 authentication_error / invalid x-api-key**. Claude was not enabled in the application. ASI:One and Sarvam credentials were verified and remain private; Neo4j is neither required nor connected.
+
+## Initial build checks
+
 - **74 automated tests passed.** Ranking, contiguous windows, bounds, missing/invalid forecast values, provider retries, timezone/DST cases, parser and ASI failure behaviour, wire validation, chat acknowledgement/error/end-session semantics, private counters and CLI execution.
 - **Independent code review completed.** Fixed and regression-tested local period end boundaries, alternate city phrasing, unsupported time constraints and incomplete ASI extractions that could otherwise default to Bengaluru.
 - **Ruff lint and format checks passed.**

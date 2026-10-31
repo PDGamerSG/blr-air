@@ -18,10 +18,26 @@ from uagents_core.contrib.protocols.chat import (
 from uagents_core.registration import AgentRegistrationPolicy
 
 from blr_air.domain import AirError, Location, NoWindowError, ProviderError, RequestSpec
-from blr_air.models import HealthResponse, WindowRequest, WindowResponse
+from blr_air.models import (
+    ComparisonRequest,
+    ComparisonResponse,
+    HealthResponse,
+    PlaceComparison,
+    WindowOption,
+    WindowRequest,
+    WindowResponse,
+)
 from blr_air.providers import OpenMeteo
-from blr_air.service import SOURCE, AirService, describe
+from blr_air.service import (
+    SOURCE,
+    AirService,
+    ComparisonItem,
+    ComparisonResult,
+    describe,
+    window_dict,
+)
 from blr_air.telemetry import Usage
+from blr_air.transport import ResilientAgent
 
 
 class AgentHandlers:
@@ -56,7 +72,7 @@ class AgentHandlers:
             try:
                 result = await self.service.chat(text)
                 reply = describe(result)
-                success = True
+                success = not isinstance(result, ComparisonResult) or result.winner is not None
             except AirError as exc:
                 reply = str(exc)
             except Exception:
@@ -121,6 +137,69 @@ class AgentHandlers:
         self.track(ctx, sender, reply.status == "ok", "typed")
         await ctx.send(sender, reply)
 
+    async def on_compare(self, ctx: Context, sender: str, req: ComparisonRequest):
+        try:
+            request = RequestSpec.model_validate({**req.dict(), "place": req.places[0]})
+            if len(req.places) == 1:
+                recommendation = await self.service.recommend(request)
+                result = ComparisonResult(request, (ComparisonItem(req.places[0], recommendation),))
+            else:
+                result = await self.service.compare(request, req.places)
+            ranked = {
+                item.place: rank
+                for rank, item in enumerate(result.items, start=1)
+                if item.recommendation is not None
+            }
+            results = []
+            for item in result.items:
+                if item.recommendation is None:
+                    results.append(
+                        PlaceComparison(
+                            place=item.place,
+                            status="error",
+                            summary=item.error or "Forecast unavailable",
+                            error_code="lookup_failed",
+                        )
+                    )
+                    continue
+                recommendation = item.recommendation
+                data = recommendation.to_dict()
+                results.append(
+                    PlaceComparison(
+                        place=item.place,
+                        status="ok",
+                        summary=describe(recommendation),
+                        rank=ranked[item.place],
+                        resolved_name=recommendation.location.name,
+                        timezone=recommendation.forecast.timezone,
+                        window=WindowOption(**window_dict(recommendation.window)),
+                        backups=[
+                            WindowOption(**window_dict(backup)) for backup in recommendation.backups
+                        ],
+                        fetched_at=data["fetched_at"],
+                        source=data["source"],
+                    )
+                )
+            reply = ComparisonResponse(
+                status="ok" if result.winner else "error",
+                summary=describe(result),
+                winner=result.winner,
+                results=results,
+                partial=any(item.error for item in result.items),
+                tied_places=result.tied_places,
+            )
+        except AirError as exc:
+            reply = ComparisonResponse(status="error", summary=str(exc), error_code="no_plan")
+        except Exception:
+            ctx.logger.exception("Comparison request failed")
+            reply = ComparisonResponse(
+                status="error",
+                summary="Planning failed. Please try again.",
+                error_code="comparison_failed",
+            )
+        self.track(ctx, sender, reply.status == "ok", "typed")
+        await ctx.send(sender, reply)
+
 
 class LocalRegistration(AgentRegistrationPolicy):
     """Local development must not register or publish an agent."""
@@ -129,7 +208,9 @@ class LocalRegistration(AgentRegistrationPolicy):
         return
 
 
-def create_agent(seed: str, *, port=8001, local=False, data_dir=Path("data")) -> Agent:
+def create_agent(
+    seed: str, *, port=8001, local=False, data_dir=Path("data"), resolver=None
+) -> Agent:
     client = httpx.AsyncClient()
     service = AirService(
         OpenMeteo(client),
@@ -139,13 +220,14 @@ def create_agent(seed: str, *, port=8001, local=False, data_dir=Path("data")) ->
     )
     handlers = AgentHandlers(service, Usage(data_dir / "usage.sqlite", seed))
     readme = Path(__file__).with_name("AGENT_README.md")
-    agent = Agent(
+    agent = ResilientAgent(
         name="blr-air",
         seed=seed,
         port=port,
         mailbox=not local,
         endpoint=f"http://127.0.0.1:{port}/submit" if local else None,
         registration_policy=LocalRegistration() if local else None,
+        resolve=resolver,
         readme_path=str(readme),
         publish_agent_details=not local,
         enable_agent_inspector=not local,
@@ -159,8 +241,11 @@ def create_agent(seed: str, *, port=8001, local=False, data_dir=Path("data")) ->
     chat.on_message(ChatAcknowledgement)(handlers.on_ack)
     api = Protocol(name="blr-air-window", version="0.1.0")
     api.on_message(model=WindowRequest, replies=WindowResponse)(handlers.on_window)
+    planning = Protocol(name="blr-air-plan", version="0.1.0")
+    planning.on_message(model=ComparisonRequest, replies=ComparisonResponse)(handlers.on_compare)
     agent.include(chat, publish_manifest=not local)
     agent.include(api, publish_manifest=not local)
+    agent.include(planning, publish_manifest=not local)
 
     @agent.on_rest_get("/healthz", HealthResponse)
     async def health(ctx: Context):

@@ -13,7 +13,7 @@ from uagents_core.contrib.protocols.chat import (
 
 from blr_air.agent_runtime import AgentHandlers
 from blr_air.domain import ProviderError
-from blr_air.models import WindowRequest, WindowResponse
+from blr_air.models import ComparisonRequest, ComparisonResponse, WindowRequest, WindowResponse
 from blr_air.telemetry import Usage
 
 
@@ -80,6 +80,45 @@ async def test_typed_provider_failure_returns_structured_error(tmp_path):
     assert isinstance(reply, WindowResponse)
     assert reply.status == "error" and reply.error_code == "provider_unavailable"
     assert reply.start is None and reply.us_aqi is None
+
+
+async def test_typed_comparison_returns_ranked_places(tmp_path):
+    import httpx
+
+    from blr_air.demo import DemoProvider
+    from blr_air.service import AirService
+
+    ctx = Context()
+    async with httpx.AsyncClient() as client:
+        handler = AgentHandlers(
+            AirService(DemoProvider(), client), Usage(tmp_path / "usage.sqlite", "test-salt")
+        )
+        await handler.on_compare(
+            ctx, "planner", ComparisonRequest(places=["HSR Layout", "Whitefield"])
+        )
+    reply = ctx.sent[0]
+    assert isinstance(reply, ComparisonResponse)
+    assert reply.status == "ok" and reply.winner == "HSR Layout"
+    assert [item.place for item in reply.results] == ["HSR Layout", "Whitefield"]
+    assert reply.results[0].backups[0].start
+    assert reply.results[0].source == "Synthetic offline demo"
+
+
+async def test_single_place_plan_enforces_limits(tmp_path):
+    import httpx
+
+    from blr_air.demo import DemoProvider
+    from blr_air.models import PlanRequest
+    from blr_air.service import AirService
+
+    ctx = Context()
+    async with httpx.AsyncClient() as client:
+        handler = AgentHandlers(
+            AirService(DemoProvider(), client), Usage(tmp_path / "usage.sqlite", "test-salt")
+        )
+        await handler.on_compare(ctx, "planner", PlanRequest(places=["HSR Layout"], max_aqi=1))
+    assert ctx.sent[0].status == "error"
+    assert ctx.sent[0].results == []
 
 
 @pytest.mark.parametrize(

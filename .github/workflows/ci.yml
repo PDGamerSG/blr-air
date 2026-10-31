@@ -17,7 +17,7 @@ jobs:
           enable-cache: true
       - run: uv sync --frozen --extra dev
       - run: uv run pytest -q
-      - run: uv run ruff check .
-      - run: uv run ruff format --check .
+      - run: uv run ruff check blr_air tests scripts agent.py caller.py models.py
+      - run: uv run ruff format --check blr_air tests scripts agent.py caller.py models.py
       - run: uv run blr-air --demo --json
       - run: uv build

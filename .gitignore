@@ -17,3 +17,5 @@ data/
 .DS_Store
 /reports/
 /research_notes/
+/artifacts/
+/scripts/evidence/

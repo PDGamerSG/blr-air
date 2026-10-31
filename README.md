@@ -38,6 +38,42 @@ python -m blr_air --latitude 12.9116 --longitude 77.6389 --hours 2
 python -m blr_air --place 'New York, US' --day tomorrow --period morning
 ```
 
+## Compare places, keep backups, and set your limits
+
+Every recommendation now includes up to **two non-overlapping backup windows**. Compare two or three places to rank each at its own best eligible time; this does not compare them at one simultaneous hour. Tied scores are disclosed and preserve input order. If a place cannot be evaluated, the reply identifies the missing result.
+
+```sh
+uv run blr-air 'compare HSR Layout and Whitefield for a run tomorrow morning'
+uv run blr-air --compare 'Paris, France' --compare 'London, UK' --hours 2 --json
+uv run blr-air --place 'HSR Layout' --day tomorrow --period morning \
+  --max-aqi 100 --max-rain 30 --max-temperature 30 --max-uv 5 --max-wind 20 --daylight-only
+```
+
+Limits apply to **every hour**, not averages. `--max-temperature` means apparent/feels-like temperature in °C; wind is km/h, rain is percent, and AQI is US AQI. Missing values cannot pass a requested limit. If no slot qualifies, the agent explains this and never relaxes your limits automatically. These are user preferences, not medically validated safety thresholds.
+
+Replies include apparent temperature, UV, wind and whether the whole block is between modelled sunrise and sunset. `--daylight-only` additionally requires that full interval. The usual 05:00–21:00 activity-hours restriction still applies. Optional weather context can be unavailable without making up values.
+
+English chat can use `AQI at most 100`, `rain at most 30%`, `feels like at most 30C`, `UV at most 5`, `wind at most 20 km/h`, and `daylight only`. Explicit Fahrenheit, mph and m/s limits are converted to °C and km/h; CLI/API fields always use those canonical units. Repeated limits use the stricter bound. The local parser rejects numeric limit wording it cannot interpret. ASI:One supports more flexible language. CLI flags and the typed API provide exact control.
+
+## Calendar and voice
+
+Save the selected window, or the winning place's window, to a new calendar file:
+
+```sh
+uv run blr-air --place 'HSR Layout' --activity run --calendar run.ics
+```
+
+Import the `.ics` into your calendar. It is one event with UTC timestamps, source/freshness notes and a reminder to recheck conditions. It does not book a venue, sync a calendar account or promise recurring future forecasts. Existing output files are never overwritten.
+
+Optional voice uses **Sarvam** for speech and the same ASI:One/Open-Meteo planning service for the answer. Put `SARVAM_API_KEY` in your private `.env` once:
+
+```sh
+uv run blr-air --audio-input request.wav --audio-output answer.wav --json
+uv run blr-air 'compare HSR Layout and Koramangala for a run' --audio-output answer.wav
+```
+
+Input is a local 16-bit PCM WAV, mono/stereo, 8–48 kHz, up to 30 seconds and 10 MiB. Use `--audio-language hi-IN` or `kn-IN` if needed; default is automatic detection. Audio goes to Sarvam for transcription; the transcript goes to ASI:One when configured. Replies are spoken **in English** and saved as private WAV files. No microphone recording or remote audio URL downloading is performed. Voice is a CLI feature; the ASI:One agent interface continues to accept text. The text-only application uses ASI:One as its sole LLM; confirm the separate challenge's rules before submitting voice-enabled evidence.
+
 Inputs support `run`, `cycle`, `walk`, `commute`, `kids`; duration `1` or `2`; day `next48`, `today`, `tomorrow`; period `any`, `morning`, `afternoon`, `evening`. Exact clock-time requests are rejected with guidance. CLI errors return nonzero exit codes. Use `--json` for structured results.
 
 ## Run the Agentverse mailbox agent
@@ -83,6 +119,20 @@ await ctx.send(BLR_AIR_ADDRESS, request)
 
 Success returns `status="ok"`, offset-aware `start`/`end`, `timezone`, mean `us_aqi`/`pm2_5`, peak `rain_probability`/`temperature`, `max_aqi`, `fetched_at`, `source`, and a readable `summary`. Always check status first. A valid request that cannot be fulfilled returns `status="error"`, `error_code`, and `summary`; measurements remain null. Invalid coordinates or durations are rejected by the wire schema.
 
+The existing wire schemas are unchanged. The new **`blr-air-plan` v0.1.0** protocol accepts `PlanRequest` for one to three place names, supports all user limits and daylight, and returns numeric best/backup windows:
+
+```python
+from blr_air.models import PlanRequest, PlanResponse
+
+await ctx.send(BLR_AIR_ADDRESS, PlanRequest(
+    places=["HSR Layout", "Whitefield"], hours=2, activity="run",
+    day="tomorrow", period="morning", max_aqi=100, max_rain=30,
+    daylight_only=True,
+))
+```
+
+`PlanResponse` includes `winner`, `tied_places`, `partial`, and `results`. Each successful result has `resolved_name`, `timezone`, `window`, `backups`, `source`, and `fetched_at`. Every window includes all numeric metrics and category; failed places contain an explanation. Check `status` and `partial` before using the winner. A targeted transport compatibility fix rejects malformed Pydantic-v1 wire messages without killing uAgents 0.26.1's processing loop.
+
 Set `BLR_AIR_ADDRESS` in `.env`, then `python caller.py`. Connect its own Inspector/mailbox too. The caller sends once after 30 seconds; after first-time registration restart it if needed to demonstrate the response.
 
 For a fully local signed agent-message exchange, start `python agent.py --local`, copy the address from `doctor`, and run:
@@ -122,12 +172,15 @@ See [deployment instructions](docs/deployment.md) for Docker, persistent identit
 
 ```sh
 uv run pytest -q
-uv run ruff check .
-uv run ruff format --check .
+uv run ruff check blr_air tests scripts agent.py caller.py models.py
+uv run ruff format --check blr_air tests scripts agent.py caller.py models.py
 uv run blr-air --demo --json
+uv run python scripts/check_live.py --run-live
 ```
 
-Tests cover window boundaries, missing values, retries, timezone/DST behaviour, parsing, schema validation, chat/error semantics, telemetry persistence and CLI execution. See [verification record](docs/verification.md) for the checks actually performed on this build.
+Tests cover window boundaries, comparisons/backups, hard limits, sunlight, missing values, retries, timezone/DST behaviour, parsing, schema validation, malformed-wire recovery, chat/error semantics, calendar, voice validation, telemetry persistence and CLI execution. The explicit live harness uses your configured ASI key, Open-Meteo, the running Docker service, and disposable local agents for signed chat callbacks; it makes real API calls and counts as developer traffic. See [verification record](docs/verification.md) and [machine-readable live evidence](docs/live-checks.json).
+
+Feature choices and limits are supported by [official-source research](docs/research/feature-opportunities.md) and [voice API research](docs/research/voice-options.md). Neo4j is deferred: route planning could use a road graph later, but coarse CAMS data cannot justify street-level pollution claims and a graph adds no value to this hourly-window calculation.
 
 ## Hackathon evidence
 

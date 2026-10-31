@@ -44,6 +44,26 @@ def merge_forecasts(aq: dict, wx: dict, fetched_at: datetime) -> Forecast:
         ZoneInfo(timezone)
         air = hourly_map(aq, ("us_aqi", "pm2_5"))
         weather = hourly_map(wx, ("precipitation_probability", "temperature_2m"))
+        extra = {}
+        for field in ("apparent_temperature", "uv_index", "wind_speed_10m"):
+            if field in wx["hourly"]:
+                extra[field] = hourly_map(wx, (field,))
+
+        def optional(field, timestamp, minimum=0, maximum=200):
+            value = extra.get(field, {}).get(timestamp, [None])[0]
+            return value if number(value, minimum=minimum, maximum=maximum) else None
+
+        daylight = []
+        daily = wx.get("daily") or {}
+        for rise, setting in zip(daily.get("sunrise", []), daily.get("sunset", []), strict=False):
+            if (
+                number(rise, minimum=1, maximum=4102444800)
+                and number(setting, minimum=1, maximum=4102444800)
+                and setting > rise
+            ):
+                daylight.append(
+                    (datetime.fromtimestamp(rise, UTC), datetime.fromtimestamp(setting, UTC))
+                )
         rows = []
         for timestamp, (aqi, pm) in sorted(air.items()):
             if timestamp not in weather:
@@ -55,7 +75,18 @@ def merge_forecasts(aq: dict, wx: dict, fetched_at: datetime) -> Forecast:
                 and number(rain, maximum=100)
                 and number(temp, minimum=-100, maximum=70)
             ):
-                rows.append(Hour(timestamp, aqi, pm, rain, temp))
+                rows.append(
+                    Hour(
+                        timestamp,
+                        aqi,
+                        pm,
+                        rain,
+                        temp,
+                        optional("apparent_temperature", timestamp, -100, 100),
+                        optional("uv_index", timestamp, 0, 100),
+                        optional("wind_speed_10m", timestamp, 0, 500),
+                    )
+                )
         current = None
         raw = aq.get("current") or {}
         if (
@@ -68,7 +99,7 @@ def merge_forecasts(aq: dict, wx: dict, fetched_at: datetime) -> Forecast:
             )
         if not rows:
             raise ValueError("No complete forecast hours")
-        return Forecast(tuple(rows), current, timezone, fetched_at)
+        return Forecast(tuple(rows), current, timezone, fetched_at, daylight=tuple(daylight))
     except (KeyError, TypeError, ValueError, OverflowError, ZoneInfoNotFoundError) as exc:
         raise ProviderError(
             "Open-Meteo returned incomplete forecast data. Please try again shortly."
@@ -115,7 +146,11 @@ class OpenMeteo:
                 str(hit.get(field, "")).casefold()
                 for field in ("admin1", "admin2", "country", "country_code")
             }
-            if any(part.casefold() not in qualifiers for part in parts[1:]):
+            aliases = {"uk": "gb", "usa": "us", "u.s.": "us", "u.k.": "gb"}
+            if any(
+                aliases.get(part.casefold(), part.casefold()) not in qualifiers
+                for part in parts[1:]
+            ):
                 continue
             if not number(hit.get("latitude"), minimum=-90, maximum=90) or not number(
                 hit.get("longitude"), minimum=-180, maximum=180
@@ -147,7 +182,14 @@ class OpenMeteo:
         aq, wx = await asyncio.gather(
             self.get_json(AIR_URL, {**common, "current": "us_aqi,pm2_5", "hourly": "us_aqi,pm2_5"}),
             self.get_json(
-                WEATHER_URL, {**common, "hourly": "precipitation_probability,temperature_2m"}
+                WEATHER_URL,
+                {
+                    **common,
+                    "hourly": "precipitation_probability,temperature_2m,"
+                    "apparent_temperature,uv_index,wind_speed_10m",
+                    "daily": "sunrise,sunset",
+                    "wind_speed_unit": "kmh",
+                },
             ),
         )
         forecast = merge_forecasts(aq, wx, datetime.now(UTC))

@@ -49,7 +49,10 @@ Stop the normal service first if it is using the same port or identity. `docker 
 - If Open-Meteo fails, users receive an explicit retry message. There are bounded retries and a five-minute cache, without a fabricated or stale fallback.
 - After a restart, requests work immediately; the cache is rebuilt and usage counters persist.
 - The direct uAgents server binds all interfaces. Docker Compose limits exposure to loopback; for a non-container host, use its firewall to keep the Inspector and service port private.
+- uAgents 0.26.1 mixes Pydantic v1 wire models with a v2 exception handler. `ResilientAgent` catches the missed v1 validation error, responds on the same session and leaves the queue running. The opt-in live checks send an invalid signed request to a disposable agent and then a valid one; an HTTP health response alone would not detect the original dead queue.
 - Keep the process alive through judging. Use the host's own uptime monitoring and verify Active status in Agentverse regularly.
+
+Changing an environment key requires `docker compose up -d --force-recreate`; merely restarting a container does not reload the env file. `SARVAM_API_KEY` is optional and only used by the CLI voice path. New clones can leave it empty. The existing agent address and `blr-air-window` wire schemas remain stable when enabling the separate `blr-air-plan` protocol.
 
 ## Updating
 
