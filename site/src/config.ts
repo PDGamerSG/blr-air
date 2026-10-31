@@ -4,7 +4,7 @@ export const PLANNER_ADDRESS = "agent1qtehmnqextcf6czcujeq3yfh5umr2qtz4cxyxknve5
 export const AGENT_HANDLE = "@blr-air";
 
 export const LINKS = {
-  asiOne: "https://asi1.ai/chat",
+  asiOne: `https://asi1.ai/ai/${AGENT_ADDRESS}`,
   agentverse: `https://agentverse.ai/agents/details/${AGENT_ADDRESS}/profile`,
   agentverseHome: "https://agentverse.ai/",
   github: "https://github.com/PDGamerSG/blr-air",
