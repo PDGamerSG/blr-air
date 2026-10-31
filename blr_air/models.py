@@ -91,6 +91,21 @@ class PlanResponse(Model):
     error_code: str | None = None
 
 
+class DetailedPlanRequest(PlanRequest):
+    """Version 0.2 request; preserves the published 0.1 request schema."""
+
+    include_venue: StrictBool = False
+
+
+class DetailedPlaceComparison(PlaceComparison):
+    assessment: dict | None = None
+    venue: dict | None = None
+
+
+class DetailedPlanResponse(PlanResponse):
+    results: list[DetailedPlaceComparison] = Field(default_factory=list)
+
+
 # Names retained for callers of the comparison helper during development.
 ComparisonRequest = PlanRequest
 ComparisonResponse = PlanResponse

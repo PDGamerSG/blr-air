@@ -1,5 +1,6 @@
 import argparse
 import os
+import re
 from collections import deque
 from datetime import UTC, datetime
 from pathlib import Path
@@ -21,6 +22,9 @@ from blr_air.domain import AirError, Location, NoWindowError, ProviderError, Req
 from blr_air.models import (
     ComparisonRequest,
     ComparisonResponse,
+    DetailedPlaceComparison,
+    DetailedPlanRequest,
+    DetailedPlanResponse,
     HealthResponse,
     PlaceComparison,
     WindowOption,
@@ -38,6 +42,88 @@ from blr_air.service import (
 )
 from blr_air.telemetry import Usage
 from blr_air.transport import ResilientAgent
+from blr_air.venues import GooglePlaces
+
+
+def chat_guidance(text: str) -> str | None:
+    command = re.sub(r"@blr-air\b", "", text, flags=re.I)
+    command = " ".join(command.casefold().split()).strip(" .!?")
+    reminder = re.match(
+        r"^(?:(?:can|could|would) you )?(?:please )?"
+        r"(?:remind me|notify me|send me alerts)\b(.*)",
+        command,
+    )
+    scheduling = (
+        reminder
+        and not re.match(r"\s+(?:what|why|how|who|which|whether)\b", reminder[1])
+        and re.search(
+            r"\b(?:before|after|tomorrow|tonight|today|daily|weekly|every|"
+            r"minutes?|hours?)\b|\bat \d",
+            reminder[1],
+        )
+    )
+    if (
+        command
+        in {
+            "updates",
+            "update",
+            "refresh",
+            "how do i get updates",
+            "how will i get updates",
+        }
+        or scheduling
+    ):
+        return (
+            "**How to get forecast updates**\n\n"
+            "1. Send the **same full request** again before leaving. Include your place, "
+            "activity, duration and limits; each request is independent. "
+            "On the outing date, change **tomorrow** to **today**.\n"
+            "2. Check **Forecast retrieved** in the reply. Data may be cached for up to "
+            "**5 minutes**, so an immediate recheck can show the same timestamp.\n"
+            "3. Open **Add this window to Google Calendar** in your forecast reply, "
+            "set a notification **1 hour before**, then save. Or import the website/CLI "
+            "**calendar file**, which includes a one-hour recheck reminder. The event "
+            "description contains your event-day prompt; "
+            "the saved event does not update itself.\n\n"
+            "**No automatic alerts are scheduled by this chat agent.**\n\n"
+            "Try:\n\n```text\n@blr-air best 1-hour window to run in HSR Layout "
+            "tomorrow morning\n```"
+        )
+    if command in {
+        "",
+        "help",
+        "start",
+        "hi",
+        "hello",
+        "hey",
+        "how do i use this",
+        "how to use",
+        "what can you do",
+        "what do you do",
+        "tell me what you were created to do",
+    }:
+        return (
+            "**Find a better time to go outside**\n\n"
+            "Ask naturally: general questions, air-quality explanations, current conditions "
+            "or outdoor planning. These examples are optional. In ASI:One, include "
+            "**@blr-air** so your request reaches this agent.\n\n"
+            "**Ask a question**\n\n```text\n@blr-air What does US AQI 150 mean?\n"
+            "@blr-air Will I need an umbrella in HSR tomorrow?\n```\n\n"
+            "**Plan an outing**\n\n```text\n@blr-air best 1-hour window to run in HSR Layout "
+            "tomorrow morning\n```\n\n"
+            "**Add your preferences**\n\n```text\n@blr-air walk in Cubbon Park tomorrow "
+            "morning with AQI at most 100, rain at most 30%, daylight only\n```\n\n"
+            "**Compare places**\n\n```text\n@blr-air compare HSR Layout and Whitefield "
+            "for a 2-hour cycle tomorrow morning\n```\n\n"
+            "For outdoor plans, I return a recommended time, conditions, precautions, backup "
+            "options, a calendar link and a retrieval timestamp. "
+            "Use a city and country outside Bengaluru. "
+            "Activities: run, walk, cycle, commute or take children outside. "
+            "Supported: today, tomorrow or the next 48 hours; morning, afternoon or evening."
+            "\n\n**Updates:** send the same full request again. Send `@blr-air updates` "
+            "for refresh and reminder options. Each request is independent."
+        )
+    return None
 
 
 class AgentHandlers:
@@ -64,20 +150,22 @@ class AgentHandlers:
         if not text and any(isinstance(part, EndSessionContent) for part in msg.content):
             return
         success = False
-        if not text:
-            reply = (
-                "Ask me: 'best 1-hour window to run in HSR Layout'. I also support other cities."
-            )
+        guidance = chat_guidance(text)
+        if guidance is not None:
+            reply = guidance
         else:
             try:
                 result = await self.service.chat(text)
-                reply = describe(result)
+                reply = result if isinstance(result, str) else describe(result)
                 success = not isinstance(result, ComparisonResult) or result.winner is not None
             except AirError as exc:
-                reply = str(exc)
+                reply = (
+                    f"**I couldn't complete that request**\n\n{exc}\n\n"
+                    "You can rephrase naturally or send `@blr-air help` for examples."
+                )
             except Exception:
                 ctx.logger.exception("Chat request failed")
-                reply = "I couldn't complete that forecast lookup. Please try again in a minute."
+                reply = "I couldn't complete that request. Please try again in a minute."
             self.track(ctx, sender, success, "chat")
         await ctx.send(
             sender,
@@ -138,6 +226,9 @@ class AgentHandlers:
         await ctx.send(sender, reply)
 
     async def on_compare(self, ctx: Context, sender: str, req: ComparisonRequest):
+        detailed = isinstance(req, DetailedPlanRequest)
+        response_type = DetailedPlanResponse if detailed else ComparisonResponse
+        place_type = DetailedPlaceComparison if detailed else PlaceComparison
         try:
             request = RequestSpec.model_validate({**req.dict(), "place": req.places[0]})
             if len(req.places) == 1:
@@ -154,7 +245,7 @@ class AgentHandlers:
             for item in result.items:
                 if item.recommendation is None:
                     results.append(
-                        PlaceComparison(
+                        place_type(
                             place=item.place,
                             status="error",
                             summary=item.error or "Forecast unavailable",
@@ -165,7 +256,7 @@ class AgentHandlers:
                 recommendation = item.recommendation
                 data = recommendation.to_dict()
                 results.append(
-                    PlaceComparison(
+                    place_type(
                         place=item.place,
                         status="ok",
                         summary=describe(recommendation),
@@ -176,11 +267,13 @@ class AgentHandlers:
                         backups=[
                             WindowOption(**window_dict(backup)) for backup in recommendation.backups
                         ],
+                        assessment=recommendation.to_dict()["assessment"],
+                        venue=recommendation.venue,
                         fetched_at=data["fetched_at"],
                         source=data["source"],
                     )
                 )
-            reply = ComparisonResponse(
+            reply = response_type(
                 status="ok" if result.winner else "error",
                 summary=describe(result),
                 winner=result.winner,
@@ -189,10 +282,10 @@ class AgentHandlers:
                 tied_places=result.tied_places,
             )
         except AirError as exc:
-            reply = ComparisonResponse(status="error", summary=str(exc), error_code="no_plan")
+            reply = response_type(status="error", summary=str(exc), error_code="no_plan")
         except Exception:
             ctx.logger.exception("Comparison request failed")
-            reply = ComparisonResponse(
+            reply = response_type(
                 status="error",
                 summary="Planning failed. Please try again.",
                 error_code="comparison_failed",
@@ -217,11 +310,12 @@ def create_agent(
         client,
         api_key=os.getenv("ASI1_API_KEY"),
         base_url=os.getenv("ASI1_BASE_URL", "https://api.asi1.ai/v1"),
+        venues=GooglePlaces(client, os.getenv("GOOGLE_PLACES_API_KEY", "")),
     )
     handlers = AgentHandlers(service, Usage(data_dir / "usage.sqlite", seed))
     readme = Path(__file__).with_name("AGENT_README.md")
     agent = ResilientAgent(
-        name="blr-air",
+        name="BLR Air Window",
         seed=seed,
         port=port,
         mailbox=not local,
@@ -234,7 +328,10 @@ def create_agent(
         store_message_history=False,
         report_events=not local,
         mark_inactive_on_shutdown=not local,
-        description="Best outdoor window by AQI, PM2.5, rain and heat in Bengaluru or any city.",
+        description=(
+            "Conversational help with live AQI/weather and outdoor planning "
+            "in Bengaluru or any city."
+        ),
     )
     chat = Protocol(spec=chat_protocol_spec)
     chat.on_message(ChatMessage)(handlers.on_chat)
@@ -243,9 +340,12 @@ def create_agent(
     api.on_message(model=WindowRequest, replies=WindowResponse)(handlers.on_window)
     planning = Protocol(name="blr-air-plan", version="0.1.0")
     planning.on_message(model=ComparisonRequest, replies=ComparisonResponse)(handlers.on_compare)
+    details = Protocol(name="blr-air-plan", version="0.2.0")
+    details.on_message(model=DetailedPlanRequest, replies=DetailedPlanResponse)(handlers.on_compare)
     agent.include(chat, publish_manifest=not local)
     agent.include(api, publish_manifest=not local)
     agent.include(planning, publish_manifest=not local)
+    agent.include(details, publish_manifest=not local)
 
     @agent.on_rest_get("/healthz", HealthResponse)
     async def health(ctx: Context):

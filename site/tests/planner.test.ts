@@ -7,13 +7,13 @@ import { initPlanner, safeExternalUrl, encodePcmWav } from '../src/ui/planner.ts
 const html = readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const turn = () => new Promise(resolve=>setTimeout(resolve,30));
 
-function setup(handler: (url: string, init?: RequestInit)=>Promise<Response>) {
+function setup(handler: (url: string, init?: RequestInit)=>Promise<Response>, plannerOnline = true) {
   const window = new Window({ url:'http://localhost:8080', settings:{disableJavaScriptFileLoading:true,disableCSSFileLoading:true,disableComputedStyleRendering:true} });
   window.document.write(html.replace(/<script[\s\S]*?<\/script>/g,''));
   Object.assign(globalThis,{window,document:window.document,HTMLElement:window.HTMLElement,HTMLButtonElement:window.HTMLButtonElement,DOMException:window.DOMException});
   Object.defineProperty(globalThis,'navigator',{value:window.navigator,configurable:true});
   globalThis.fetch = async (url,init) => String(url)==='/api/status'
-    ? new Response(JSON.stringify({status:'ok',features:{language:true,voice:true,venues:true}}),{headers:{'content-type':'application/json'}})
+    ? new Response(JSON.stringify(plannerOnline ? {status:'ok',features:{language:true,voice:true,venues:true}} : {status:'error'}),{status:plannerOnline ? 200 : 503,headers:{'content-type':'application/json'}})
     : handler(String(url),init);
   initPlanner();
   const submit=(query='run in HSR Layout')=>{
@@ -102,4 +102,46 @@ test('planner readiness resolves false when the planner mount is absent', async 
   } finally {
     window.happyDOM.abort();
   }
+});
+
+test('unavailable planner sends typed requests and examples to the published agent', async () => {
+  const requests: string[] = [];
+  const opened: string[] = [];
+  const copied: string[] = [];
+  const env = setup(async (url) => {
+    requests.push(url);
+    return new Response(JSON.stringify({error:'Planning service unavailable'}), {status:503});
+  }, false);
+  env.window.open = ((url: string) => { opened.push(url); return null; }) as typeof env.window.open;
+  Object.defineProperty(env.window.navigator, 'clipboard', {
+    configurable:true,
+    value:{writeText:async (text: string) => { copied.push(text); }},
+  });
+  try {
+    await turn();
+    env.submit('best 2-hour run in HSR Layout tomorrow morning with AQI at most 100');
+    assert.equal(opened.length, 1, 'open during the submit gesture, before clipboard work finishes');
+    await turn();
+    assert.deepEqual(requests, []);
+    assert.equal(opened[0], 'https://asi1.ai/ai/agent1q2z89ttne7p57zq7r473lrc5jan899raacv6sjqj9eymk7kdqzkwkxhcwg3');
+    assert.equal(copied[0], '@blr-air best 2-hour run in HSR Layout tomorrow morning with AQI at most 100');
+    assert.match(env.window.document.querySelector('[data-plan-submit]')!.textContent!, /ASI:One/);
+    assert.match(env.window.document.querySelector('[data-plan-status]')!.textContent!, /[Pp]aste/);
+    (env.window.document.querySelectorAll('[data-plan-example]')[2] as HTMLButtonElement).click();
+    await turn();
+    assert.equal(opened[1], opened[0]);
+    assert.match(copied[1], /^@blr-air .*wind at most 20 km\/h and UV at most 5/);
+    env.submit('@blr-air walk in Indiranagar tomorrow evening');
+    await turn();
+    assert.equal(copied[2], '@blr-air walk in Indiranagar tomorrow evening');
+    Object.defineProperty(env.window.navigator, 'clipboard', {
+      configurable:true,
+      value:{writeText:async () => { throw new Error('Clipboard denied'); }},
+    });
+    env.submit('walk in Paris, France today');
+    await turn();
+    assert.equal(opened[3], opened[0]);
+    assert.match(env.window.document.querySelector('[data-plan-status]')!.textContent!, /@blr-air walk in Paris, France today/);
+    assert.deepEqual(requests, []);
+  } finally { env.cleanup(); }
 });

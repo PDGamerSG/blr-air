@@ -40,7 +40,15 @@ from uagents_core.identity import Identity
 from uagents_core.models import ERROR_MESSAGE_DIGEST, Model
 
 from blr_air.domain import AirError, LocationError, RequestSpec
-from blr_air.models import PlanRequest, PlanResponse, WindowRequest, WindowResponse
+from blr_air.localities import local_location
+from blr_air.models import (
+    DetailedPlanRequest,
+    DetailedPlanResponse,
+    PlanRequest,
+    PlanResponse,
+    WindowRequest,
+    WindowResponse,
+)
 from blr_air.parsing import parse_local, parse_request
 from blr_air.providers import AIR_URL, GEOCODING_URL, WEATHER_URL, OpenMeteo
 from blr_air.service import SOURCE, AirService
@@ -264,7 +272,10 @@ class LiveChecks:
                     api_key=key,
                     base_url=os.getenv("ASI1_BASE_URL", "https://api.asi1.ai/v1"),
                 )
-        require(result.place.casefold() == "hsr layout", "ASI did not retain the requested place")
+        require(
+            local_location(result.place) == local_location("HSR Layout"),
+            "ASI did not retain the requested locality",
+        )
         require(
             (result.activity, result.hours, result.day, result.period)
             == ("cycle", 2, "tomorrow", "morning"),
@@ -544,12 +555,19 @@ class LiveChecks:
                         require(bool(text), "Chat did not return a text answer")
                         return msg, text
 
-                    valid, answer = await chat("best 1-hour window to run in HSR Layout")
+                    valid, answer = await chat(
+                        "best 1-hour window to run in HSR Layout with reviews"
+                    )
                     require(
                         "Best available" in answer and "Open-Meteo" in answer,
                         "Chat did not return a successful live recommendation",
                     )
                     self.partial["successful_chat_ack_text_end_session"] = True
+                    require(
+                        "Map:" in answer and "Venue" in answer,
+                        "Chat omitted location context or requested venue information",
+                    )
+                    self.partial["aqi_location_assessment_and_venue_status_in_chat"] = True
                     _, duration_error = await chat("best 3-hour window to run in HSR Layout")
                     require(
                         "1" in duration_error and "2" in duration_error,
@@ -690,6 +708,20 @@ class LiveChecks:
                         },
                         "Plan/legacy responses were not reflected in usage counters",
                     )
+                    detail_request = DetailedPlanRequest(places=["Cubbon Park"], include_venue=True)
+                    detail_env = make_envelope(identity, target["address"], detail_request)
+                    await post_envelope(client, endpoint + "/submit", detail_env)
+                    detailed_answer = await next_message(DetailedPlanResponse, detail_env.session)
+                    require(detailed_answer.status == "ok", "Detailed plan failed")
+                    require(
+                        bool(detailed_answer.results[0].assessment), "Detailed assessment missing"
+                    )
+                    require(detailed_answer.results[0].venue is not None, "Venue status missing")
+                    self.partial["detailed_plan_v02"] = {
+                        "status": detailed_answer.status,
+                        "venue_status": detailed_answer.results[0].venue["status"],
+                        "category": detailed_answer.results[0].assessment["aqi"]["category"],
+                    }
                 await stop_process(process)
                 process = None
             return {
@@ -706,6 +738,7 @@ class LiveChecks:
                 "hard_limit_no_plan": impossible_reply.model_dump(),
                 "v1_schema_digests_unchanged": True,
                 "v1_request_passed_after_plan_requests": True,
+                "detailed_plan_v02": self.partial["detailed_plan_v02"],
             }
         finally:
             if process is not None:

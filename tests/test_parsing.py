@@ -295,3 +295,35 @@ async def test_asi_fahrenheit_conversion_is_not_overridden_with_celsius_number()
             "run in New York with feels like under 50 F", client, api_key="test"
         )
     assert q.max_temperature == 10
+
+
+@pytest.mark.parametrize(
+    "text,place",
+    [
+        ("reviews of Central Park, New York", "Central Park, New York"),
+        ("walk in Cubbon Park tomorrow with customer reviews", "Cubbon Park"),
+        ("show ratings for Lalbagh", "Lalbagh"),
+    ],
+)
+def test_venue_review_intent_retains_location(text, place):
+    q = parse_local(text)
+    assert q.place == place
+    assert q.include_venue is True
+
+
+def test_review_phrase_cannot_consume_following_limits_and_date():
+    q = parse_local("run in Cubbon Park with reviews tomorrow morning AQI at most 30")
+    assert (q.day, q.period, q.max_aqi) == ("tomorrow", "morning", 30)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "show opening hours for Royal Botanic Gardens, Melbourne tomorrow morning",
+        "accessibility of Royal Botanic Gardens, Melbourne tomorrow morning",
+    ],
+)
+def test_venue_facility_intent_preserves_exact_named_place(text):
+    q = parse_local(text)
+    assert q.place == "Royal Botanic Gardens, Melbourne"
+    assert q.include_venue and q.day == "tomorrow" and q.period == "morning"

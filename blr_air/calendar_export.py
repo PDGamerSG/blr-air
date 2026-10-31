@@ -5,7 +5,7 @@ from pathlib import Path
 from uuid import NAMESPACE_URL, uuid5
 
 from blr_air.domain import AirError
-from blr_air.service import LIMITATION, SOURCE, Recommendation
+from blr_air.service import LIMITATION, SOURCE, Recommendation, request_prompt
 
 
 def _text(value: str) -> str:
@@ -72,6 +72,8 @@ def write_calendar(
         f"Source: {source}. Forecast retrieved {fetched.isoformat()}.",
         "This event is a forecast snapshot and does not update. "
         "Re-check BLR Air before going outside; conditions can change.",
+        "On the event date, send: "
+        + request_prompt(recommendation.request.model_copy(update={"day": "today"})),
         "A best available window can still have unhealthy air and is not a guarantee of safety.",
         LIMITATION,
     ]

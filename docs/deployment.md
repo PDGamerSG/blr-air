@@ -52,9 +52,11 @@ Stop the normal service first if it is using the same port or identity. `docker 
 - uAgents 0.26.1 mixes Pydantic v1 wire models with a v2 exception handler. `ResilientAgent` catches the missed v1 validation error, responds on the same session and leaves the queue running. The opt-in live checks send an invalid signed request to a disposable agent and then a valid one; an HTTP health response alone would not detect the original dead queue.
 - Keep the process alive through judging. Use the host's own uptime monitoring and verify Active status in Agentverse regularly.
 
-Changing an environment key requires `docker compose up -d --force-recreate`; merely restarting a container does not reload the env file. `SARVAM_API_KEY` is optional and only used by the CLI voice path. New clones can leave it empty. The existing agent address and `blr-air-window` wire schemas remain stable when enabling the separate `blr-air-plan` protocol.
+Changing an environment key requires `docker compose up -d --force-recreate`; merely restarting a container does not reload the env file. `SARVAM_API_KEY` is optional and used by the CLI and website voice paths. New clones can leave it empty. The existing agent address and `blr-air-window` wire schemas remain stable when enabling the separate `blr-air-plan` protocol.
 
 ## Updating
+
+The optional website API is a separate `web` Compose service on `127.0.0.1:8082`; the signed agent keeps port 8001 and its identity. It supports forecast requests, venue lookup, calendar download and voice without routing through Agentverse. Use [agent-http-api.md](agent-http-api.md) when connecting a separately deployed static frontend. `SARVAM_API_KEY` is used by the CLI and this HTTP service, while the Agentverse chat channel remains text-only. `GOOGLE_PLACES_API_KEY` enables authentic venue data only when the provider accepts the key and project configuration.
 
 ```sh
 git pull --ff-only

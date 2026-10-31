@@ -1,0 +1,17 @@
+*
+!Dockerfile.web
+!pyproject.toml
+!uv.lock
+!README.md
+!LICENSE
+!blr_air/
+!blr_air/**
+!site/
+!site/**
+site/node_modules
+site/dist
+site/.21st
+site/blender
+site/.env*
+**/__pycache__
+**/*.pyc

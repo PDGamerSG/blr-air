@@ -1,0 +1,123 @@
+{
+  "checked_at": "2026-10-31T11:59:59.235238+00:00",
+  "scope": "Developer checks of deployed local Docker services and live Agentverse mailbox chat; not outside-user evidence.",
+  "agent": "agent1q2z89ttne7p57zq7r473lrc5jan899raacv6sjqj9eymk7kdqzkwkxhcwg3",
+  "selected_update_experience": "Fresh forecast when asked, plus a calendar reminder to recheck",
+  "checks": {
+    "python_tests": {
+      "passed": 251
+    },
+    "website_tests": {
+      "passed": 6
+    },
+    "ruff_lint_and_format": "passed",
+    "docker_agent_and_web_builds": "passed",
+    "docker_health": "both healthy",
+    "signed_request_to_deployed_agent": "ok",
+    "agentverse_authenticated_mailbox_read": 200,
+    "agentverse_manual_forecast": "passed: structured reply and usable Google Calendar link",
+    "agentverse_manual_updates": "passed: on-demand forecast, cache disclosure, manual reminder saving",
+    "public_usage_guide": "updated and saved in Agentverse",
+    "exact_calendar_window_and_one_hour_alarm": "passed",
+    "event_day_prompt_uses_today": "passed",
+    "immediate_recheck_discloses_cache_reuse": "passed"
+  },
+  "logo": {
+    "source": "site/public/favicon.svg",
+    "svg_sha256": "3c159c615e7900f69f860e77aa5cd4df30f4d93b02168187e984e2ff3bae2013",
+    "upload": "assets/avatar.png",
+    "upload_dimensions": [
+      512,
+      512
+    ],
+    "published_url": "https://storage.googleapis.com/agentverse-prod-assets/agent-avatars-pub/1103462814.png",
+    "verification": "Agentverse avatar URL changed after Confirm; profile screenshot shows matching UFO favicon"
+  },
+  "live_example": {
+    "location": {
+      "name": "HSR Layout, Bengaluru",
+      "latitude": 12.9116,
+      "longitude": 77.6389,
+      "timezone": "Asia/Kolkata"
+    },
+    "request": {
+      "place": "HSR Layout",
+      "activity": "run",
+      "hours": 1,
+      "day": "tomorrow",
+      "period": "morning",
+      "places": [],
+      "max_aqi": null,
+      "max_rain": null,
+      "max_temperature": null,
+      "max_uv": null,
+      "max_wind": null,
+      "daylight_only": false,
+      "include_venue": false
+    },
+    "window": {
+      "start": "2026-11-01T08:00:00+05:30",
+      "end": "2026-11-01T09:00:00+05:30",
+      "us_aqi": 87,
+      "pm2_5": 25.7,
+      "rain_probability": 2,
+      "temperature": 22.9,
+      "max_aqi": 87,
+      "score": 102.85,
+      "apparent_temperature": 25.5,
+      "uv_index": 2.45,
+      "wind_speed": 6.3,
+      "daylight": true,
+      "aqi_category": "Moderate",
+      "assessment": {
+        "verdict": "Best available window; review the forecast and local conditions before leaving.",
+        "aqi": {
+          "category": "Moderate",
+          "index": 87,
+          "worst_hourly": 87,
+          "meaning": "Air quality is acceptable, but unusually sensitive people may still be affected.",
+          "advice": "If you are unusually sensitive to air pollution, consider reducing prolonged or heavy outdoor exertion."
+        },
+        "location": {
+          "resolved_name": "HSR Layout, Bengaluru",
+          "latitude": 12.9116,
+          "longitude": 77.6389,
+          "timezone": "Asia/Kolkata",
+          "precision_note": "Air quality is a regional model-grid estimate, not a station reading or street-level measurement. Nearby places can share the same forecast. A forecast does not establish a venue's quality, access or safety.",
+          "maps_url": "https://www.google.com/maps/search/?api=1&query=12.9116%2C77.6389"
+        },
+        "warnings": [
+          "If you are unusually sensitive to air pollution, consider reducing prolonged or heavy outdoor exertion.",
+          "Peak hourly rain chance is 2%; this is not the probability of rain over the entire outing."
+        ],
+        "reasons": [
+          "Chosen from complete forecast windows that match your requested duration and period.",
+          "Pollution/rain/heat preference score: 102.8; lower is preferred. This score is not a health-risk percentage.",
+          "AQI guidance uses the worst hour, so the average cannot hide a more polluted hour."
+        ],
+        "checklist": [
+          "Recheck the forecast before leaving; conditions can change.",
+          "Confirm the resolved location and venue access or opening hours before travelling.",
+          "Have a rain plan and check wet or slippery surfaces locally."
+        ]
+      }
+    },
+    "fetched_at": "2026-10-31T11:54:09.584871+00:00",
+    "source": "Open-Meteo Air Quality (CAMS) and Weather Forecast"
+  },
+  "local_artifacts": [
+    "artifacts/reply-updates/agent-profile.png",
+    "artifacts/reply-updates/agentverse-chat.png",
+    "artifacts/reply-updates/agentverse-chat.txt",
+    "artifacts/reply-updates/agentverse-updates.txt",
+    "artifacts/reply-updates/example-reply.md",
+    "artifacts/reply-updates/live-evidence.json",
+    "artifacts/reply-updates/recheck-reminder.ics",
+    "artifacts/reply-updates/typed-agent-response.json"
+  ],
+  "limits": [
+    "Runtime is hosted on this computer and requires Docker and an awake computer.",
+    "Calendar events are snapshots; Google Calendar notifications are configured and saved by the user.",
+    "No new ASI:One browser interaction or successful Agentverse automated evaluation is claimed."
+  ]
+}

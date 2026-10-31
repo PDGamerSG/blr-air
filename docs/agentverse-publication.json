@@ -1,0 +1,77 @@
+{
+  "recorded_at": "2026-10-31T11:18:04.524757+00:00",
+  "scope": "Developer verification of published Agentverse mailbox and ASI:One explicit-mention routing; not outside-user evidence.",
+  "agent": {
+    "address": "agent1q2z89ttne7p57zq7r473lrc5jan899raacv6sjqj9eymk7kdqzkwkxhcwg3",
+    "name": "BLR Air Window",
+    "handle": "blr-air",
+    "agentverse_profile": "https://agentverse.ai/agents/details/agent1q2z89ttne7p57zq7r473lrc5jan899raacv6sjqj9eymk7kdqzkwkxhcwg3/profile",
+    "asi_one_profile": "https://asi1.ai/ai/agent1q2z89ttne7p57zq7r473lrc5jan899raacv6sjqj9eymk7kdqzkwkxhcwg3",
+    "observed_status": [
+      "Active",
+      "ASI Available",
+      "Mailbox"
+    ],
+    "published": [
+      "README",
+      "description",
+      "custom avatar",
+      "three starter prompts"
+    ]
+  },
+  "hosting": {
+    "runtime": "local Docker Compose",
+    "service": "agent",
+    "health_observed": "healthy",
+    "restart_policy": "unless-stopped",
+    "requires": "This computer awake and Docker running",
+    "remote_always_on_verified": false
+  },
+  "checks": [
+    {
+      "channel": "Agentverse Manual Test",
+      "prompt": "Best 1-hour window to run in HSR Layout tomorrow morning",
+      "status": "passed",
+      "observed_reply": "Your Message\n16:28\n\nBest 1-hour window to run in HSR Layout tomorrow morning\n\nBLR Air Window\n16:28\n\nHSR Layout, Bengaluru \u00b7 Asia/Kolkata Current model at 31 Oct 15:30: US AQI 135 (Unhealthy for sensitive groups), PM2.5 24.2 \u00b5g/m\u00b3. Best available 1-hour window to run: Sun 01 Nov 2026, 08:00\u201309:00 (+0530). Average US AQI 87; PM2.5 25.7 \u00b5g/m\u00b3. Peak hourly rain chance 0%; temperature up to 22.9\u00b0C. Worst hourly AQI: 87 (Moderate). Ranked by air pollution, rain and heat among complete windows between 05:00\u201321:00 local. Backup windows:\n\nSun 01 Nov 09:00\u201310:00 (+0530), avg AQI 86, peak rain 3%\nSun 01 Nov 07:00\u201308:00 (+0530), avg AQI 90, peak rain 1% Feels like up to 25.5\u00b0C; peak UV 2.5; wind up to 6.3 km/h; fully in daylight. Data: Open-Meteo Air Quality (CAMS) and Weather Forecast. Retrieved 31 Oct 2026 10:58 UTC. Model forecasts, not CPCB station readings or medical advice. Try next: 'best 2-hour cycling window in Koramangala tomorrow morning'. Best available window; review the forecast and local conditions before leaving. If you are unusually sensitive to air pollution, consider reducing prolonged or heavy outdoor exertion. Location: Air quality is a regional model-grid estimate, not a station reading or street-level measurement. Nearby places can share the same forecast. A forecast does not establish a venue's quality, access or safety. Map: https://www.google.com/maps/search/?api=1&query=12.9116%2C77.6389 Before you go: Recheck the forecast before leaving; conditions can change. Before you go: Confirm the resolved location and venue access or opening hours before travelling."
+    },
+    {
+      "channel": "ASI:One explicit mention",
+      "prompt": "@blr-air Best 2-hour cycling window in Koramangala tomorrow morning",
+      "status": "passed",
+      "responder": "BLR Air Window (@blr-air)",
+      "observed_reply": "Koramangala, Bengaluru \u00b7 Asia/Kolkata Current model at 31 Oct 16:30: US AQI 143 (Unhealthy for sensitive groups), PM2.5 25.0 \u00b5g/m\u00b3. Best available 2-hour window to cycle: Sun 01 Nov 2026, 07:00\u201309:00 (+0530). Average US AQI 88; PM2.5 26.7 \u00b5g/m\u00b3. Peak hourly rain chance 4%; temperature up to 23.1\u00b0C. Worst hourly AQI: 90 (Moderate). Ranked by air pollution, rain and heat among complete windows between 05:00\u201321:00 local. Backup windows:\n\nSun 01 Nov 05:00\u201307:00 (+0530), avg AQI 93, peak rain 2%\nSun 01 Nov 09:00\u201311:00 (+0530), avg AQI 86, peak rain 32% Feels like up to 25.6\u00b0C; peak UV 2.5; wind up to 7.2 km/h; fully in daylight. Data: Open-Meteo Air Quality (CAMS) and Weather Forecast. Retrieved 31 Oct 2026 11:07 UTC. Model forecasts, not CPCB station readings or medical advice. Try next: 'best 2-hour cycling window in Koramangala tomorrow morning'. Best available window; review the forecast and local conditions before leaving. If you are unusually sensitive to air pollution, consider reducing prolonged or heavy outdoor exertion. Location: Air quality is a regional model-grid estimate, not a station reading or street-level measurement. Nearby places can share the same forecast. A forecast does not establish a venue's quality, access or safety. Map: https://www.google.com/maps/search/?api=1&query=12.9352%2C77.6245 Before you go: Recheck the forecast before leaving; conditions can change. Before you go: Confirm the resolved location and venue access or opening hours before travelling. Before you go: Have a rain plan and check wet or slippery surfaces locally. Before you go: Forecast wind reaches 7.2 km/h; check gusts, exposed sections and local riding conditions. Gust forecasts are not included here.\nGoogle Maps\n4:37 PM\n\ud83d\udc4d\n\ud83d\udc4e\n\u2764\ufe0f"
+    }
+  ],
+  "routing_note": "Without an explicit mention, ASI:One routed the request to the account personal AI. That reply is excluded from agent verification.",
+  "automated_evaluation": {
+    "questions_imported": 10,
+    "status": "failed_to_start",
+    "message": "unable to find agent",
+    "failing_request": {
+      "method": "POST",
+      "path": "/v2/automations",
+      "status": 404
+    },
+    "completed_run": false
+  },
+  "pending": [
+    "Complete the broader manual test suite (one additional request sent but reply not captured).",
+    "Verify a separate caller mailbox request/reply.",
+    "Migrate to an always-on remote host using the existing private identity."
+  ],
+  "browser_stop": "Original handoff respected. Browser resumed for the user-requested favicon update, then task finished with the profile and ASI chat retained for the user.",
+  "reply_and_logo_update": {
+    "checked_at": "2026-10-31T11:59:59.235238+00:00",
+    "evidence": "reply-update-verification.json",
+    "avatar_source": "site/public/favicon.svg",
+    "avatar_url": "https://storage.googleapis.com/agentverse-prod-assets/agent-avatars-pub/1103462814.png",
+    "usage_guide_published": true,
+    "forecast_and_updates_manual_chat": "passed"
+  },
+  "conversation_update": {
+    "checked_at": "2026-10-31T12:56:22.615112+00:00",
+    "evidence": "conversation-verification.json",
+    "general_and_current_conditions_manual_chat": "passed",
+    "guide_description_starters": "saved"
+  }
+}

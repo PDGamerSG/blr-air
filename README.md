@@ -57,6 +57,10 @@ English chat can use `AQI at most 100`, `rain at most 30%`, `feels like at most 
 
 ## Calendar and voice
 
+The same planning service is also available through a server-side HTTP API for website clients. Run `uv run blr-air-web` (port 8080), or use Docker Compose (web port 8082). It supports natural-language/structured planning, exact backup calendar downloads and Sarvam transcription/speech. See the [integration contract](docs/agent-http-api.md). API keys remain on the server; static frontend hosting alone does not run this API.
+
+Replies now explain the worst-hour AQI category, weather concerns and the resolved location, with map links and a checklist. Named-park requests and requests for reviews can use Google Places for genuine customer ratings, review excerpts, opening hours and accessibility. Configure `GOOGLE_PLACES_API_KEY` with Places API (New) and billing. Missing or rejected access is explicitly reported; no ratings are generated or inferred from air quality. [Official-source venue research](docs/research/venue-data.md) and [outdoor guidance](docs/research/outdoor-assessment.md) explain the limits.
+
 Save the selected window, or the winning place's window, to a new calendar file:
 
 ```sh
@@ -86,7 +90,7 @@ python agent.py
 
 `init` creates a private, ignored `.env` with unique agent and caller seeds. It never overwrites an existing file. **Back up the seed; it determines your address.** Keep it unchanged when moving to an always-on host. `doctor` prints the public address without printing secrets.
 
-1. Optionally set `ASI1_API_KEY` in `.env` for freeform/multilingual parsing using **asi1-mini**. ASI:One is the only model integration. No key, invalid output, unavailable API or HTTP 402 uses the deterministic English parser.
+1. Optionally set `ASI1_API_KEY` in `.env` for general conversation and freeform/multilingual parsing using **asi1-mini**. ASI:One is the only model integration. No key, invalid output, unavailable API or HTTP 402 preserves deterministic English planning and basic AQI explanations; general answers report the conversation service is unavailable.
 2. Open the Inspector URL printed by `python agent.py`. Choose **Connect → Mailbox → Finish**. Allow local-network access if your browser asks. Confirm registration and **Active** status on Agentverse; local process health alone does not prove this.
 3. Set profile name **BLR Air Window**, claim `@blr-air` if available, upload an avatar, and publish [AGENT_README.md](AGENT_README.md). The handle is a profile setting; running the code does not claim it.
 4. In ASI:One, enable **Agents** and use the profile's **Chat with Agent** link. Paste one of the prompts below. Save the actual share link from your account.
@@ -98,7 +102,11 @@ python agent.py
 @blr-air can I take children outside in Melbourne tomorrow morning
 ```
 
-The profile link, ASI:One share link and Active status must be verified after registration. They are not inferred from a local run.
+**Published as BLR Air Window, `@blr-air`.** [Open the agent in ASI:One](https://asi1.ai/ai/agent1q2z89ttne7p57zq7r473lrc5jan899raacv6sjqj9eymk7kdqzkwkxhcwg3). On 31 October 2026, Agentverse showed **Active**, **ASI Available** and **Mailbox**; both Agentverse manual testing and an explicit `@blr-air` message in ASI:One returned live forecasts. Include the mention when chatting: an unmentioned message was routed to the account's personal AI. See the [publication evidence](docs/agentverse-publication.json).
+
+Ask naturally: the examples are optional. General questions receive direct answers through ASI:One. Current AQI/weather questions fetch model forecasts without selecting an activity window; outdoor plans retain the structured recommendation and calendar links. Send `@blr-air help` for examples and `@blr-air updates` for refresh/reminder guidance. Planning replies include a complete request to resend for an update. Use the reply's Google Calendar link, set a notification one hour before, then save; website/CLI `.ics` downloads include that reminder. Requests are independent and forecasts can be cached for five minutes; automatic chat alerts are not scheduled. See the [user guide](AGENT_README.md#read-your-answer-and-get-an-update).
+
+The mailbox worker currently runs in local Docker Compose with automatic container restart. Keep this machine awake and Docker running; an always-on remote deployment remains outstanding. Agentverse's automated evaluator returned `unable to find agent`; a completed automated evaluation is not claimed.
 
 ## Agents and typed API
 
@@ -107,7 +115,7 @@ The profile link, ASI:One share link and Active status must be verified after re
 | `blr-air` | Chat Protocol and typed forecast requests | `agent1q2z89ttne7p57zq7r473lrc5jan899raacv6sjqj9eymk7kdqzkwkxhcwg3` |
 | `day-planner-demo` | Hires BLR Air using the shared wire models | `agent1qtehmnqextcf6czcujeq3yfh5umr2qtz4cxyxknve5tlcxgdkmpdgp4x53p` |
 
-These are the identities generated for this build; Agentverse account connection and ASI:One routing still need verification. A fresh clone's `init` creates its own identities. The original seeds stay private. A ready-to-upload avatar is in [assets/avatar.png](assets/avatar.png).
+These are the identities generated for this build. The `blr-air` identity is connected to Agentverse and its explicit-mention ASI:One routing has been verified; the separate caller's mailbox connection remains unverified. A fresh clone's `init` creates its own identities. The original seeds stay private. The published avatar is in [assets/avatar.png](assets/avatar.png).
 
 Protocol: **`blr-air-window` v0.1.0**. Import `WindowRequest` and `WindowResponse` from `blr_air.models` (or the root `models.py` compatibility module).
 

@@ -1,0 +1,59 @@
+{
+  "checked_at": "2026-10-31T10:29:22.530948+00:00",
+  "scope": "Local developer traffic; not public deployment or customer evidence",
+  "checks": [
+    {
+      "name": "website_and_private_files",
+      "status": "passed",
+      "features": {
+        "language": true,
+        "voice": true,
+        "venues": true,
+        "calendar": true,
+        "comparisons": true
+      }
+    },
+    {
+      "name": "live_comparison_assessment_backups",
+      "status": "passed",
+      "places": [
+        {
+          "name": "HSR Layout, Bengaluru",
+          "start": "2026-11-01T08:00:00+05:30",
+          "category": "Moderate",
+          "backups": 2
+        },
+        {
+          "name": "Whitefield, Bengaluru",
+          "start": "2026-11-01T08:00:00+05:30",
+          "category": "Moderate",
+          "backups": 2
+        }
+      ],
+      "ties": [
+        "HSR Layout",
+        "Whitefield"
+      ]
+    },
+    {
+      "name": "exact_backup_calendar",
+      "status": "passed"
+    },
+    {
+      "name": "invalid_limits_and_foreign_origin",
+      "status": "passed"
+    },
+    {
+      "name": "live_google_places",
+      "status": "provider_unavailable",
+      "message": "Google Places rejected the server API key. Configure a valid Google Cloud key for Places API (New).",
+      "fallback_forecast": "passed"
+    },
+    {
+      "name": "sarvam_speech_to_plan_to_speech",
+      "status": "passed",
+      "transcript": "Find a one hour running window in Bengaluru tomorrow morning.",
+      "spoken_seconds": 29.62
+    }
+  ]
+}

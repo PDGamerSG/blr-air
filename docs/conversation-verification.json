@@ -1,0 +1,81 @@
+{
+  "checked_at": "2026-10-31T12:56:22.615112+00:00",
+  "scope": "Developer traffic through real ASI/Open-Meteo and published Agentverse Manual Test; not outside-user evidence.",
+  "agent": "agent1q2z89ttne7p57zq7r473lrc5jan899raacv6sjqj9eymk7kdqzkwkxhcwg3",
+  "selected_behavior": "General questions too, with live forecasts when relevant",
+  "tests": {
+    "python": 272,
+    "ruff": "passed",
+    "format": "passed",
+    "docker_builds": "agent and web passed",
+    "docker_health": "both healthy"
+  },
+  "direct_service_checks": [
+    {
+      "prompt": "What does US AQI 150 mean?",
+      "response_type": "str",
+      "seconds": 0.0,
+      "status": "passed"
+    },
+    {
+      "prompt": "Explain photosynthesis in two sentences",
+      "response_type": "str",
+      "seconds": 1.47,
+      "status": "passed"
+    },
+    {
+      "prompt": "What's the AQI in HSR Layout right now?",
+      "response_type": "str",
+      "seconds": 1.52,
+      "status": "passed"
+    },
+    {
+      "prompt": "Will I need an umbrella in HSR Layout tomorrow?",
+      "response_type": "str",
+      "seconds": 0.86,
+      "status": "passed"
+    },
+    {
+      "prompt": "I'd love a jog around HSR Layout tomorrow morning. Keep AQI at most 150 and rain at most 50%.",
+      "response_type": "Recommendation",
+      "seconds": 4.84,
+      "status": "passed"
+    },
+    {
+      "prompt": "Is it better there?",
+      "response_type": "str",
+      "seconds": 0.8,
+      "status": "passed"
+    }
+  ],
+  "published_chat_checks": [
+    {
+      "prompt": "Explain photosynthesis in two sentences",
+      "status": "passed",
+      "result": "Direct conversational explanation, no forecast template"
+    },
+    {
+      "prompt": "What's the AQI in HSR Layout right now?",
+      "status": "passed",
+      "result": "Current model US AQI 141, PM2.5 29.0, source and retrieval time"
+    }
+  ],
+  "existing_typed_planner": "Signed local request to deployed agent passed after rebuild",
+  "public_profile_updates": [
+    "guide",
+    "description",
+    "starter prompts"
+  ],
+  "local_artifacts": [
+    "artifacts/conversation-agentverse-current.txt",
+    "artifacts/conversation-agentverse.txt",
+    "artifacts/conversation-live.json",
+    "artifacts/conversation-typed-agent.json"
+  ],
+  "limits": [
+    "Independent messages; previous conversation context is not retained",
+    "General answers depend on ASI; local planning and basic AQI explanations survive outages",
+    "No browsing/live news or market data",
+    "Runtime remains on this computer"
+  ]
+}

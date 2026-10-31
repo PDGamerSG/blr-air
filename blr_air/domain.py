@@ -40,6 +40,7 @@ class RequestSpec(BaseModel):
     max_uv: float | None = Field(default=None, ge=0, le=30, allow_inf_nan=False)
     max_wind: float | None = Field(default=None, ge=0, le=200, allow_inf_nan=False)
     daylight_only: bool = Field(default=False, strict=True)
+    include_venue: bool = Field(default=False, strict=True)
 
     @field_validator("places")
     @classmethod

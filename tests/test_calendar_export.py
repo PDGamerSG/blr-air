@@ -49,6 +49,36 @@ def test_calendar_keeps_elapsed_hour_across_dst_and_includes_recheck_context(tmp
     assert "does not update" in text.lower()
 
 
+def test_calendar_recheck_uses_event_day_and_keeps_requested_limits(tmp_path):
+    from blr_air.calendar_export import write_calendar
+
+    selected = replace(
+        recommendation(),
+        request=RequestSpec(place="New York, US", day="tomorrow", period="morning", max_rain=30),
+    )
+    text = content(write_calendar(selected, tmp_path / "recheck.ics")).replace("\\,", ",")
+    assert "@blr-air best 1-hour window to walk in New York, US today morning" in text
+    assert "rain at most 30%" in text
+    assert "on the event date" in text.lower()
+
+
+def test_answer_calendar_link_preserves_actual_instants_across_dst():
+    import re
+    from urllib.parse import parse_qs, urlsplit
+
+    from blr_air.service import describe
+
+    answer = describe(recommendation())
+    match = re.search(r"\]\((https://calendar\.google\.com/[^)]+)\)", answer)
+    assert match, "A chat user should be able to open the recommended window in their calendar"
+    query = parse_qs(urlsplit(match[1]).query)
+    assert query["dates"] == ["20261101T053000Z/20261101T063000Z"]
+    assert query["ctz"] == ["America/New_York"]
+    assert query["location"] == ["Central Park, New York"]
+    assert "@blr-air" in query["details"][0] and "today" in query["details"][0]
+    assert "1 hour" in answer
+
+
 def test_calendar_escapes_text_instead_of_injecting_properties(tmp_path):
     from blr_air.calendar_export import write_calendar
 

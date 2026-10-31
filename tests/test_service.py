@@ -54,6 +54,32 @@ async def test_service_renders_current_and_window_with_source_timezone_and_risk(
     assert result.to_dict()["window"]["end"] == "2026-10-31T09:30:00+05:30"
 
 
+async def test_copyable_recheck_request_preserves_user_limits_and_time_preferences():
+    import re
+
+    from blr_air.demo import DemoProvider
+    from blr_air.parsing import parse_local
+
+    request = RequestSpec(
+        place="HSR Layout",
+        activity="cycle",
+        hours=2,
+        day="tomorrow",
+        period="morning",
+        max_aqi=100,
+        max_rain=30,
+        max_temperature=35,
+        max_uv=5,
+        max_wind=20,
+        daylight_only=True,
+    )
+    async with httpx.AsyncClient() as client:
+        result = await AirService(DemoProvider(), client).recommend(request)
+    match = re.search(r"```(?:text)?\n(@blr-air [^\n]+)\n```", describe(result))
+    assert match, "The user needs a complete request to copy when rechecking the forecast"
+    assert parse_local(match[1]).model_dump() == request.model_dump()
+
+
 async def test_coordinate_requests_do_not_run_geocoding():
     class CoordinateProvider(ForecastProvider):
         async def locate(self, place):
@@ -125,3 +151,115 @@ async def test_comparison_discloses_tied_scores_and_partial_coverage():
     assert result.to_dict()["tied_places"] == ["Whitefield", "Koramangala"]
     assert "tie" in describe_comparison(result).lower()
     assert "could not" in describe_comparison(result).lower()
+
+
+async def test_venue_coordinates_drive_forecast_and_reviews_stay_attributed():
+    class VenueProvider:
+        api_key = "test"
+
+        async def search(self, query):
+            return {
+                "status": "ok",
+                "name": "Chosen Park",
+                "address": "Bengaluru, India",
+                "latitude": 13.1,
+                "longitude": 77.7,
+                "rating": 4.2,
+                "rating_count": 123,
+                "google_maps_uri": "https://maps.google.com/place/example",
+                "reviews": [
+                    {
+                        "text": "Good paths.",
+                        "author": "A reviewer",
+                        "author_url": "https://maps.google.com/user/example",
+                    }
+                ],
+                "review_notice": "A relevance-ranked sample, not all reviews.",
+                "opening_hours": ["Monday: 06:00–18:00"],
+                "open_now": True,
+            }
+
+    class ExactProvider(ForecastProvider):
+        async def locate(self, place):
+            raise AssertionError("Named venue should use its resolved coordinates")
+
+        async def forecast(self, location):
+            assert location.latitude == 13.1 and location.longitude == 77.7
+            return await super().forecast(location)
+
+    async with httpx.AsyncClient() as client:
+        result = await AirService(ExactProvider(), client, venues=VenueProvider()).recommend(
+            RequestSpec(place="Chosen Park", include_venue=True), now=NOW
+        )
+    data = result.to_dict()
+    assert data["venue"]["rating"] == 4.2
+    assert data["assessment"]["location"]["resolved_name"] == "Chosen Park, Bengaluru, India"
+    text = describe(result)
+    assert "Google Maps" in text and "A reviewer" in text and "Good paths." in text
+    assert "opening" in text.lower() or "hours" in text.lower()
+
+
+async def test_missing_review_access_does_not_hide_forecast():
+    async with httpx.AsyncClient() as client:
+        result = await AirService(ForecastProvider(), client).recommend(
+            RequestSpec(place="HSR Layout", include_venue=True), now=NOW
+        )
+    assert result.to_dict()["status"] == "ok"
+    assert result.to_dict()["venue"]["status"] == "unavailable"
+    assert "review" in describe(result).lower()
+
+
+async def test_venue_without_address_still_produces_forecast():
+    class Venues:
+        async def search(self, query):
+            return {
+                "status": "ok",
+                "name": "Park",
+                "address": None,
+                "latitude": 13,
+                "longitude": 77,
+                "reviews": [],
+            }
+
+    async with httpx.AsyncClient() as client:
+        result = await AirService(ForecastProvider(), client, venues=Venues()).recommend(
+            RequestSpec(place="Park", include_venue=True), now=NOW
+        )
+    assert result.location.name == "Park"
+    assert result.to_dict()["status"] == "ok"
+
+
+def test_customer_rating_never_fabricates_count_and_retains_attribution():
+    from blr_air.service import venue_description
+
+    lines = venue_description(
+        {
+            "status": "ok",
+            "name": "Park",
+            "rating": 4.5,
+            "rating_count": None,
+            "attributions": [{"display_name": "Contributor", "uri": "https://example.org"}],
+            "reviews": [
+                {
+                    "author": "Reviewer",
+                    "text": "Paths",
+                    "published_at": "2026-10-30",
+                    "author_photo_uri": "https://example.org/photo",
+                    "author_url": "https://example.org/user",
+                }
+            ],
+        }
+    )
+    text = "\n".join(lines)
+    assert "0 ratings" not in text
+    assert "2026-10-30" in text and "Contributor" in text
+
+
+def test_customer_rating_zero_count_is_reported_as_unavailable():
+    from blr_air.service import venue_description
+
+    text = "\n".join(
+        venue_description({"status": "ok", "name": "Park", "rating": 4.5, "rating_count": 0})
+    )
+    assert "0 ratings" not in text
+    assert "rating count unavailable" in text

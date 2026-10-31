@@ -52,10 +52,10 @@ Expand the short version with the Agentverse Active state, the Chat Protocol pro
 ## Proof checklist
 
 - [ ] Public non-fork repository and creation timestamp satisfy the current rules.
-- [ ] Actual stable agent address, Active dashboard and configured handle recorded.
-- [ ] Agentverse README, description and avatar published.
+- [x] Actual stable agent address, Active dashboard and configured handle recorded in [publication evidence](agentverse-publication.json).
+- [x] Agentverse README, description and avatar published; name `BLR Air Window`, handle `@blr-air`, and three starter prompts saved.
 - [ ] Ten or more real interactions; Agentverse Testing results captured.
-- [ ] ASI:One chat and share link verified with Agents enabled.
+- [x] ASI:One explicit `@blr-air` chat verified; [public agent profile](https://asi1.ai/ai/agent1q2z89ttne7p57zq7r473lrc5jan899raacv6sjqj9eymk7kdqzkwkxhcwg3) recorded. Unmentioned requests route to the personal AI.
 - [ ] Three assigned outside-user tries in ASI:One, each with written note, score and sufficient duration.
 - [ ] At least one shipped change traced to an actual note in [feedback.md](feedback.md).
 - [ ] Actual aggregate counters and Discovery Insights recorded, with developer traffic disclosed.

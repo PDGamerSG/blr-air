@@ -1,11 +1,14 @@
 import asyncio
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from datetime import UTC, datetime, timedelta
 from math import isclose
+from urllib.parse import urlencode
 from zoneinfo import ZoneInfo
 
 import httpx
 
+from blr_air.assessment import assess
+from blr_air.conversation import chat_intent, clean_message, describe_conditions
 from blr_air.domain import AirError, Forecast, Location, ProviderError, RequestSpec, Window
 from blr_air.parsing import parse_request
 from blr_air.providers import OpenMeteo
@@ -13,6 +16,13 @@ from blr_air.scoring import aqi_category, select_windows
 
 SOURCE = "Open-Meteo Air Quality (CAMS) and Weather Forecast"
 LIMITATION = "Model forecasts, not CPCB station readings or medical advice."
+ACTIVITIES = {
+    "run": "run",
+    "walk": "walk",
+    "cycle": "cycle",
+    "commute": "commute",
+    "kids": "take children outside",
+}
 
 
 def window_dict(window: Window) -> dict:
@@ -31,6 +41,7 @@ class Recommendation:
     forecast: Forecast
     window: Window
     backups: tuple[Window, ...] = ()
+    venue: dict | None = None
 
     def to_dict(self):
         current = self.forecast.current
@@ -40,8 +51,11 @@ class Recommendation:
             "location": asdict(self.location),
             "request": self.request.model_dump(),
             "timezone": self.forecast.timezone,
-            "window": window_dict(self.window),
-            "backups": [window_dict(window) for window in self.backups],
+            "window": {**window_dict(self.window), "assessment": assess(self)},
+            "backups": [
+                {**window_dict(window), "assessment": assess(replace(self, window=window))}
+                for window in self.backups
+            ],
             "current": (
                 {
                     "time": current.time.isoformat(),
@@ -56,6 +70,8 @@ class Recommendation:
             "source": "Synthetic offline demo" if self.forecast.is_demo else SOURCE,
             "limitation": LIMITATION,
             "summary": describe(self),
+            "assessment": assess(self),
+            "venue": self.venue,
         }
 
 
@@ -106,84 +122,234 @@ class ComparisonResult:
         }
 
 
+def request_prompt(request: RequestSpec) -> str:
+    """A complete, stateless recheck request that retains the user's constraints."""
+    activity = ACTIVITIES[request.activity]
+    if len(request.places) > 1:
+        prompt = f"compare {' and '.join(request.places)} for a {request.hours}-hour {activity}"
+    else:
+        prompt = f"best {request.hours}-hour window to {activity} in {request.place}"
+    if request.day != "next48":
+        prompt += " " + request.day
+    if request.period != "any":
+        prompt += " " + request.period
+    limits = []
+    for field, label, unit in (
+        ("max_aqi", "AQI", ""),
+        ("max_rain", "rain", "%"),
+        ("max_temperature", "feels like", "C"),
+        ("max_uv", "UV", ""),
+        ("max_wind", "wind", " km/h"),
+    ):
+        value = getattr(request, field)
+        if value is not None:
+            limits.append(f"{label} at most {value:g}{unit}")
+    if request.daylight_only:
+        limits.append("daylight only")
+    if request.include_venue:
+        limits.append("reviews")
+    if limits:
+        prompt += " with " + ", ".join(limits)
+    return "@blr-air " + prompt
+
+
+def recheck_guidance(request: RequestSpec) -> str:
+    return (
+        "**Get an update**\n\n"
+        "Send this full request again before leaving:\n\n"
+        f"```text\n{request_prompt(request)}\n```\n\n"
+        "If you recheck on the outing date, change `tomorrow` to `today`. "
+        "Forecasts may be cached for up to 5 minutes. No automatic alerts are scheduled. "
+        "Send `@blr-air help` for examples or `@blr-air updates` for reminder options."
+    )
+
+
+def calendar_guidance(result: Recommendation) -> str:
+    window, forecast = result.window, result.forecast
+    # The reminder is read on the event date, when the original "tomorrow" is "today".
+    prompt = request_prompt(result.request.model_copy(update={"day": "today"}))
+    details = (
+        "Recheck BLR Air before leaving. On the event date, send:\n"
+        + prompt
+        + "\n\nThis event is a forecast snapshot and does not update itself. "
+        + f"Forecast retrieved {forecast.fetched_at.astimezone(UTC):%d %b %Y %H:%M UTC}. "
+        + LIMITATION
+    )
+    if forecast.is_demo:
+        details = "OFFLINE DEMO: synthetic data; do not use for outdoor decisions.\n" + details
+    query = urlencode(
+        {
+            "action": "TEMPLATE",
+            "text": f"{'DEMO — ' if forecast.is_demo else ''}BLR Air: "
+            f"{ACTIVITIES[result.request.activity]} · {result.location.name}",
+            "dates": f"{window.start.astimezone(UTC):%Y%m%dT%H%M%SZ}/"
+            f"{window.end.astimezone(UTC):%Y%m%dT%H%M%SZ}",
+            "ctz": forecast.timezone,
+            "location": result.location.name,
+            "details": details,
+        }
+    )
+    return (
+        "**Save a recheck reminder**\n\n"
+        f"[Add this window to Google Calendar](https://calendar.google.com/calendar/render?{query})"
+        "\n\nBefore saving, set a notification **1 hour before** to recheck the forecast. "
+        "The event description includes your recheck prompt. Nothing is saved until you "
+        "confirm it in your calendar. The website's calendar download includes a "
+        "one-hour reminder when imported."
+    )
+
+
+def window_time(window: Window, timezone: str) -> str:
+    zone = ZoneInfo(timezone)
+    start, end = window.start.astimezone(zone), window.end.astimezone(zone)
+    return f"{start:%a %d %b %Y} · {start:%H:%M}–{end:%H:%M} ({start:%z})"
+
+
+def condition_lines(window: Window) -> str:
+    return "\n".join(
+        [
+            f"- **Air:** US AQI {window.us_aqi:.0f} average; "
+            f"worst hour {window.max_aqi:.0f} ({aqi_category(window.max_aqi)}).",
+            f"- **PM2.5:** {window.pm2_5:.1f} µg/m³ average.",
+            f"- **Weather:** rain {window.rain_probability:.0f}% peak hourly chance; "
+            f"temperature up to {window.temperature:.1f}°C.",
+            "- " + weather_context(window),
+        ]
+    )
+
+
+def before_leaving(result: Recommendation) -> str:
+    assessment = assess(result)
+    notes = [assessment["aqi"]["advice"]]
+    # Keep activity-specific precautions, without repeating the generic recheck/access notes.
+    notes.extend(assessment["checklist"][2:])
+    if result.window.rain_probability >= 70:
+        notes.append("Rain is still likely in this window; keep an indoor backup.")
+    return "**Before you go**\n\n" + "\n".join("- " + note for note in notes)
+
+
+def forecast_note(forecast: Forecast) -> str:
+    zone = ZoneInfo(forecast.timezone)
+    fetched = forecast.fetched_at.astimezone(zone)
+    source = "Synthetic offline demo" if forecast.is_demo else SOURCE
+    return (
+        f"**Forecast retrieved:** {fetched:%d %b %Y, %H:%M} ({forecast.timezone}).\n\n"
+        f"Source: {source}. {LIMITATION} Air quality is a regional estimate; "
+        "nearby places may share the same forecast."
+    )
+
+
 def describe(result: Recommendation | ComparisonResult) -> str:
     if isinstance(result, ComparisonResult):
         return describe_comparison(result)
     w, q, forecast = result.window, result.request, result.forecast
-    activity = {
-        "run": "run",
-        "walk": "walk",
-        "cycle": "cycle",
-        "commute": "commute",
-        "kids": "take children outside",
-    }[q.activity]
-    lines = [f"{result.location.name} · {forecast.timezone}"]
+    sections = [
+        f"**{result.location.name}**\n\n"
+        f"**Best available {q.hours}-hour window to {ACTIVITIES[q.activity]}**\n\n"
+        f"{window_time(w, forecast.timezone)}\n\n"
+        f"All times in {forecast.timezone}.",
+        "**Conditions during your window**\n\n" + condition_lines(w),
+        "**Why this time?**\n\n"
+        "Ranked using AQI, PM2.5, rain and heat within your requested time range "
+        "and the 05:00–21:00 activity hours.",
+    ]
     if forecast.is_demo:
-        lines.insert(0, "OFFLINE DEMO — synthetic data; do not use for outdoor decisions.")
+        sections.insert(0, "**OFFLINE DEMO — synthetic data; do not use for outdoor decisions.**")
+    if any(key.startswith("max_") and value is not None for key, value in q.model_dump().items()):
+        sections.append("Every selected hour meets your requested limits.")
+    if q.daylight_only:
+        sections.append("Your entire window and backups are in daylight.")
+    sections.append(before_leaving(result))
+    if result.backups:
+        sections.append(
+            "**Backup options**\n\n"
+            + "\n".join(
+                f"- {window_time(backup, forecast.timezone)} — "
+                f"AQI {backup.us_aqi:.0f} average; rain {backup.rain_probability:.0f}% peak hourly."
+                for backup in result.backups
+            )
+        )
     current = forecast.current
     if current:
-        when = current.time.astimezone(ZoneInfo(forecast.timezone)).strftime("%d %b %H:%M")
+        when = current.time.astimezone(ZoneInfo(forecast.timezone)).strftime("%d %b, %H:%M")
         stale = (
             " (older model estimate)"
             if forecast.fetched_at - current.time > timedelta(hours=3)
             else ""
         )
-        lines.append(
-            f"Current model at {when}{stale}: US AQI {current.us_aqi:.0f} "
-            f"({aqi_category(current.us_aqi)}), PM2.5 {current.pm2_5:.1f} µg/m³."
+        sections.append(
+            f"**Current model · {when}{stale}**\n\n"
+            f"US AQI {current.us_aqi:.0f} ({aqi_category(current.us_aqi)}); "
+            f"PM2.5 {current.pm2_5:.1f} µg/m³. These are current estimates, "
+            "separate from the recommended window."
         )
     else:
-        lines.append("Current air-quality estimate unavailable; hourly forecast shown below.")
-    lines.extend(
-        [
-            f"Best available {q.hours}-hour window to {activity}: "
-            f"{w.start:%a %d %b %Y, %H:%M}–{w.end:%H:%M} ({w.start:%z}).",
-            f"Average US AQI {w.us_aqi:.0f}; PM2.5 {w.pm2_5:.1f} µg/m³. "
-            f"Peak hourly rain chance {w.rain_probability:.0f}%; "
-            f"temperature up to {w.temperature:.1f}°C.",
-            f"Worst hourly AQI: {w.max_aqi:.0f} ({aqi_category(w.max_aqi)}).",
-            "Ranked by air pollution, rain and heat among complete windows "
-            "between 05:00–21:00 local.",
-        ]
+        sections.append("Current air-quality estimate unavailable; the hourly forecast is shown.")
+    sections.append(
+        "Map: [Open location in Maps]("
+        + assess(result)["location"]["maps_url"]
+        + ")\n\nConfirm the location and venue opening hours before travelling."
     )
-    if result.backups:
-        lines.append("Backup windows:")
-        lines.extend(
-            f"- {backup.start:%a %d %b %H:%M}–{backup.end:%H:%M} ({backup.start:%z}), "
-            f"avg AQI {backup.us_aqi:.0f}, peak rain {backup.rain_probability:.0f}%"
-            for backup in result.backups
+    if result.venue:
+        sections.append("**Venue reviews**\n\n" + "\n\n".join(venue_description(result.venue)))
+    sections.extend([forecast_note(forecast), calendar_guidance(result), recheck_guidance(q)])
+    return "\n\n".join(sections)
+
+
+def venue_description(venue: dict | None) -> list[str]:
+    if not venue:
+        return []
+    if venue["status"] != "ok":
+        return ["Venue reviews: " + venue.get("message", "Unavailable for this place.")]
+    lines = ["Venue match: " + ", ".join(filter(None, (venue["name"], venue.get("address"))))]
+    if venue.get("rating") is not None:
+        count = venue.get("rating_count")
+        count_text = (
+            f"from {count} ratings"
+            if type(count) is int and count > 0
+            else "(rating count unavailable)"
         )
-    lines.append(weather_context(w))
-    active_limits = {
-        key: value
-        for key, value in q.model_dump().items()
-        if key.startswith("max_") and value is not None
-    }
-    if active_limits or q.daylight_only:
         lines.append(
-            "All selected windows meet your requested limits"
-            + (" and lie entirely between sunrise and sunset." if q.daylight_only else ".")
+            f"Google Maps customer rating: {venue['rating']}/5 "
+            f"{count_text}. This is not an air-quality score."
         )
-    if w.max_aqi > 100:
-        lines.append(
-            "This is the least-bad available slot; consider an indoor alternative, "
-            "especially for children or people sensitive to air pollution."
-        )
-    if w.temperature >= 35:
-        lines.append("Significant heat is forecast even in this slot; consider an indoor activity.")
-    if w.rain_probability >= 70:
-        lines.append("Rain is still likely in this slot; keep an indoor alternative.")
-    if w.uv_index is not None and w.uv_index >= 3:
-        lines.append("UV index is 3 or above: plan shade and sun protection.")
-    lines.extend(
-        [
-            f"Data: {'Synthetic offline demo' if forecast.is_demo else SOURCE}. "
-            f"Retrieved {forecast.fetched_at:%d %b %Y %H:%M UTC}.",
-            LIMITATION,
-            "Try next: 'best 2-hour cycling window in Koramangala tomorrow morning'.",
-        ]
+    if venue.get("match_notice"):
+        lines.append(venue["match_notice"])
+    lines.append(
+        "Confirm venue opening hours for your selected date; "
+        "an outdoor forecast does not establish access."
     )
-    return "\n".join(lines)
+    lines.extend(venue.get("opening_hours") or [])
+    lines.append(
+        venue.get(
+            "review_notice", "Google Maps reviews are a relevance-ranked sample, not all reviews."
+        )
+    )
+    for review in venue.get("reviews", [])[:2]:
+        text = review.get("text", "")
+        excerpt = text[:700] + ("… [excerpt]" if len(text) > 700 else "")
+        lines.append(
+            f"{review.get('author', 'Reviewer')} "
+            f"({review.get('author_url') or 'Google Maps'}), "
+            f"{review.get('published_at') or 'date unavailable'}: {excerpt}"
+        )
+        if review.get("author_photo_uri"):
+            lines.append("Reviewer photo: " + review["author_photo_uri"])
+    for attribution in venue.get("attributions", []):
+        lines.append(
+            "Attribution: "
+            + str(
+                attribution.get("provider")
+                or attribution.get("display_name")
+                or attribution.get("displayName")
+                or "Google Maps"
+            )
+            + " "
+            + str(attribution.get("provider_uri") or attribution.get("uri") or "")
+        )
+    if venue.get("google_maps_uri"):
+        lines.append("Google Maps: " + venue["google_maps_uri"])
+    return lines
 
 
 def weather_context(window: Window) -> str:
@@ -206,7 +372,7 @@ def weather_context(window: Window) -> str:
 
 def describe_comparison(result: ComparisonResult) -> str:
     lines = [
-        f"Best place: {result.winner or 'none available'}",
+        f"**Best place: {result.winner or 'none available'}**",
         "Each place is compared at its own best time, using the same pollution/rain/heat score.",
     ]
     if result.tied_places:
@@ -226,27 +392,31 @@ def describe_comparison(result: ComparisonResult) -> str:
         recommendation = item.recommendation
         window = recommendation.window
         lines.append(
-            f"{rank}. {recommendation.location.name} · {recommendation.forecast.timezone}: "
-            f"{window.start:%a %d %b %H:%M}–{window.end:%H:%M} ({window.start:%z}), "
-            f"avg AQI {window.us_aqi:.0f}, PM2.5 {window.pm2_5:.1f} µg/m³, "
-            f"peak rain {window.rain_probability:.0f}%, temperature {window.temperature:.1f}°C. "
-            f"Worst AQI: {aqi_category(window.max_aqi)}."
+            f"**{rank}. {recommendation.location.name}**\n\n"
+            f"{window_time(window, recommendation.forecast.timezone)} · "
+            f"{recommendation.forecast.timezone}\n\n" + condition_lines(window)
         )
-        for backup in recommendation.backups:
+        if recommendation.backups:
             lines.append(
-                f"  Backup: {backup.start:%a %d %b %H:%M}–{backup.end:%H:%M} "
-                f"({backup.start:%z}), avg AQI {backup.us_aqi:.0f}, "
-                f"peak rain {backup.rain_probability:.0f}%."
+                "**Backup options**\n\n"
+                + "\n".join(
+                    f"- {window_time(backup, recommendation.forecast.timezone)} — "
+                    f"AQI {backup.us_aqi:.0f} average; "
+                    f"rain {backup.rain_probability:.0f}% peak hourly."
+                    for backup in recommendation.backups
+                )
             )
-        lines.append("  " + weather_context(window))
-        if window.max_aqi > 100 or window.temperature >= 35 or window.rain_probability >= 70:
-            lines.append("  Conditions remain adverse; consider an indoor alternative.")
-        lines.append(
-            f"  Data: {'Synthetic offline demo' if recommendation.forecast.is_demo else SOURCE}. "
-            f"Retrieved {recommendation.forecast.fetched_at:%d %b %Y %H:%M UTC}."
-        )
-    lines.append(LIMITATION)
-    return "\n".join(lines)
+        lines.append(before_leaving(recommendation))
+        assessment = assess(recommendation)
+        lines.append("Map: [Open location in Maps](" + assessment["location"]["maps_url"] + ")")
+        lines.extend(venue_description(recommendation.venue))
+        if recommendation.forecast.is_demo:
+            lines.append("**OFFLINE DEMO — synthetic data; do not use for outdoor decisions.**")
+        lines.append(forecast_note(recommendation.forecast))
+        if rank == 1:
+            lines.append(calendar_guidance(recommendation))
+    lines.append(recheck_guidance(result.request))
+    return "\n\n".join(lines)
 
 
 def spoken_summary(result: Recommendation | ComparisonResult) -> str:
@@ -291,15 +461,34 @@ class AirService:
         *,
         api_key: str | None = None,
         base_url="https://api.asi1.ai/v1",
+        venues=None,
     ):
         self.provider = provider
         self.client = client
         self.api_key = api_key
         self.base_url = base_url
+        self.venues = venues
 
     async def recommend(
         self, request: RequestSpec, *, location: Location | None = None, now: datetime | None = None
     ) -> Recommendation:
+        venue = None
+        if request.include_venue:
+            venue = (
+                await self.venues.search(request.place)
+                if self.venues
+                else {
+                    "status": "unavailable",
+                    "message": "Customer reviews require Google Places access on this server. "
+                    "Air and weather forecasts remain available.",
+                }
+            )
+            if venue["status"] == "ok" and location is None:
+                location = Location(
+                    ", ".join(filter(None, (venue["name"], venue.get("address")))),
+                    venue["latitude"],
+                    venue["longitude"],
+                )
         try:
             async with asyncio.timeout(23):
                 location = location or await self.provider.locate(request.place)
@@ -312,7 +501,9 @@ class AirService:
                     limit=3,
                     daylight=forecast.daylight,
                 )
-                return Recommendation(request, location, forecast, windows[0], tuple(windows[1:]))
+                return Recommendation(
+                    request, location, forecast, windows[0], tuple(windows[1:]), venue
+                )
         except TimeoutError as exc:
             raise ProviderError("Forecast lookup timed out. Please try again in a minute.") from exc
 
@@ -340,7 +531,17 @@ class AirService:
             validated, tuple(valid + [item for item in items if item.recommendation is None])
         )
 
-    async def chat(self, text: str) -> Recommendation | ComparisonResult:
+    async def chat(self, text: str) -> Recommendation | ComparisonResult | str:
+        text = clean_message(text)
+        intent = await chat_intent(text, self)
+        if intent.kind in ("answer", "clarify"):
+            return intent.text
+        if intent.kind == "conditions":
+            # Keep unsupported forecast dates/times out of live conditions, too.
+            from blr_air.parsing import validate_text
+
+            validate_text(text)
+            return await describe_conditions(self, intent)
         request = await parse_request(
             text, self.client, api_key=self.api_key, base_url=self.base_url
         )

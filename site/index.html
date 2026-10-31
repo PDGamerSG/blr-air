@@ -51,7 +51,7 @@
         <a href="#hire">Hire</a>
         <a href="#fine-print">Fine print</a>
       </nav>
-      <a class="btn btn--small" data-asi href="#" target="_blank" rel="noopener"><span class="hide-sm">Chat on</span>ASI:One <span aria-hidden="true">↗</span></a>
+      <a class="btn btn--small" data-asi href="%ASI_AGENT_URL%" target="_blank" rel="noopener"><span class="hide-sm">Chat on</span>ASI:One <span aria-hidden="true">↗</span></a>
     </header>
 
     <aside class="altimeter" aria-hidden="true">
@@ -76,7 +76,7 @@
             <span class="rotator" aria-live="off"><span>run.</span></span>
           </p>
           <div class="hero__ctas reveal">
-            <a class="btn" href="#planner">Ask the agent here <span aria-hidden="true">↓</span></a>
+            <a class="btn" data-asi href="%ASI_AGENT_URL%" target="_blank" rel="noopener">Ask the agent <span aria-hidden="true">↗</span></a>
             <a class="btn btn--ghost" href="#scanner">Scan the sky <span aria-hidden="true">↓</span></a>
           </div>
         </div>
@@ -189,6 +189,7 @@
           <div class="planner__intro">
             <h3 id="planner-title">Tell Gaali what you have in mind.</h3>
             <p class="planner__capabilities" data-planner-capabilities role="status">Checking available services…</p>
+            <p class="planner__hint"><a data-asi href="%ASI_AGENT_URL%" target="_blank" rel="noopener">Open BLR Air Window on ASI:One ↗</a></p>
           </div>
           <form class="planner__form" data-planner-form>
             <label for="planner-query">Your request</label>
@@ -356,13 +357,13 @@
             <p class="card__kicker">For humans</p>
             <h3>Chat on ASI:One</h3>
             <ol class="steps">
-              <li>Open <a data-asi href="#" target="_blank" rel="noopener">asi1.ai</a> and switch <b>Agents</b> on.</li>
+              <li>Open the <a data-asi href="%ASI_AGENT_URL%" target="_blank" rel="noopener">BLR Air Window extension on ASI:One</a> and start a chat.</li>
               <li>Mention <code class="handle"></code> or open the agent's Agentverse profile and choose <b>Chat with Agent</b>.</li>
               <li>Ask like a person: <q>best 2-hour cycling window in Koramangala tomorrow morning</q>.</li>
             </ol>
             <div class="hire__actions">
-              <a class="btn btn--small" data-asi href="#" target="_blank" rel="noopener">Open ASI:One ↗</a>
-              <a class="btn btn--small btn--ghost" data-agentverse href="#" target="_blank" rel="noopener">Agentverse profile ↗</a>
+              <a class="btn btn--small" data-asi href="%ASI_AGENT_URL%" target="_blank" rel="noopener">Open extension ↗</a>
+              <a class="btn btn--small btn--ghost" data-agentverse href="%AGENTVERSE_PROFILE_URL%" target="_blank" rel="noopener">Agentverse profile ↗</a>
             </div>
           </article>
           <article class="panel hire__card hire__card--code">
@@ -436,7 +437,7 @@ request = <span class="f">WindowRequest</span>(
               better. <strong>Zero users is a bug.</strong> You could be user number one.
             </p>
             <div class="hero__ctas">
-              <a class="btn" href="#planner">Try it now</a>
+              <a class="btn" data-asi href="%ASI_AGENT_URL%" target="_blank" rel="noopener">Try it now ↗</a>
               <a class="btn btn--ghost" data-roast href="#" target="_blank" rel="noopener">Roast it on GitHub ↗</a>
             </div>
           </div>
@@ -471,8 +472,8 @@ request = <span class="f">WindowRequest</span>(
           </h2>
           <p class="final__lede">Gaali took the mask off. Your turn: ask when to go outside.</p>
           <div class="final__ctas">
-            <a class="btn btn--xl" data-asi href="#" target="_blank" rel="noopener">Chat on ASI:One ↗</a>
-            <a class="btn btn--xl btn--cyan" data-agentverse href="#" target="_blank" rel="noopener">Agentverse ↗</a>
+            <a class="btn btn--xl" data-asi href="%ASI_AGENT_URL%" target="_blank" rel="noopener">Open extension ↗</a>
+            <a class="btn btn--xl btn--cyan" data-agentverse href="%AGENTVERSE_PROFILE_URL%" target="_blank" rel="noopener">Agentverse ↗</a>
             <a class="btn btn--xl btn--ghost" data-github href="#" target="_blank" rel="noopener">Source on GitHub ↗</a>
           </div>
           <button type="button" class="final__prompt" data-prompt-copy>

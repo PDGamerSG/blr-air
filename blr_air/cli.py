@@ -15,6 +15,7 @@ from blr_air.domain import AirError, Location, RequestSpec
 from blr_air.parsing import parse_request
 from blr_air.providers import OpenMeteo, number
 from blr_air.service import AirService, ComparisonResult, describe
+from blr_air.venues import GooglePlaces
 
 
 def initialize(path: Path):
@@ -110,7 +111,13 @@ async def run(args):
                 f"{args.latitude:.4f}, {args.longitude:.4f}", args.latitude, args.longitude
             )
         provider = DemoProvider() if args.demo else OpenMeteo(client)
-        service = AirService(provider, client)
+        service = AirService(
+            provider,
+            client,
+            venues=GooglePlaces(client, os.getenv("GOOGLE_PLACES_API_KEY", ""))
+            if not args.demo
+            else None,
+        )
         result = (
             await service.compare(q, q.places)
             if len(q.places) > 1
