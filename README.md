@@ -198,7 +198,14 @@ cd site && npm install && npm run dev
 
 The website and the agent deploy independently. Vercel builds only `site/` and serves `site/dist`, as configured in [vercel.json](vercel.json) and [.vercelignore](.vercelignore). It skips rebuilds when a commit doesn't touch `site/`. The agent's Docker image, wheel and CI never include `site/`.
 
-To deploy on Vercel, import this repository and name the project **blrairwindow** so the URL is `blrairwindow.vercel.app`. Leave Root Directory as the repository root; no environment variables are needed.
+To deploy on Vercel, import this repository and name the project **blrairwindow** so the URL is `blrairwindow.vercel.app`. Leave Root Directory as the repository root, because the `/api` proxy lives in root `api/`.
+
+The on-page planner calls same-origin `/api/*`. Vercel rewrites those requests to [api/proxy.mjs](api/proxy.mjs), which forwards them to the Python web service (`blr-air-web`, `Dockerfile.web`) running on an always-on HTTPS host:
+
+1. On Vercel, set `BLR_AIR_API_ORIGIN` to the backend origin, e.g. `https://api.example.com`, then redeploy.
+2. On the backend, set `PUBLIC_ORIGIN=https://blrairwindow.vercel.app` exactly. The proxy forwards the browser's `Origin` header, and any other value gets a 403.
+
+Until `BLR_AIR_API_ORIGIN` is set, `/api` returns a JSON 503. The planner then shows itself as unavailable, the hero and prompt cards fall back to ASI:One, and the keyless quick scanner and live map keep working. Behind the proxy, the backend's per-client rate limit applies to Vercel's egress addresses. Uploads through Vercel are capped at 4.5 MB.
 
 ## Credits and licence
 
