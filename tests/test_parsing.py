@@ -97,3 +97,43 @@ async def test_invalid_asi_schema_falls_back_to_deterministic_parser():
     ) as client:
         q = await parse_request("cycle in London", client, api_key="test-key")
     assert q.place == "London"
+
+
+@pytest.mark.parametrize(
+    "text,city",
+    [
+        ("best window for Paris", "Paris"),
+        ("London running window tomorrow morning", "London"),
+        ("AQI London", "London"),
+        ("best time to run in Runcorn", "Runcorn"),
+    ],
+)
+def test_preserves_city_in_alternative_word_orders(text, city):
+    assert parse_local(text).place == city
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "best 1-hour run between 6am and 8am in HSR Layout tomorrow",
+        "best run day after tomorrow in HSR Layout",
+        "best 90-minute walk in Paris",
+        "walk in Paris from 6 to 8",
+    ],
+)
+def test_does_not_silently_drop_unsupported_constraints(text):
+    with pytest.raises(AirError):
+        parse_local(text)
+
+
+@pytest.mark.parametrize("content", ["{}", '{"activity":"run"}'])
+async def test_incomplete_asi_extraction_cannot_overwrite_supplied_city(content):
+    async with httpx.AsyncClient(
+        transport=httpx.MockTransport(
+            lambda request: httpx.Response(
+                200, json={"choices": [{"message": {"content": content}}]}
+            )
+        )
+    ) as client:
+        result = await parse_request("run in Delhi", client, api_key="test-key")
+    assert result.place == "Delhi"

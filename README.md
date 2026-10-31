@@ -8,6 +8,8 @@
 
 Uses live, keyless Open-Meteo forecasts. All replies identify the location, timezone, data retrieval time and source. This is **modelled air quality, not CPCB station readings**. A best available window can still have unhealthy air; the agent says so. It does not provide medical advice.
 
+Public repository: [PDGamerSG/blr-air](https://github.com/PDGamerSG/blr-air). See the [verification record](docs/verification.md) for completed checks and external steps still to verify.
+
 ## Run it now
 
 Python **3.12 or 3.13** is required. With [uv](https://docs.astral.sh/uv/):

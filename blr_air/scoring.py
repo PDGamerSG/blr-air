@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import time, timedelta
 from statistics import mean
 from zoneinfo import ZoneInfo
 
@@ -49,6 +49,9 @@ def select_window(rows, request: RequestSpec, timezone: str, now) -> Window:
             continue
         local = [row.time.astimezone(tz) for row in block]
         if any(not start_hour <= t.hour < end_hour for t in local):
+            continue
+        local_end = end.astimezone(tz)
+        if local_end.date() != local[0].date() or local_end.time() > time(end_hour):
             continue
         if target_day and any(t.date() != target_day for t in local):
             continue

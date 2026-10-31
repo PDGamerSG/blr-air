@@ -15,6 +15,8 @@ uv run blr-air-agent
 
 Follow the startup Inspector link, then **Connect → Mailbox → Finish**. Verify the address matches `doctor` and the Agentverse dashboard says Active. Publish the supplied profile README and claim an available handle. Mailbox registration and ASI:One routing require your authenticated account; process logs alone do not establish either.
 
+For the identity created in this workspace, the [Inspector connection link](https://agentverse.ai/inspect/?uri=http%3A//127.0.0.1%3A8001&address=agent1q2z89ttne7p57zq7r473lrc5jan899raacv6sjqj9eymk7kdqzkwkxhcwg3) points to the running Compose service. Open it on this machine while Docker is running. The current account-connection state is recorded in [verification.md](verification.md).
+
 ## Docker Compose on an always-on machine
 
 Copy the project and the same private `.env` to the host. Stop the original process before starting the replacement.

@@ -78,6 +78,12 @@ def test_dst_uses_real_elapsed_hours_and_explicit_offsets():
     assert result.end.isoformat() == "2026-11-01T07:00:00-05:00"
 
 
+@pytest.mark.parametrize("utc_hour,period", [(15, "any"), (6, "morning"), (11, "afternoon")])
+def test_entire_window_must_fit_local_period_even_with_fractional_timezone(utc_hour, period):
+    with pytest.raises(NoWindowError):
+        select_window([hour(utc_hour)], RequestSpec(period=period), "Asia/Kolkata", NOW)
+
+
 @pytest.mark.parametrize(
     "value,label",
     [

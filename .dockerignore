@@ -3,6 +3,7 @@
 !pyproject.toml
 !uv.lock
 !README.md
+!LICENSE
 !blr_air/
 !blr_air/**
 **/__pycache__

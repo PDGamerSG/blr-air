@@ -20,21 +20,24 @@ def validate_text(text: str) -> str:
     text = re.sub(r"@blr-air\b", "", text, flags=re.I).strip()
     if not text or len(text) > 2000:
         raise AirError("Send a short request, for example: 'best 1-hour run in HSR Layout'.")
+    if re.search(
+        r"\b(next week|next month|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b"
+        r"|\b(?:after|before|at|between|from)\s+\d|\b\d{4}-\d{2}-\d{2}\b"
+        r"|\b\d{1,2}(?::\d{2}|\s*[ap]\.?m\.?)\b|\bday after tomorrow\b"
+        r"|\b\d+\s*[- ]?\s*(?:minutes?|mins?)\b",
+        text,
+        re.I,
+    ):
+        raise AirError(
+            "I support the next 48 hours, today or tomorrow, optionally morning, "
+            "afternoon or evening. Exact clock times and later dates aren't supported."
+        )
     return text
 
 
 def parse_local(text: str) -> RequestSpec:
     text = validate_text(text)
     lower = text.casefold()
-    if re.search(
-        r"\b(next week|next month|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b"
-        r"|\b(?:after|before|at)\s+\d|\b\d{4}-\d{2}-\d{2}\b",
-        lower,
-    ):
-        raise AirError(
-            "I support the next 48 hours, today or tomorrow, optionally morning, "
-            "afternoon or evening. Exact clock times and later dates aren't supported."
-        )
     duration_text = re.sub(r"(?:in\s+)?(?:the\s+)?next\s+48\s+hours?", "", lower)
     match = re.search(r"\b(\d+|one|two|three|four)\s*[- ]?\s*(?:hours?|hrs?)\b", duration_text)
     hours = 1
@@ -48,15 +51,17 @@ def parse_local(text: str) -> RequestSpec:
     activity = "walk"
     for pattern, candidate in (
         (r"\b(kids?|children|child|playground)\b", "kids"),
-        (r"\b(cycl\w*|bik\w*)\b", "cycle"),
-        (r"\b(run\w*|jog\w*)\b", "run"),
-        (r"\b(commut\w*)\b", "commute"),
+        (r"\b(cycle|cycling|bike|biking)\b", "cycle"),
+        (r"\b(run|runs|running|jog|jogging)\b", "run"),
+        (r"\b(commute|commuting)\b", "commute"),
     ):
         if re.search(pattern, lower):
             activity = candidate
             break
-    day = "tomorrow" if "tomorrow" in lower else "today" if "today" in lower else "next48"
-    period = next((p for p in ("morning", "afternoon", "evening") if p in lower), "any")
+    day = next((d for d in ("tomorrow", "today") if re.search(rf"\b{d}\b", lower)), "next48")
+    period = next(
+        (p for p in ("morning", "afternoon", "evening") if re.search(rf"\b{p}\b", lower)), "any"
+    )
     # Remove temporal clauses before extracting place; "in the next 48 hours" is not a city.
     cleaned = re.sub(r"(?:in\s+)?(?:the\s+)?next\s+48\s+hours?", "", text, flags=re.I)
     match = re.search(r"\b(?:in|near|at)\s+(.+)", cleaned, re.I)
@@ -74,13 +79,20 @@ def parse_local(text: str) -> RequestSpec:
                 place = name.upper() if name == "hsr" else name.title()
                 break
     if not place:
-        is_question = re.search(
-            r"\b(best|when|window|air|aqi|pm2|run\w*|walk\w*|cycl\w*|"
-            r"commut\w*|kids?|outside|weather|pollution)\b",
-            lower,
+        # Retain unrecognised words as a possible place instead of silently defaulting.
+        # This handles city-first requests and "AQI for Paris" without an LLM.
+        residue = re.sub(r"\b(?:\d+|one|two)\s*[- ]?\s*(?:hours?|hrs?)\b", " ", cleaned, flags=re.I)
+        residue = re.sub(
+            r"\b(?:best|when|what|is|the|a|an|can|i|my|to|for|go|take|should|please|"
+            r"time|times|window|windows|air|quality|cleanest|aqi|pm2\.5|"
+            r"run|runs|running|jog|jogging|walk|walking|cycle|cycling|bike|biking|"
+            r"commute|commuting|kids?|children|child|outside|outdoors?|weather|pollution|"
+            r"today|tomorrow|this|morning|afternoon|evening)\b",
+            " ",
+            residue,
+            flags=re.I,
         )
-        if not is_question:
-            place = cleaned.strip(" .,?!")
+        place = re.sub(r"\s+", " ", residue).strip(" .,?!")
     try:
         return RequestSpec(
             place=place or "Bengaluru", activity=activity, hours=hours, day=day, period=period
@@ -124,6 +136,8 @@ async def parse_request(
                     "Choose 1 or 2 hours in the next 48 hours, today or tomorrow; "
                     "morning, afternoon and evening are supported."
                 )
+            if not isinstance(data, dict) or not set(RequestSpec.model_fields).issubset(data):
+                raise ValueError("ASI extraction omitted required fields")
             return RequestSpec.model_validate(data)
         except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError, AttributeError):
             # Preserve the original request when language parsing is unavailable.
