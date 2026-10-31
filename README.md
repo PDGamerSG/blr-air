@@ -186,6 +186,14 @@ Feature choices and limits are supported by [official-source research](docs/rese
 
 The [submission kit](docs/submission.md) includes ten evaluation prompts, a routing experiment, outside-test notes, deployment checks and demo scripts. [Feedback log](docs/feedback.md) starts empty: there are no invented tester notes, users, videos, endorsements or challenge-completion claims. Record actual usage counts after deployment; local development messages are not outside-user tries.
 
+## Landing page
+
+`site/` contains a static, scroll-driven landing page (Three.js, GSAP, Blender-made models). It includes an in-browser scanner that applies the same scoring rules to live Open-Meteo data, and links to ASI:One and Agentverse. See [site/README.md](site/README.md).
+
+```sh
+cd site && npm install && npm run dev
+```
+
 ## Credits and licence
 
 Code: MIT; see [LICENSE](LICENSE). Weather/geocoding: [Open-Meteo](https://open-meteo.com/). Air-quality forecasts: [Open-Meteo Air Quality API](https://open-meteo.com/en/docs/air-quality-api), based on [CAMS](https://atmosphere.copernicus.eu/). Follow the [Open-Meteo attribution and API terms](https://open-meteo.com/en/terms); the free endpoint is intended for noncommercial use. Language parsing: [ASI:One](https://asi1.ai/), optional. Agent transport: [Fetch.ai uAgents](https://github.com/fetchai/uAgents).

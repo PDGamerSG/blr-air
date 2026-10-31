@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>BLR Air Window — find the cleanest hour to go outside</title>
+    <meta
+      name="description"
+      content="A Fetch.ai agent that reads the next 48 hours of AQI, PM2.5, rain and heat and finds the best 1–2 hour window to run, cycle, walk, commute or take the kids out. Built at Stranger Builds Bangalore."
+    />
+    <meta name="theme-color" content="#080b0d" />
+    <meta property="og:title" content="BLR Air Window — breathe on schedule" />
+    <meta property="og:description" content="The sky over Bengaluru has better hours. An agent that finds them." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="./og.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  </head>
+  <body>
+    <div class="preloader" id="preloader" aria-hidden="true">
+      <div class="preloader__stage">
+        <svg class="preloader__ufo" viewBox="0 0 200 150">
+          <path class="preloader__beam" d="M78 70h44l40 80H38z" />
+          <ellipse cx="100" cy="62" rx="72" ry="17" fill="#c04f93" stroke="#080b0d" stroke-width="5" />
+          <path d="M66 55a34 32 0 0 1 68 0z" fill="#8be9ed" stroke="#080b0d" stroke-width="5" />
+          <circle cx="52" cy="63" r="5" fill="#ffe62b" />
+          <circle cx="78" cy="69" r="5" fill="#ffe62b" />
+          <circle cx="100" cy="71" r="5" fill="#ffe62b" />
+          <circle cx="122" cy="69" r="5" fill="#ffe62b" />
+          <circle cx="148" cy="63" r="5" fill="#ffe62b" />
+        </svg>
+      </div>
+      <p class="preloader__label">Reading the sky over Bengaluru</p>
+      <p class="preloader__count"><span id="loadCount">000</span><small>%</small></p>
+    </div>
+
+    <canvas id="world" aria-hidden="true"></canvas>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="cursor" aria-hidden="true"><span></span></div>
+    <div class="toast" role="status" aria-live="polite"></div>
+
+    <header class="nav">
+      <a class="nav__logo" href="#top" aria-label="BLR Air Window, back to top">
+        <span class="nav__mark" aria-hidden="true"></span>BLR&nbsp;AIR <em>WINDOW</em>
+      </a>
+      <nav class="nav__links" aria-label="Sections">
+        <a href="#signals">How</a>
+        <a href="#scanner">Scan</a>
+        <a href="#city">City</a>
+        <a href="#hire">Hire</a>
+        <a href="#fine-print">Fine print</a>
+      </nav>
+      <a class="btn btn--small" data-asi href="#" target="_blank" rel="noopener"><span class="hide-sm">Chat on</span>ASI:One <span aria-hidden="true">↗</span></a>
+    </header>
+
+    <aside class="altimeter" aria-hidden="true">
+      <div class="altimeter__track"><span class="altimeter__ufo"></span></div>
+      <ol class="altimeter__ticks"></ol>
+    </aside>
+
+    <main>
+      <!-- 01 · HERO -->
+      <section class="hero" id="top" data-scene="hero">
+        <div class="hero__inner">
+          <p class="eyebrow reveal">
+            <span class="dot dot--live"></span> A Fetch.ai agent <i>✦</i> Stranger Builds Bangalore <i>✦</i> 31·10·2026
+          </p>
+          <h1 class="hero__title">
+            <span class="hero__line" data-split>Breathe</span>
+            <span class="hero__line hero__line--indent" data-split>on schedule.</span>
+          </h1>
+          <p class="hero__lede reveal">
+            The sky over Bengaluru has better hours. <strong>BLR Air Window</strong> reads the next 48 hours of AQI, PM2.5,
+            rain and heat, then tells you the cleanest 1–2 hours to
+            <span class="rotator" aria-live="off"><span>run.</span></span>
+          </p>
+          <div class="hero__ctas reveal">
+            <a class="btn" data-asi href="#" target="_blank" rel="noopener">Ask the agent <span aria-hidden="true">↗</span></a>
+            <a class="btn btn--ghost" href="#scanner">Scan the sky <span aria-hidden="true">↓</span></a>
+          </div>
+        </div>
+        <div class="hero__live sticker" style="--r: 3deg" hidden>
+          <span class="sticker__label"><span class="dot dot--live"></span> Live · Bengaluru</span>
+          <strong class="hero__aqi">—</strong>
+          <span class="hero__aqi-meta">US AQI, modelled</span>
+          <span class="hero__aqi-cat"></span>
+        </div>
+        <p class="hero__pilot sticker sticker--paper" style="--r: -4deg">
+          Piloted by <b>Gaali</b> <span lang="kn">ಗಾಳಿ</span><small>“air”, in Kannada</small>
+        </p>
+        <a class="scroll-hint" href="#haze"><span>Scroll to descend</span><i aria-hidden="true"></i></a>
+      </section>
+
+      <div class="marquee" aria-label="Bengaluru localities the agent knows">
+        <div class="marquee__track"></div>
+      </div>
+
+      <!-- 02 · THE PROBLEM -->
+      <section class="haze" id="haze" data-scene="haze" data-sticky>
+        <div class="sticky">
+          <div class="haze__words" aria-hidden="true">
+            <span class="haze__word" data-step="0">AQI is</span>
+            <span class="haze__word" data-step="0">a number.</span>
+            <span class="haze__word haze__word--hl" data-step="1">You need</span>
+            <span class="haze__word haze__word--hl" data-step="1">a time.</span>
+          </div>
+          <h2 class="sr-only">AQI is a number. You need a time.</h2>
+          <div class="haze__compare">
+            <article class="card card--muted" data-step="1">
+              <p class="card__kicker">What an app tells you</p>
+              <p class="card__big"><s>AQI 112.</s></p>
+              <p>Unhealthy for sensitive groups. Right now. Good luck.</p>
+              <span class="card__note">illustrative</span>
+            </article>
+            <article class="card card--answer" data-step="2">
+              <p class="card__kicker">What Gaali tells you</p>
+              <p class="card__big">Go at 06:00.</p>
+              <p>Cleanest 1-hour slot before noon tomorrow. Rain chance stays low. Worst hour still flagged.</p>
+              <span class="card__note">illustrative</span>
+            </article>
+          </div>
+          <p class="haze__foot" data-step="2">
+            Most air apps show the air <em>right now</em>. This agent looks ahead 48&nbsp;hours, weighs pollution, rain and
+            heat hour by hour, and gives you the best consecutive slot. If even the best slot is unhealthy, it says so.
+          </p>
+        </div>
+      </section>
+
+      <!-- 03 · FOUR SIGNALS -->
+      <section class="signals" id="signals" data-scene="signals" data-sticky>
+        <div class="sticky">
+          <header class="section-head">
+            <p class="eyebrow">01 <i>✦</i> How Gaali reads the sky</p>
+            <h2 class="title" data-split>Four signals.<br />One window.</h2>
+          </header>
+          <div class="signals__cards">
+            <article class="signal" data-i="0" style="--c: var(--orange)">
+              <p class="signal__n">01 / 04</p>
+              <h3>US AQI</h3>
+              <p>The headline number, averaged across your window. The worst single hour is still reported, so one bad hour can't hide.</p>
+              <code>+ 1 × AQI</code>
+            </article>
+            <article class="signal" data-i="1" style="--c: var(--paper)">
+              <p class="signal__n">02 / 04</p>
+              <h3>PM2.5</h3>
+              <p>AQI already counts particles. They get extra weight on purpose, so smoggy, particle-heavy hours sink in the ranking.</p>
+              <code>+ 0.5 × PM2.5</code>
+            </article>
+            <article class="signal" data-i="2" style="--c: var(--cyan)">
+              <p class="signal__n">03 / 04</p>
+              <h3>Rain</h3>
+              <p>Hourly chance of rain. You see the peak hour, not a soothing block average.</p>
+              <code>+ 1.5 × rain %</code>
+            </article>
+            <article class="signal" data-i="3" style="--c: var(--yellow)">
+              <p class="signal__n">04 / 04</p>
+              <h3>Heat</h3>
+              <p>Every degree above 30&nbsp;°C costs five points. Bengaluru afternoons, we see you.</p>
+              <code>+ 5 × max(0, °C − 30)</code>
+            </article>
+          </div>
+          <div class="formula" aria-label="cost equals AQI plus 0.5 times PM2.5 plus 1.5 times rain percent plus 5 times degrees above 30">
+            <span class="formula__lhs">cost =</span>
+            <span class="formula__term" data-i="0">AQI</span>
+            <span class="formula__term" data-i="1">+ 0.5·PM2.5</span>
+            <span class="formula__term" data-i="2">+ 1.5·rain%</span>
+            <span class="formula__term" data-i="3">+ 5·max(0,&nbsp;°C−30)</span>
+          </div>
+          <p class="signals__foot">
+            Lowest mean cost wins; ties go to the earlier hour. Only complete windows between 05:00 and 21:00 local count.
+            This is a transparent preference heuristic, <strong>not a medical model</strong>.
+          </p>
+          <ol class="signals__dots" aria-hidden="true"><li></li><li></li><li></li><li></li></ol>
+        </div>
+      </section>
+
+      <!-- 04 · LIVE SCANNER -->
+      <section class="scanner" id="scanner" data-scene="scanner">
+        <header class="section-head section-head--center">
+          <p class="eyebrow">02 <i>✦</i> Try it right here</p>
+          <h2 class="title" data-split>Scan the next 48 hours</h2>
+          <p class="section-head__lede">
+            Live Open-Meteo forecasts, scored in your browser using the agent's own rules. Pick a spot and an activity, then
+            press the button.
+          </p>
+        </header>
+
+        <div class="scanner__grid">
+          <form class="scanner__controls panel" autocomplete="off">
+            <fieldset>
+              <legend>Where</legend>
+              <div class="select">
+                <select name="place" aria-label="Bengaluru locality"></select>
+              </div>
+              <div class="city-search">
+                <input name="city" type="text" placeholder="…or any city, e.g. Paris, France" aria-label="Any city" />
+                <button type="button" class="chip chip--go" data-geocode>Find</button>
+              </div>
+            </fieldset>
+            <fieldset>
+              <legend>To</legend>
+              <div class="chips" data-group="activity">
+                <button type="button" class="chip" data-value="run">Run</button>
+                <button type="button" class="chip" data-value="cycle">Cycle</button>
+                <button type="button" class="chip is-on" data-value="walk">Walk</button>
+                <button type="button" class="chip" data-value="commute">Commute</button>
+                <button type="button" class="chip" data-value="kids">Kids out</button>
+              </div>
+            </fieldset>
+            <div class="scanner__row">
+              <fieldset>
+                <legend>For</legend>
+                <div class="chips" data-group="hours">
+                  <button type="button" class="chip is-on" data-value="1">1 hr</button>
+                  <button type="button" class="chip" data-value="2">2 hrs</button>
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend>When</legend>
+                <div class="chips" data-group="day">
+                  <button type="button" class="chip is-on" data-value="next48">Next 48h</button>
+                  <button type="button" class="chip" data-value="today">Today</button>
+                  <button type="button" class="chip" data-value="tomorrow">Tomorrow</button>
+                </div>
+              </fieldset>
+            </div>
+            <fieldset>
+              <legend>Part of day</legend>
+              <div class="chips" data-group="period">
+                <button type="button" class="chip is-on" data-value="any">Any</button>
+                <button type="button" class="chip" data-value="morning">Morning</button>
+                <button type="button" class="chip" data-value="afternoon">Afternoon</button>
+                <button type="button" class="chip" data-value="evening">Evening</button>
+              </div>
+            </fieldset>
+            <button type="submit" class="btn btn--wide scanner__go">
+              <span>Scan the sky</span>
+            </button>
+          </form>
+
+          <div class="scanner__out">
+            <div class="chart panel" aria-label="48-hour forecast chart">
+              <div class="chart__head">
+                <p class="chart__place">—</p>
+                <p class="chart__status"><span class="dot"></span> <span class="chart__status-text">Waiting for a scan</span></p>
+              </div>
+              <div class="chart__scroll">
+                <div class="chart__bars" role="list"></div>
+                <div class="chart__beam" aria-hidden="true"></div>
+              </div>
+              <div class="chart__legend">
+                <span><i style="--c: #7cff5b"></i>Good</span>
+                <span><i style="--c: #ffe62b"></i>Moderate</span>
+                <span><i style="--c: #ff6a2a"></i>Sensitive</span>
+                <span><i style="--c: #e20b1b"></i>Unhealthy</span>
+                <span><i style="--c: #a14bd8"></i>Very</span>
+                <span><i class="legend-off"></i>Outside your hours</span>
+                <span class="chart__hint">Bar height = hourly cost. Shorter is better.</span>
+              </div>
+              <div class="chart__tip" hidden></div>
+            </div>
+
+            <article class="result panel" aria-live="polite">
+              <p class="result__kicker">Gaali's verdict</p>
+              <p class="result__window">Press <b>Scan the sky</b>.</p>
+              <dl class="result__stats"></dl>
+              <pre class="result__text"></pre>
+              <div class="result__actions">
+                <button type="button" class="btn btn--small" data-ask disabled>Ask the real agent <span aria-hidden="true">↗</span></button>
+                <button type="button" class="btn btn--small btn--ghost" data-copy-prompt disabled>Copy prompt</button>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- 05 · THE CITY -->
+      <section class="city" id="city" data-scene="city" data-sticky>
+        <div class="sticky">
+          <header class="section-head city__head">
+            <p class="eyebrow">03 <i>✦</i> Bengaluru, mapped</p>
+            <h2 class="title" data-split>20 neighbourhoods on call</h2>
+            <p class="section-head__lede">
+              From Yelahanka to Electronic City, the agent knows 20 locality centroids by name. Anywhere else on Earth works
+              through geocoding. Beacon height shows <em>current modelled</em> US AQI.
+            </p>
+          </header>
+          <div class="city__board panel">
+            <p class="city__board-head"><span>Locality</span><span>AQI now</span></p>
+            <ol class="city__list"></ol>
+            <p class="city__note">
+              Modelled CAMS grid, not CPCB stations. Neighbourhoods that share a model grid cell show the same value.
+            </p>
+          </div>
+          <div class="city__labels" aria-hidden="true"></div>
+        </div>
+      </section>
+
+      <!-- 06 · HIRE IT -->
+      <section class="hire" id="hire" data-scene="hire">
+        <header class="section-head section-head--center">
+          <p class="eyebrow">04 <i>✦</i> Two ways in</p>
+          <h2 class="title" data-split>Get it hired</h2>
+          <p class="section-head__lede">
+            Humans chat in plain words on ASI:One. Other agents send a typed <code>WindowRequest</code> and get a typed
+            <code>WindowResponse</code> back. Same brain behind both.
+          </p>
+        </header>
+        <div class="hire__board panel panel--paper">
+          <svg class="hire__sketch" viewBox="0 0 1200 560" role="img" aria-label="Diagram: you chat on ASI:One, which routes to the BLR Air agent; a planner agent sends WindowRequest directly; the agent reads Open-Meteo and CAMS forecasts and replies."></svg>
+        </div>
+        <div class="hire__cols">
+          <article class="panel hire__card">
+            <p class="card__kicker">For humans</p>
+            <h3>Chat on ASI:One</h3>
+            <ol class="steps">
+              <li>Open <a data-asi href="#" target="_blank" rel="noopener">asi1.ai</a> and switch <b>Agents</b> on.</li>
+              <li>Mention <code class="handle"></code> or open the agent's Agentverse profile and choose <b>Chat with Agent</b>.</li>
+              <li>Ask like a person: <q>best 2-hour cycling window in Koramangala tomorrow morning</q>.</li>
+            </ol>
+            <div class="hire__actions">
+              <a class="btn btn--small" data-asi href="#" target="_blank" rel="noopener">Open ASI:One ↗</a>
+              <a class="btn btn--small btn--ghost" data-agentverse href="#" target="_blank" rel="noopener">Agentverse profile ↗</a>
+            </div>
+          </article>
+          <article class="panel hire__card hire__card--code">
+            <p class="card__kicker">For agents · protocol <code>blr-air-window v0.1.0</code></p>
+            <pre class="code"><code><span class="k">from</span> blr_air.models <span class="k">import</span> WindowRequest
+
+request = <span class="f">WindowRequest</span>(
+    latitude=<span class="n">12.9116</span>, longitude=<span class="n">77.6389</span>,
+    hours=<span class="n">2</span>, activity=<span class="s">"run"</span>,
+    day=<span class="s">"tomorrow"</span>, period=<span class="s">"morning"</span>,
+)
+<span class="k">await</span> ctx.<span class="f">send</span>(BLR_AIR_ADDRESS, request)
+
+<span class="c"># ← WindowResponse(status="ok", start, end, timezone,</span>
+<span class="c">#     us_aqi, pm2_5, rain_probability, temperature,</span>
+<span class="c">#     max_aqi, fetched_at, source, summary)</span></code></pre>
+            <div class="address">
+              <span class="address__label">Agent address</span>
+              <code class="address__value" data-address></code>
+              <button type="button" class="chip" data-copy-address>Copy</button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- 07 · PROMPTS -->
+      <section class="prompts" id="prompts" data-scene="prompts" data-sticky>
+        <div class="sticky">
+          <header class="section-head section-head--center">
+            <p class="eyebrow">05 <i>✦</i> Incoming transmissions</p>
+            <h2 class="title" data-split>Say it like a human</h2>
+            <p class="section-head__lede">Drag the wheel or keep scrolling. Tap a card to copy the prompt and open ASI:One.</p>
+          </header>
+          <div class="wheel" tabindex="0" aria-label="Example prompts carousel. Use arrow keys to rotate.">
+            <div class="wheel__ring"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 08 · FINE PRINT -->
+      <section class="fine" id="fine-print" data-scene="fine">
+        <div class="file panel panel--paper">
+          <p class="file__stamp" aria-hidden="true">Declassified</p>
+          <header>
+            <p class="file__ref">FILE NO. BLR-AIR-0.1.0 · HONESTY DEPT.</p>
+            <h2 class="file__title">The fine print, unredacted</h2>
+          </header>
+          <ul class="file__list">
+            <li><span class="redact">Modelled air, not station readings.</span> Open-Meteo / CAMS forecasts, not CPCB monitors or street-level sensors.</li>
+            <li><span class="redact">Not medical advice.</span> The best window can still be unhealthy. When it is, the agent says so and suggests going indoors.</li>
+            <li><span class="redact">Activity hours only.</span> Windows run 05:00–21:00 local. That is a preference, not a sunrise calculation.</li>
+            <li><span class="redact">No invented data.</span> An hour with missing rain, heat, AQI or PM2.5 is skipped, never assumed clean.</li>
+            <li><span class="redact">Privacy by boredom.</span> Prompts aren't stored. Senders are keyed hashes. Only aggregate counters persist.</li>
+            <li><span class="redact">Next 48 hours only.</span> Today, tomorrow, morning, afternoon or evening. Exact clock times aren't supported.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 09 · STRANGER BUILDS -->
+      <section class="builds" id="stranger-builds" data-scene="builds">
+        <div class="builds__grid">
+          <div class="builds__copy">
+            <p class="eyebrow">06 <i>✦</i> Origin story</p>
+            <h2 class="title" data-split>Born at Stranger&nbsp;Builds</h2>
+            <p class="builds__meta">
+              Bangalore <i>✦</i> Bharat1.ai, RGA Tech Park <i>✦</i> Sat 31 Oct 2026 <i>✦</i> Fetch.ai challenge:
+              <b>Get your agent hired.</b>
+            </p>
+            <p class="builds__lede">
+              A seven-day hackathon with one rule that matters: put it in front of real people, let them roast it, make it
+              better. <strong>Zero users is a bug.</strong> You could be user number one.
+            </p>
+            <div class="hero__ctas">
+              <a class="btn" data-asi href="#" target="_blank" rel="noopener">Try it now ↗</a>
+              <a class="btn btn--ghost" data-roast href="#" target="_blank" rel="noopener">Roast it on GitHub ↗</a>
+            </div>
+          </div>
+          <div class="builds__side">
+            <div class="countdown panel" aria-label="Time until online submissions close">
+              <p class="countdown__label">Online submissions close · Sun 8 Nov</p>
+              <div class="countdown__digits">
+                <span><b data-cd="d">00</b><small>days</small></span>
+                <span><b data-cd="h">00</b><small>hrs</small></span>
+                <span><b data-cd="m">00</b><small>min</small></span>
+                <span><b data-cd="s">00</b><small>sec</small></span>
+              </div>
+            </div>
+            <ol class="journey">
+              <li class="is-done"><span>01</span> Pick an idea</li>
+              <li class="is-done"><span>02</span> Ship it</li>
+              <li class="is-now"><span>03</span> Get feedback <em>← you are here</em></li>
+              <li><span>04</span> Improve it</li>
+              <li><span>05</span> Submit</li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10 · FINALE -->
+      <section class="final" id="open" data-scene="final">
+        <div class="final__inner">
+          <p class="eyebrow">07 <i>✦</i> Landing</p>
+          <h2 class="final__title">
+            <span data-split>The window</span>
+            <span data-split>is open.</span>
+          </h2>
+          <p class="final__lede">Gaali took the mask off. Your turn: ask when to go outside.</p>
+          <div class="final__ctas">
+            <a class="btn btn--xl" data-asi href="#" target="_blank" rel="noopener">Chat on ASI:One ↗</a>
+            <a class="btn btn--xl btn--cyan" data-agentverse href="#" target="_blank" rel="noopener">Agentverse ↗</a>
+            <a class="btn btn--xl btn--ghost" data-github href="#" target="_blank" rel="noopener">Source on GitHub ↗</a>
+          </div>
+          <button type="button" class="final__prompt" data-prompt-copy>
+            <span class="final__prompt-label">Copy &amp; paste</span>
+            <code></code>
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer__cols">
+        <p>
+          <b>BLR Air Window</b> · built for Stranger Builds Bangalore 2026 · code MIT.<br />
+          Weather and geocoding by <a data-openmeteo href="#" target="_blank" rel="noopener">Open-Meteo</a>. Air quality from
+          <a data-cams href="#" target="_blank" rel="noopener">CAMS</a> via Open-Meteo. Agent transport by Fetch.ai uAgents;
+          optional language parsing by ASI:One.
+        </p>
+        <p>
+          Modelled forecasts, not CPCB station readings or medical advice.<br />
+          <a data-docs href="#" target="_blank" rel="noopener">Build your own uAgent</a> ·
+          <a data-sb href="#" target="_blank" rel="noopener">strangerbuilds.com</a>
+        </p>
+      </div>
+      <div class="footer__bar">
+        <button type="button" class="chip" data-motion aria-pressed="false">Pause motion</button>
+        <a href="#top" class="chip">Back to orbit ↑</a>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
