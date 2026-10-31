@@ -18,6 +18,7 @@ import { initCityBoard, initMarquee, loadLive, MAP_LOCALITIES, renderHeroLive } 
 import { initScanner, promptFor } from "./ui/scanner";
 import { initPlanner } from "./ui/planner";
 import { initWheel } from "./ui/wheel";
+import { copyText, openAgent } from "./ui/agentLink";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -58,30 +59,10 @@ function toast(msg: string) {
   toastTimer = window.setTimeout(() => toastEl.classList.remove("is-on"), 3200);
 }
 
-async function copyText(text: string) {
-  try {
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch {
-    const ta = document.createElement("textarea");
-    ta.value = text;
-    ta.style.position = "fixed";
-    ta.style.opacity = "0";
-    document.body.append(ta);
-    ta.select();
-    const ok = document.execCommand("copy");
-    ta.remove();
-    return ok;
-  }
-}
-
 // On-page requests use the shared service; without it, fall back to ASI:One.
 function askAgent(prompt: string) {
   if (!plannerOnline) {
-    // Copy first (while the page still has focus), then open ASI:One in a new tab.
-    const copied = copyText(prompt);
-    window.open(LINKS.asiOne, "_blank", "noopener");
-    copied.then((ok) => toast(ok ? "Prompt copied. Paste it into ASI:One with Agents on." : `Paste this into ASI:One: ${prompt}`));
+    void openAgent(prompt).then(toast);
     return;
   }
   const input = $<HTMLTextAreaElement>("#planner-query");
@@ -94,12 +75,6 @@ function askAgent(prompt: string) {
 
 planner.ready.then((ok) => {
   plannerOnline = ok;
-  if (ok) return;
-  const cta = $<HTMLAnchorElement>('.hero__ctas a[href="#planner"]');
-  cta.href = LINKS.asiOne;
-  cta.target = "_blank";
-  cta.rel = "noopener";
-  cta.innerHTML = 'Ask the agent <span aria-hidden="true">↗</span>';
 });
 
 $("[data-copy-address]").addEventListener("click", () => copyText(AGENT_ADDRESS).then(() => toast("Agent address copied.")));

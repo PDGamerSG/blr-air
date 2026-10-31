@@ -1,4 +1,5 @@
 import { aqiColor } from "../air/scoring";
+import { openAgent } from "./agentLink";
 
 interface Assessment {
   verdict?: string;
@@ -261,6 +262,7 @@ export function initPlanner(): { ready: Promise<boolean> } {
   const output = find<HTMLElement>("[data-plan-results]");
   const audio = find<HTMLAudioElement>("[data-plan-audio]");
   let voiceEnabled = false;
+  let plannerOnline = false;
   let controller: AbortController | null = null;
   let audioUrl: string | null = null;
   let requestNumber = 0;
@@ -291,7 +293,7 @@ export function initPlanner(): { ready: Promise<boolean> } {
       control.disabled = busy || control.dataset.disabled === "true" || (control === upload && !voiceEnabled) || (control === record && (!voiceEnabled || !navigator.mediaDevices?.getUserMedia));
     });
     cancel.hidden = !busy;
-    submit.textContent = busy ? "Working on your request…" : "Find my plan";
+    submit.textContent = busy ? "Working on your request…" : plannerOnline ? "Find my plan" : "Ask on ASI:One ↗";
   }
 
   async function responseError(response: Response): Promise<Error> {
@@ -505,6 +507,15 @@ export function initPlanner(): { ready: Promise<boolean> } {
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     if (!form.reportValidity()) return;
+    if (!plannerOnline) {
+      let prompt = query.value.trim();
+      if (includeVenue.checked) {
+        prompt += `\nInclude venue ratings, customer reviews and opening hours${venueQuery.value.trim() ? ` for ${venueQuery.value.trim()}` : ""}.`;
+      }
+      setStatus("Opening BLR Air Window on ASI:One…");
+      void openAgent(prompt).then((message) => setStatus(message));
+      return;
+    }
     captureNumber++;
     capturePending = false;
     stopRecording?.(false);
@@ -656,6 +667,7 @@ export function initPlanner(): { ready: Promise<boolean> } {
       if (!response.ok) throw new Error("Planning service unavailable");
       const body = await response.json();
       if (body.status !== "ok" || !body.features) throw new Error("Planning service unavailable");
+      plannerOnline = true;
       voiceEnabled = Boolean(body.features.voice);
       upload.disabled = !voiceEnabled || controller !== null || capturePending || stopRecording !== null;
       record.disabled = !voiceEnabled || !navigator.mediaDevices?.getUserMedia || controller !== null;
@@ -663,7 +675,8 @@ export function initPlanner(): { ready: Promise<boolean> } {
       return true;
     })
     .catch(() => {
-      capabilities.textContent = "The planning server is currently unreachable. Try again shortly; the quick forecast scan below works independently.";
+      capabilities.textContent = "Ask BLR Air Window on ASI:One. Your request will be copied so you can paste it into the agent's chat. The quick forecast scan below also works here.";
+      submit.textContent = "Ask on ASI:One ↗";
       return false;
     })
     .finally(() => window.clearTimeout(healthTimer));
