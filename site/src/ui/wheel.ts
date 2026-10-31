@@ -24,8 +24,8 @@ export function initWheel(root: HTMLElement, onPick: (prompt: string) => void) {
     card.innerHTML = `
       <span class="ticket__top"><span>Transmission ${String(i + 1).padStart(2, "0")}</span><span>${p.tag}</span></span>
       <span class="ticket__text" data-handle="${AGENT_HANDLE}">${p.text}</span>
-      <span class="ticket__foot">Tap to copy → ASI:One</span>`;
-    card.setAttribute("aria-label", `Copy prompt: ${p.text}`);
+      <span class="ticket__foot">Tap to ask Gaali</span>`;
+    card.setAttribute("aria-label", `Ask: ${p.text}`);
     ring.append(card);
     return card;
   });

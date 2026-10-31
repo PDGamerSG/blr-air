@@ -49,7 +49,7 @@
       </a>
       <nav class="nav__links" aria-label="Sections">
         <a href="#signals">How</a>
-        <a href="#scanner">Scan</a>
+        <a href="#planner">Plan</a>
         <a href="#city">City</a>
         <a href="#hire">Hire</a>
         <a href="#fine-print">Fine print</a>
@@ -79,7 +79,7 @@
             <span class="rotator" aria-live="off"><span>run.</span></span>
           </p>
           <div class="hero__ctas reveal">
-            <a class="btn" data-asi href="#" target="_blank" rel="noopener">Ask the agent <span aria-hidden="true">↗</span></a>
+            <a class="btn" href="#planner">Ask the agent here <span aria-hidden="true">↓</span></a>
             <a class="btn btn--ghost" href="#scanner">Scan the sky <span aria-hidden="true">↓</span></a>
           </div>
         </div>
@@ -182,12 +182,53 @@
       <section class="scanner" id="scanner" data-scene="scanner">
         <header class="section-head section-head--center">
           <p class="eyebrow">02 <i>✦</i> Try it right here</p>
-          <h2 class="title" data-split>Scan the next 48 hours</h2>
+          <h2 class="title" data-split>Your next outdoor plan</h2>
           <p class="section-head__lede">
-            Live Open-Meteo forecasts, scored in your browser using the agent's own rules. Pick a spot and an activity, then
-            press the button.
+            Ask in your own words. Get a live air-quality assessment, places to compare, backup times and a plan you can save.
           </p>
         </header>
+
+        <section class="planner panel" id="planner" aria-labelledby="planner-title">
+          <div class="planner__intro">
+            <h3 id="planner-title">Tell Gaali what you have in mind.</h3>
+            <p class="planner__capabilities" data-planner-capabilities role="status">Checking available services…</p>
+          </div>
+          <form class="planner__form" data-planner-form>
+            <label for="planner-query">Your request</label>
+            <textarea id="planner-query" name="query" rows="3" maxlength="2000" required placeholder="Compare Cubbon Park and Lalbagh for a walk tomorrow morning, with AQI at most 100 and daylight only."></textarea>
+            <div class="planner__examples" aria-label="Example requests">
+              <button type="button" class="chip" data-plan-example="Compare HSR Layout and Whitefield for a run tomorrow morning with AQI at most 100, rain at most 30%, daylight only">Compare two places</button>
+              <button type="button" class="chip" data-plan-example="Best 1-hour walk in Cubbon Park tomorrow morning with daylight only" data-example-venue="Cubbon Park, Bengaluru">Plan a park visit</button>
+              <button type="button" class="chip" data-plan-example="Best 2-hour cycling window in Koramangala tomorrow morning with wind at most 20 km/h and UV at most 5">Plan a bike ride</button>
+            </div>
+            <details class="planner__options">
+              <summary>Venue reviews and voice input</summary>
+              <label class="planner__check"><input type="checkbox" name="include_venue" /> Include real venue ratings, customer reviews and opening hours</label>
+              <label for="planner-venue">Specific venue to look up <span>(optional)</span></label>
+              <input id="planner-venue" name="venue_query" type="text" maxlength="160" placeholder="Cubbon Park, Bengaluru" />
+              <p class="planner__hint">Ratings describe the venue. Air-quality advice describes the forecast. Opening hours shown by the provider need checking for your visit date.</p>
+              <label for="planner-audio">Or transcribe a recording</label>
+              <input id="planner-audio" name="audio" type="file" accept=".wav,audio/wav" disabled />
+              <p class="planner__hint">WAV, 16-bit PCM, up to 30 seconds and 10 MiB. Audio is sent to Sarvam. You can edit the transcript before submitting.</p>
+              <button type="button" class="chip" data-plan-record disabled>Record a request</button>
+              <p class="planner__hint">Microphone recording starts only when you choose it and grant permission. Recording stops automatically after 30 seconds.</p>
+            </details>
+            <div class="planner__submit">
+              <button type="submit" class="btn" data-plan-submit>Find my plan</button>
+              <button type="button" class="btn btn--ghost" data-plan-cancel hidden>Cancel request</button>
+            </div>
+            <p class="planner__hint">Today or tomorrow · 1–2 hours · up to 3 places. Ask for AQI, rain, feels-like temperature, UV, wind or daylight limits.</p>
+          </form>
+          <p class="planner__status" data-plan-status role="status" aria-live="polite"></p>
+          <div class="planner__results" data-plan-results></div>
+          <audio class="planner__audio" data-plan-audio controls hidden aria-label="Spoken outdoor plan"></audio>
+          <p class="planner__hint">Forecasts can change. Review the matched place and conditions before leaving. <a href="#privacy">Privacy and terms</a>.</p>
+        </section>
+
+        <div class="planner__quick-heading">
+          <h3>Quick forecast scan</h3>
+          <p>Prefer choosing controls? This keyless browser scan shows one place. Use the agent above for comparisons, reviews, voice and calendar downloads.</p>
+        </div>
 
         <div class="scanner__grid">
           <form class="scanner__controls panel" autocomplete="off">
@@ -270,7 +311,7 @@
               <dl class="result__stats"></dl>
               <pre class="result__text"></pre>
               <div class="result__actions">
-                <button type="button" class="btn btn--small" data-ask disabled>Ask the real agent <span aria-hidden="true">↗</span></button>
+                <button type="button" class="btn btn--small" data-ask disabled>Open full agent plan</button>
                 <button type="button" class="btn btn--small btn--ghost" data-copy-prompt disabled>Copy prompt</button>
               </div>
             </article>
@@ -356,7 +397,7 @@ request = <span class="f">WindowRequest</span>(
           <header class="section-head section-head--center">
             <p class="eyebrow">05 <i>✦</i> Incoming transmissions</p>
             <h2 class="title" data-split>Say it like a human</h2>
-            <p class="section-head__lede">Drag the wheel or keep scrolling. Tap a card to copy the prompt and open ASI:One.</p>
+            <p class="section-head__lede">Drag the wheel or keep scrolling. Tap a card to ask Gaali.</p>
           </header>
           <div class="wheel" tabindex="0" aria-label="Example prompts carousel. Use arrow keys to rotate.">
             <div class="wheel__ring"></div>
@@ -377,7 +418,7 @@ request = <span class="f">WindowRequest</span>(
             <li><span class="redact">Not medical advice.</span> The best window can still be unhealthy. When it is, the agent says so and suggests going indoors.</li>
             <li><span class="redact">Activity hours only.</span> Windows run 05:00–21:00 local. That is a preference, not a sunrise calculation.</li>
             <li><span class="redact">No invented data.</span> An hour with missing rain, heat, AQI or PM2.5 is skipped, never assumed clean.</li>
-            <li><span class="redact">Privacy by boredom.</span> Prompts aren't stored. Senders are keyed hashes. Only aggregate counters persist.</li>
+            <li><span class="redact">Privacy by design.</span> Website plans live briefly in server memory for downloads. Prompts and audio are processed by the configured services; see the privacy details below.</li>
             <li><span class="redact">Next 48 hours only.</span> Today, tomorrow, morning, afternoon or evening. Exact clock times aren't supported.</li>
           </ul>
         </div>
@@ -398,7 +439,7 @@ request = <span class="f">WindowRequest</span>(
               better. <strong>Zero users is a bug.</strong> You could be user number one.
             </p>
             <div class="hero__ctas">
-              <a class="btn" data-asi href="#" target="_blank" rel="noopener">Try it now ↗</a>
+              <a class="btn" href="#planner">Try it now</a>
               <a class="btn btn--ghost" data-roast href="#" target="_blank" rel="noopener">Roast it on GitHub ↗</a>
             </div>
           </div>
@@ -463,6 +504,13 @@ request = <span class="f">WindowRequest</span>(
         <button type="button" class="chip" data-motion aria-pressed="false">Pause motion</button>
         <a href="#top" class="chip">Back to orbit ↑</a>
       </div>
+      <details class="planner__legal" id="privacy">
+        <summary>Privacy and terms of use</summary>
+        <p>BLR Air helps you choose an outdoor window from model forecasts. It is not medical advice, a venue booking or a guarantee of safe conditions. Recheck conditions and venue access before travelling.</p>
+        <p>Your request is processed by this server and, when configured, ASI:One for language understanding. Place names or coordinates go to Open-Meteo for forecasts. Venue queries go to Google Places when requested. Uploaded recordings and spoken replies use Sarvam. Do not include sensitive personal information.</p>
+        <p>Website plans are kept temporarily in server memory so you can download a calendar or spoken answer; they expire and are lost on restart. The application does not persist your recordings or customer-review content. Infrastructure and third-party services have their own data policies. Agent-to-agent usage counters store keyed sender hashes and aggregate counts.</p>
+        <p>Google Maps venue data includes attributed ratings and a limited, relevance-ranked sample of customer reviews. Reviews are written by their authors and are not verified or endorsed by BLR Air. Google Maps content is subject to the <a href="https://maps.google.com/help/terms_maps/" target="_blank" rel="noopener noreferrer">Google Maps terms</a> and <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google Privacy Policy</a>.</p>
+      </details>
     </footer>
 
     <script type="module" src="/src/main.ts"></script>
