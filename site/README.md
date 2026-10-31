@@ -29,7 +29,7 @@ npm run build     # static output in site/dist
 npm run preview
 ```
 
-Run the Python web service on `127.0.0.1:8080` alongside Vite for development; Vite proxies `/api` there. Production should serve `site/dist/` and `/api` from the same origin using the Python service or a reverse proxy. A standalone static host can show the landing page and keyless quick scanner, but cannot run the full planner without routing `/api` to the server. No API keys belong in browser code or `VITE_*` variables.
+Run the Python web service on `127.0.0.1:8080` alongside Vite for development; Vite proxies `/api` there. On Vercel, `/api/*` goes through the same-origin proxy in `../api/proxy.mjs` to `BLR_AIR_API_ORIGIN`; see the root README. Production should serve `site/dist/` and `/api` from the same origin using the Python service or a reverse proxy. A standalone static host can show the landing page and keyless quick scanner, but cannot run the full planner without routing `/api` to the server. No API keys belong in browser code or `VITE_*` variables.
 
 The server reports configured language, voice and venue capabilities at `/api/status`. Missing optional credentials produce visible unavailability messages. The interface never substitutes synthetic forecasts for a failed full-agent request. An interrupted or new request clears previous full-agent results; transient plan IDs expire, so downloads require a fresh plan afterward.
 

@@ -1,5 +1,11 @@
 # Verification record
 
+## Request-specific answers
+
+The routing fix passes **275 Python tests**, Ruff lint/format, **8 website tests** and the production website build. Both Docker services were rebuilt and restarted. Six consecutive requests from one caller through the installed Docker agent handler, using real ASI and Open-Meteo, returned relevant answers: a two-sentence photosynthesis explanation, a one-sentence notification explanation, a sample sentence containing “send me alerts”, multiplication, exactly three walking-benefit bullets, and current HSR Layout AQI with source and retrieval time.
+
+Previously, a broad reminder keyword rule intercepted unrelated questions and returned the same forecast-update guide. Guidance now matches scheduling requests rather than words quoted in a question. The model prompt distinguishes activity explanations from outing plans, follows the requested format, and uses JSON response mode; the outage fallback also keeps activity explanations out of geocoding. The integration preserves the newer main-branch website and media features. See [request/reply verification](request-reply-verification.json).
+
 ## Natural questions and general conversation
 
 The conversational revision passes **272 Python tests**, Ruff lint/format and both Docker builds. It adds ASI:One intent/answer handling before planning-only validation: everyday questions get a direct answer, current/daily condition requests fetch real provider data, planning requests preserve the original constraint parser, and ambiguous requests ask a short question. The typed APIs remain compatible. General model answers do not provide live news, market data or browsing; messages remain independent.

@@ -181,6 +181,19 @@ async def test_missing_conversation_key_is_honest_and_does_not_query_a_fake_city
     assert "conversational" in result.lower()
 
 
+@pytest.mark.parametrize(
+    "question",
+    [
+        "Answer with exactly 3 bullet points: benefits of walking.",
+        "List the advantages of cycling.",
+    ],
+)
+async def test_activity_explanations_during_an_outage_are_not_geocoded_as_outings(question):
+    async with httpx.AsyncClient() as client:
+        result = await AirService(NoForecast(), client).chat(question)
+    assert isinstance(result, str) and "conversational" in result.lower()
+
+
 async def test_current_conditions_provider_failure_cannot_be_replaced_with_model_measurements():
     class Unavailable(WeatherProvider):
         async def forecast(self, location):

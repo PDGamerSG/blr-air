@@ -12,8 +12,11 @@
     <meta property="og:title" content="BLR Air Window — breathe on schedule" />
     <meta property="og:description" content="The sky over Bengaluru has better hours. An agent that finds them." />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="./og.jpg" />
+    <meta property="og:url" content="https://blrairwindow.vercel.app/" />
+    <meta property="og:image" content="https://blrairwindow.vercel.app/og.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://blrairwindow.vercel.app/og.jpg" />
+    <link rel="canonical" href="https://blrairwindow.vercel.app/" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
   </head>
   <body>
@@ -76,7 +79,7 @@
             <span class="rotator" aria-live="off"><span>run.</span></span>
           </p>
           <div class="hero__ctas reveal">
-            <a class="btn" data-asi href="%ASI_AGENT_URL%" target="_blank" rel="noopener">Ask the agent <span aria-hidden="true">↗</span></a>
+            <a class="btn" href="#planner">Ask the agent here <span aria-hidden="true">↓</span></a>
             <a class="btn btn--ghost" href="#scanner">Scan the sky <span aria-hidden="true">↓</span></a>
           </div>
         </div>
@@ -109,15 +112,15 @@
           <div class="haze__compare">
             <article class="card card--muted" data-step="1">
               <p class="card__kicker">What an app tells you</p>
-              <p class="card__big"><s>AQI 112.</s></p>
-              <p>Unhealthy for sensitive groups. Right now. Good luck.</p>
-              <span class="card__note">illustrative</span>
+              <p class="card__big" data-compare-now-big><s>AQI —.</s></p>
+              <p data-compare-now-text>Loading live Bengaluru air quality…</p>
+              <span class="card__note" data-compare-now-note>live · Bengaluru</span>
             </article>
             <article class="card card--answer" data-step="2">
               <p class="card__kicker">What Gaali tells you</p>
-              <p class="card__big">Go at 06:00.</p>
-              <p>Cleanest 1-hour slot before noon tomorrow. Rain chance stays low. Worst hour still flagged.</p>
-              <span class="card__note">illustrative</span>
+              <p class="card__big" data-compare-go-big>Go at —.</p>
+              <p data-compare-go-text>Finding the cleanest 1-hour slot before noon tomorrow…</p>
+              <span class="card__note" data-compare-go-note>live · Bengaluru</span>
             </article>
           </div>
           <p class="haze__foot" data-step="2">
@@ -189,7 +192,6 @@
           <div class="planner__intro">
             <h3 id="planner-title">Tell Gaali what you have in mind.</h3>
             <p class="planner__capabilities" data-planner-capabilities role="status">Checking available services…</p>
-            <p class="planner__hint"><a data-asi href="%ASI_AGENT_URL%" target="_blank" rel="noopener">Open BLR Air Window on ASI:One ↗</a></p>
           </div>
           <form class="planner__form" data-planner-form>
             <label for="planner-query">Your request</label>
@@ -199,17 +201,18 @@
               <button type="button" class="chip" data-plan-example="Best 1-hour walk in Cubbon Park tomorrow morning with daylight only" data-example-venue="Cubbon Park, Bengaluru">Plan a park visit</button>
               <button type="button" class="chip" data-plan-example="Best 2-hour cycling window in Koramangala tomorrow morning with wind at most 20 km/h and UV at most 5">Plan a bike ride</button>
             </div>
+            <div class="planner__voice">
+              <label for="planner-audio">Or say it: upload a voice note or video</label>
+              <input id="planner-audio" name="audio" type="file" accept="audio/*,video/*,.wav,.mp3,.m4a,.aac,.ogg,.opus,.flac,.webm,.mp4,.mov" disabled />
+              <button type="button" class="chip" data-plan-record disabled>Record a request</button>
+              <p class="planner__hint">Audio or video up to 50 MB. Your browser extracts the first 30 seconds of sound and sends it to Sarvam for transcription. Microphone recording starts only when you choose it and stops after 30 seconds. Edit the transcript before submitting.</p>
+            </div>
             <details class="planner__options">
-              <summary>Venue reviews and voice input</summary>
+              <summary>Venue reviews</summary>
               <label class="planner__check"><input type="checkbox" name="include_venue" /> Include real venue ratings, customer reviews and opening hours</label>
               <label for="planner-venue">Specific venue to look up <span>(optional)</span></label>
               <input id="planner-venue" name="venue_query" type="text" maxlength="160" placeholder="Cubbon Park, Bengaluru" />
               <p class="planner__hint">Ratings describe the venue. Air-quality advice describes the forecast. Opening hours shown by the provider need checking for your visit date.</p>
-              <label for="planner-audio">Or transcribe a recording</label>
-              <input id="planner-audio" name="audio" type="file" accept=".wav,audio/wav" disabled />
-              <p class="planner__hint">WAV, 16-bit PCM, up to 30 seconds and 10 MiB. Audio is sent to Sarvam. You can edit the transcript before submitting.</p>
-              <button type="button" class="chip" data-plan-record disabled>Record a request</button>
-              <p class="planner__hint">Microphone recording starts only when you choose it and grant permission. Recording stops automatically after 30 seconds.</p>
             </details>
             <div class="planner__submit">
               <button type="submit" class="btn" data-plan-submit>Find my plan</button>
@@ -220,7 +223,9 @@
           <p class="planner__status" data-plan-status role="status" aria-live="polite"></p>
           <div class="planner__results" data-plan-results></div>
           <audio class="planner__audio" data-plan-audio controls hidden aria-label="Spoken outdoor plan"></audio>
+          <p class="planner__hint" data-plan-audio-actions hidden><a data-plan-audio-download href="#" download="blr-air-plan.wav">Download spoken plan (WAV)</a></p>
           <p class="planner__hint">Forecasts can change. Review the matched place and conditions before leaving. <a href="#privacy">Privacy and terms</a>.</p>
+          <p class="planner__agent">Prefer to chat? <a data-asi href="%ASI_AGENT_URL%" target="_blank" rel="noopener">Open the BLR Air Window agent on ASI:One ↗</a> <a data-agentverse href="%AGENTVERSE_PROFILE_URL%" target="_blank" rel="noopener">Agentverse profile ↗</a></p>
         </section>
 
         <div class="planner__quick-heading">
@@ -437,7 +442,7 @@ request = <span class="f">WindowRequest</span>(
               better. <strong>Zero users is a bug.</strong> You could be user number one.
             </p>
             <div class="hero__ctas">
-              <a class="btn" data-asi href="%ASI_AGENT_URL%" target="_blank" rel="noopener">Try it now ↗</a>
+              <a class="btn" href="#planner">Try it now</a>
               <a class="btn btn--ghost" data-roast href="#" target="_blank" rel="noopener">Roast it on GitHub ↗</a>
             </div>
           </div>

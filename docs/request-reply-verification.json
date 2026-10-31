@@ -1,0 +1,43 @@
+{
+  "checked_at": "2026-10-31T13:16:11.615141+00:00",
+  "scope": "Installed Docker agent handler with real ASI and Open-Meteo; developer test traffic",
+  "checks": [
+    {
+      "prompt": "Can you remind me what photosynthesis means? Give two sentences.",
+      "answer": "Photosynthesis is the process by which green plants and some other organisms use sunlight to synthesize foods from carbon dioxide and water. It generally involves the green pigment chlorophyll and generates oxygen as a byproduct.",
+      "passed": true
+    },
+    {
+      "prompt": "Explain how apps notify me about messages in one sentence.",
+      "answer": "Apps use push notification services, such as Apple's APNs or Google's FCM, to send a lightweight signal from the server to your device, which then displays the alert even if the app is closed.",
+      "passed": true
+    },
+    {
+      "prompt": "Write a sentence containing 'send me alerts'",
+      "answer": "Please send me alerts whenever the air quality index exceeds 100.",
+      "passed": true
+    },
+    {
+      "prompt": "What is 24 multiplied by 17?",
+      "answer": "24 multiplied by 17 is **408**.",
+      "passed": true
+    },
+    {
+      "prompt": "Answer with exactly 3 bullet points: benefits of walking.",
+      "answer": "- **Improves cardiovascular health**: Regular walking strengthens the heart, lowers blood pressure, and improves circulation, significantly reducing the risk of heart disease and stroke.\n\n- **Supports mental well-being**: Physical activity releases endorphins that help reduce stress, anxiety, and symptoms of depression while boosting overall mood and cognitive function.\n\n- **Aids in weight management and joint health**: Walking is a low-impact exercise that burns calories effectively to maintain a healthy weight, while also strengthening muscles around joints to improve mobility and reduce stiffness.",
+      "passed": true
+    },
+    {
+      "prompt": "What's the AQI in HSR Layout right now?",
+      "answer": "**HSR Layout, Bengaluru** \u00b7 Asia/Kolkata\n\n**Current model \u00b7 31 Oct, 18:30**\n\n- US AQI **131 (Unhealthy for sensitive groups)**.\n- PM2.5 **32.2 \u00b5g/m\u00b3**.\n\nSensitive groups should reduce prolonged or heavy outdoor exertion; consider an indoor alternative. Follow your clinician's advice for an existing condition.\n\n**Hourly weather \u00b7 31 Oct, 19:00**\n\nTemperature **23.6\u00b0C**; rain **0% hourly chance**.\n\n**Forecast retrieved:** 31 Oct 2026, 18:46 (Asia/Kolkata).\n\nSource: Open-Meteo Air Quality (CAMS) and Weather Forecast. Model forecasts, not CPCB station readings or medical advice. Air quality is a regional estimate; nearby places may share the same forecast.",
+      "passed": true
+    }
+  ],
+  "python_tests": 275,
+  "website_tests": 8,
+  "ruff": "passed",
+  "format": "passed",
+  "website_build": "passed",
+  "docker_builds": "agent and web passed",
+  "local_artifact": "artifacts/request-reply-live.json"
+}

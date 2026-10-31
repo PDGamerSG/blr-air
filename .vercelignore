@@ -1,0 +1,10 @@
+# Vercel serves the static site in site/ plus the /api proxy function in api/.
+# The Python agent and web service (blr_air/, Dockerfiles, etc.) deploy separately.
+/*
+!/site
+!/api
+!/vercel.json
+!/.vercelignore
+/site/node_modules
+/site/dist
+/site/blender

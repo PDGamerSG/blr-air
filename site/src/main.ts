@@ -10,21 +10,21 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
 import Lenis from "lenis";
-import { aqiColor } from "./air/scoring";
-import { AGENT_ADDRESS, AGENT_HANDLE, LINKS, SUBMISSIONS_CLOSE } from "./config";
+import { fetchForecast } from "./air/openMeteo";
+import { aqiCategory, aqiColor, localTime, selectWindow } from "./air/scoring";
+import { AGENT_ADDRESS, AGENT_HANDLE, LINKS, LOCALITIES, SUBMISSIONS_CLOSE } from "./config";
 import { World } from "./scene/World";
 import { drawDiagram } from "./ui/diagram";
 import { initCityBoard, initMarquee, loadLive, MAP_LOCALITIES, renderHeroLive } from "./ui/live";
 import { initScanner, promptFor } from "./ui/scanner";
 import { initPlanner } from "./ui/planner";
 import { initWheel } from "./ui/wheel";
-import { copyText, openAgent } from "./ui/agentLink";
+import { copyText } from "./ui/agentLink";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
 // The working planner does not depend on WebGL or the scroll animation loading.
-const planner = initPlanner();
-let plannerOnline = false;
+initPlanner();
 
 const $ = <T extends Element = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 const $$ = <T extends Element = HTMLElement>(sel: string) => [...document.querySelectorAll<T>(sel)];
@@ -59,12 +59,8 @@ function toast(msg: string) {
   toastTimer = window.setTimeout(() => toastEl.classList.remove("is-on"), 3200);
 }
 
-// On-page requests use the shared service; without it, fall back to ASI:One.
+// On-page requests always use the on-page planner; ASI:One chat stays on the extension links.
 function askAgent(prompt: string) {
-  if (!plannerOnline) {
-    void openAgent(prompt).then(toast);
-    return;
-  }
   const input = $<HTMLTextAreaElement>("#planner-query");
   input.value = prompt;
   $<HTMLInputElement>("#planner-venue").value = "";
@@ -72,10 +68,6 @@ function askAgent(prompt: string) {
   $<HTMLFormElement>("[data-planner-form]").requestSubmit();
   lenis.scrollTo("#planner", { offset: -90 });
 }
-
-planner.ready.then((ok) => {
-  plannerOnline = ok;
-});
 
 $("[data-copy-address]").addEventListener("click", () => copyText(AGENT_ADDRESS).then(() => toast("Agent address copied.")));
 const finalPrompt = promptFor("HSR Layout", { hours: 1, activity: "run", day: "next48", period: "any" });
@@ -206,6 +198,30 @@ loadLive()
   })
   .catch(() => {
     // The page still works without live readings; beacons just stay cyan.
+  });
+
+// "App vs Gaali" cards: live Bengaluru reading and the real best slot before noon tomorrow.
+const centre = LOCALITIES.find((l) => l.name === "Bengaluru")!;
+const pad = (n: number) => String(n).padStart(2, "0");
+fetchForecast({ name: "Bengaluru", lat: centre.lat, lon: centre.lon })
+  .then((f) => {
+    const w = selectWindow(f.hours, { hours: 1, activity: "walk", day: "tomorrow", period: "morning" }, f.timezone, Date.now() / 1000);
+    if (f.current) {
+      const at = localTime(f.current.t, f.timezone);
+      $("[data-compare-now-big]").innerHTML = `<s>AQI ${f.current.aqi.toFixed(0)}.</s>`;
+      $("[data-compare-now-text]").textContent = `${aqiCategory(f.current.aqi)}. Right now. Good luck.`;
+      $("[data-compare-now-note]").textContent = `live · Bengaluru · ${pad(at.hour)}:${pad(at.minute)} IST`;
+    }
+    if (w) {
+      const at = localTime(w.start, f.timezone);
+      $("[data-compare-go-big]").textContent = `Go at ${pad(at.hour)}:${pad(at.minute)}.`;
+      $("[data-compare-go-text]").textContent = `Cleanest 1-hour slot before noon tomorrow. Rain chance ${w.rain.toFixed(0)}%. Worst hour AQI ${w.maxAqi.toFixed(0)}, ${aqiCategory(w.maxAqi).toLowerCase()}.`;
+      $("[data-compare-go-note]").textContent = "live · Open-Meteo CAMS forecast";
+    }
+  })
+  .catch(() => {
+    $("[data-compare-now-text]").textContent = "Live air quality is unavailable right now.";
+    $("[data-compare-go-text]").textContent = "Live forecast is unavailable right now. Try the scanner below.";
   });
 
 // ---------- scanner ----------
