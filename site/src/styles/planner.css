@@ -14,7 +14,7 @@
 .planner a { text-underline-offset: 4px; overflow-wrap: anywhere; }
 .planner__capabilities { color: var(--cyan); font: 12px/1.8 var(--mono); }
 .planner__form { margin: 24px 0 0; }
-.planner__form > label, .planner__options > label { display: block; margin: 14px 0 8px; font-weight: 700; }
+.planner__form > label, .planner__options > label, .planner__voice > label { display: block; margin: 14px 0 8px; font-weight: 700; }
 .planner__options label span { font-weight: 400; opacity: .7; }
 .planner textarea, .planner input[type=text] {
   display: block;
@@ -32,6 +32,8 @@
 .planner__examples { margin: 12px 0 20px; }
 .planner__examples .chip { text-align: left; white-space: normal; }
 .planner__options { padding: 14px 0; border-block: 1px solid var(--line); }
+.planner__voice { padding: 6px 0 14px; border-top: 1px solid var(--line); }
+.planner__voice .chip { display: block; margin: 10px 0 8px; }
 .planner summary { cursor: pointer; font-weight: 700; padding: 4px 0; }
 .planner__check { display: flex !important; align-items: flex-start; gap: 10px; }
 .planner__check input { width: 18px; height: 18px; flex-shrink: 0; margin-top: 4px; accent-color: var(--yellow); }
@@ -62,6 +64,7 @@
 .planner__explanation { margin: 18px 0; border-top: 1px solid var(--line); padding-top: 12px; }
 .planner__full { font: 13px/1.7 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
 .planner__audio { display: block; width: 100%; margin: 20px 0; }
+.planner__agent { margin-top: 18px !important; padding-top: 16px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 14px; }
 .planner__scores { margin: 24px 0; }
 .planner__scores figcaption { font-size: 14px; font-weight: 700; }
 .planner__score-bars { padding: 16px 0; }

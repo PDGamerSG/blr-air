@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { Window } from 'happy-dom';
-import { initPlanner, safeExternalUrl, encodePcmWav } from '../src/ui/planner.ts';
+import { initPlanner, safeExternalUrl, encodePcmWav, toSpeechSamples } from '../src/ui/planner.ts';
 
 const html = readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const turn = () => new Promise(resolve=>setTimeout(resolve,30));
@@ -104,44 +104,58 @@ test('planner readiness resolves false when the planner mount is absent', async 
   }
 });
 
-test('unavailable planner sends typed requests and examples to the published agent', async () => {
+test('unavailable planner stays on the page instead of handing off to chat', async () => {
   const requests: string[] = [];
   const opened: string[] = [];
-  const copied: string[] = [];
   const env = setup(async (url) => {
     requests.push(url);
     return new Response(JSON.stringify({error:'Planning service unavailable'}), {status:503});
   }, false);
   env.window.open = ((url: string) => { opened.push(url); return null; }) as typeof env.window.open;
-  Object.defineProperty(env.window.navigator, 'clipboard', {
-    configurable:true,
-    value:{writeText:async (text: string) => { copied.push(text); }},
-  });
   try {
     await turn();
     env.submit('best 2-hour run in HSR Layout tomorrow morning with AQI at most 100');
-    assert.equal(opened.length, 1, 'open during the submit gesture, before clipboard work finishes');
     await turn();
     assert.deepEqual(requests, []);
-    assert.equal(opened[0], 'https://asi1.ai/ai/agent1q2z89ttne7p57zq7r473lrc5jan899raacv6sjqj9eymk7kdqzkwkxhcwg3');
-    assert.equal(copied[0], '@blr-air best 2-hour run in HSR Layout tomorrow morning with AQI at most 100');
-    assert.match(env.window.document.querySelector('[data-plan-submit]')!.textContent!, /ASI:One/);
-    assert.match(env.window.document.querySelector('[data-plan-status]')!.textContent!, /[Pp]aste/);
-    (env.window.document.querySelectorAll('[data-plan-example]')[2] as HTMLButtonElement).click();
-    await turn();
-    assert.equal(opened[1], opened[0]);
-    assert.match(copied[1], /^@blr-air .*wind at most 20 km\/h and UV at most 5/);
-    env.submit('@blr-air walk in Indiranagar tomorrow evening');
-    await turn();
-    assert.equal(copied[2], '@blr-air walk in Indiranagar tomorrow evening');
-    Object.defineProperty(env.window.navigator, 'clipboard', {
-      configurable:true,
-      value:{writeText:async () => { throw new Error('Clipboard denied'); }},
-    });
-    env.submit('walk in Paris, France today');
-    await turn();
-    assert.equal(opened[3], opened[0]);
-    assert.match(env.window.document.querySelector('[data-plan-status]')!.textContent!, /@blr-air walk in Paris, France today/);
-    assert.deepEqual(requests, []);
+    assert.deepEqual(opened, []);
+    assert.equal(env.window.document.querySelector('[data-plan-submit]')!.textContent, 'Find my plan');
+    assert.match(env.window.document.querySelector('[data-plan-status]')!.textContent!, /offline/);
+    assert.match(env.window.document.querySelector('[data-planner-capabilities]')!.textContent!, /offline/);
   } finally { env.cleanup(); }
+});
+
+test('spoken plan can be downloaded and the planner ends with the agent link', async () => {
+  const env = setup(async (url) => {
+    if (url === '/api/plan') return new Response(JSON.stringify(plan()), {headers:{'content-type':'application/json'}});
+    return new Response(encodePcmWav([new Float32Array(1600)], 16000), {headers:{'content-type':'audio/wav'}});
+  });
+  try {
+    await turn();env.submit();await turn();
+    const doc = env.window.document;
+    assert.equal((doc.querySelector('[data-plan-audio-actions]') as HTMLElement).hidden, true);
+    [...doc.querySelectorAll('[data-plan-results] button')].find(b=>b.textContent==='Listen to selected plan')!.dispatchEvent(new env.window.Event('click'));
+    await turn();
+    const link = doc.querySelector('[data-plan-audio-download]') as HTMLAnchorElement;
+    assert.equal((doc.querySelector('[data-plan-audio-actions]') as HTMLElement).hidden, false);
+    assert.match(link.href, /^blob:/);
+    assert.equal(link.getAttribute('download'), 'blr-air-plan.wav');
+    const agent = doc.querySelector('.planner__agent a[data-asi]');
+    assert.ok(agent, 'agent link closes the planner');
+    assert.equal(doc.querySelector('.planner__intro a[data-asi]'), null);
+    assert.match((doc.querySelector('#planner-audio') as HTMLInputElement).accept, /video\/\*/);
+  } finally { env.cleanup(); }
+});
+
+test('decoded media becomes 16 kHz mono speech capped at 30 seconds', () => {
+  const left = new Float32Array(48000).fill(.5);
+  const right = new Float32Array(48000).fill(-.1);
+  const short = toSpeechSamples([left, right], 48000);
+  assert.equal(short.samples.length, 16000);
+  assert.equal(short.trimmed, false);
+  assert.ok(Math.abs(short.samples[100] - .2) < 1e-6);
+  const long = toSpeechSamples([new Float32Array(44100 * 45)], 44100);
+  assert.equal(long.samples.length, 16000 * 30);
+  assert.equal(long.trimmed, true);
+  assert.equal(toSpeechSamples([], 48000).samples.length, 0);
+  assert.doesNotThrow(() => encodePcmWav([long.samples], 16000));
 });

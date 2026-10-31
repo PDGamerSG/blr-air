@@ -1,5 +1,4 @@
 import { aqiColor } from "../air/scoring";
-import { openAgent } from "./agentLink";
 
 interface Assessment {
   verdict?: string;
@@ -123,6 +122,46 @@ export function encodePcmWav(chunks: Float32Array[], sampleRate: number): Blob {
   return new Blob([buffer], { type: "audio/wav" });
 }
 
+export const SPEECH_RATE = 16000;
+export const MAX_MEDIA_BYTES = 50 * 1024 * 1024;
+
+/** Mix decoded channels to mono and resample to 16 kHz, keeping at most the first 30 seconds. */
+export function toSpeechSamples(channels: Float32Array[], sampleRate: number, maxSeconds = 30): { samples: Float32Array; trimmed: boolean } {
+  const length = channels[0]?.length ?? 0;
+  if (!(sampleRate > 0) || length === 0) return { samples: new Float32Array(0), trimmed: false };
+  const ratio = sampleRate / SPEECH_RATE;
+  const total = Math.floor(length / ratio);
+  const frames = Math.min(total, SPEECH_RATE * maxSeconds);
+  const samples = new Float32Array(frames);
+  for (let i = 0; i < frames; i++) {
+    const position = i * ratio;
+    const index = Math.floor(position);
+    const next = Math.min(index + 1, length - 1);
+    const fraction = position - index;
+    let sum = 0;
+    for (const channel of channels) sum += channel[index] + (channel[next] - channel[index]) * fraction;
+    samples[i] = sum / channels.length;
+  }
+  return { samples, trimmed: total > frames };
+}
+
+/** Any audio or video the browser can decode becomes a short 16 kHz PCM WAV for transcription. */
+async function mediaToWav(file: Blob): Promise<{ wav: Blob; trimmed: boolean }> {
+  const Context = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!Context) throw new Error("This browser cannot read audio files. Record your request or type it instead.");
+  const context = new Context();
+  try {
+    const decoded = await context.decodeAudioData(await file.arrayBuffer());
+    const channels = Array.from({ length: decoded.numberOfChannels }, (_, index) => decoded.getChannelData(index));
+    const { samples, trimmed } = toSpeechSamples(channels, decoded.sampleRate);
+    return { wav: encodePcmWav([samples], SPEECH_RATE), trimmed };
+  } catch {
+    throw new Error("Could not read any sound from that file. Try an MP3, M4A, WAV, MP4 or MOV that has audio.");
+  } finally {
+    void context.close();
+  }
+}
+
 function link(text: string, value: unknown): HTMLAnchorElement | HTMLSpanElement {
   const url = safeExternalUrl(value);
   if (!url) return el("span", "", text);
@@ -243,7 +282,7 @@ function renderScoreChart(places: PlaceResult[]): HTMLElement {
   return figure;
 }
 
-// Resolves once /api/status answers, so callers can fall back to ASI:One when the
+// Resolves once /api/status answers, so callers know whether on-page planning works when the
 // planning server isn't reachable (e.g. a static deploy without a backend).
 export function initPlanner(): { ready: Promise<boolean> } {
   const root = document.querySelector<HTMLElement>("#planner");
@@ -261,6 +300,8 @@ export function initPlanner(): { ready: Promise<boolean> } {
   const status = find<HTMLElement>("[data-plan-status]");
   const output = find<HTMLElement>("[data-plan-results]");
   const audio = find<HTMLAudioElement>("[data-plan-audio]");
+  const audioActions = find<HTMLElement>("[data-plan-audio-actions]");
+  const audioDownload = find<HTMLAnchorElement>("[data-plan-audio-download]");
   let voiceEnabled = false;
   let plannerOnline = false;
   let controller: AbortController | null = null;
@@ -282,6 +323,8 @@ export function initPlanner(): { ready: Promise<boolean> } {
     audio.pause();
     audio.removeAttribute("src");
     audio.hidden = true;
+    audioActions.hidden = true;
+    audioDownload.href = "#";
     if (audioUrl) URL.revokeObjectURL(audioUrl);
     audioUrl = null;
   }
@@ -293,7 +336,7 @@ export function initPlanner(): { ready: Promise<boolean> } {
       control.disabled = busy || control.dataset.disabled === "true" || (control === upload && !voiceEnabled) || (control === record && (!voiceEnabled || !navigator.mediaDevices?.getUserMedia));
     });
     cancel.hidden = !busy;
-    submit.textContent = busy ? "Working on your request…" : plannerOnline ? "Find my plan" : "Ask on ASI:One ↗";
+    submit.textContent = busy ? "Working on your request…" : "Find my plan";
   }
 
   async function responseError(response: Response): Promise<Error> {
@@ -454,7 +497,9 @@ export function initPlanner(): { ready: Promise<boolean> } {
         audioUrl = URL.createObjectURL(blob);
         audio.src = audioUrl;
         audio.hidden = false;
-        setStatus("Spoken answer ready for the selected window. Use the player below to listen.");
+        audioDownload.href = audioUrl;
+        audioActions.hidden = false;
+        setStatus("Spoken answer ready for the selected window. Listen below or download the WAV.");
         void audio.play().catch(() => { /* Some browsers require a second explicit play gesture. */ });
       }, "Generating the spoken answer…");
     });
@@ -508,12 +553,7 @@ export function initPlanner(): { ready: Promise<boolean> } {
     event.preventDefault();
     if (!form.reportValidity()) return;
     if (!plannerOnline) {
-      let prompt = query.value.trim();
-      if (includeVenue.checked) {
-        prompt += `\nInclude venue ratings, customer reviews and opening hours${venueQuery.value.trim() ? ` for ${venueQuery.value.trim()}` : ""}.`;
-      }
-      setStatus("Opening BLR Air Window on ASI:One…");
-      void openAgent(prompt).then((message) => setStatus(message));
+      setStatus("The planning service is offline right now. Please retry shortly. The quick forecast scan below still works.", true);
       return;
     }
     captureNumber++;
@@ -553,11 +593,18 @@ export function initPlanner(): { ready: Promise<boolean> } {
       form.requestSubmit();
     });
   });
-  function transcribe(file: Blob) {
+  function transcribe(source: Blob, fromMedia = false) {
     clearAudio();
     window.clearTimeout(expiryTimer);
     output.replaceChildren();
+    let trimmed = false;
     void run(async (signal) => {
+      let file = source;
+      if (fromMedia) {
+        ({ wav: file, trimmed } = await mediaToWav(source));
+        signal.throwIfAborted();
+        setStatus(trimmed ? "Using the first 30 seconds of sound. Transcribing with Sarvam…" : "Transcribing your recording with Sarvam…");
+      }
       const response = await fetch("/api/transcribe", { method: "POST", signal, headers: { "content-type": "audio/wav" }, body: file });
       if (!response.ok) throw await responseError(response);
       const body = await response.json();
@@ -566,20 +613,20 @@ export function initPlanner(): { ready: Promise<boolean> } {
     }, (transcript) => {
       query.value = transcript;
       upload.value = "";
-      setStatus("Transcript ready. Check the place and date, edit if needed, then choose Find my plan.");
+      setStatus(`Transcript ready${trimmed ? " from the first 30 seconds" : ""}. Check the place and date, edit if needed, then choose Find my plan.`);
       query.focus();
-    }, "Transcribing your recording with Sarvam…");
+    }, fromMedia ? "Reading the sound from your file…" : "Transcribing your recording with Sarvam…");
   }
 
   upload.addEventListener("change", () => {
     const file = upload.files?.[0];
     if (!file) return;
     upload.value = "";
-    if (!file.name.toLowerCase().endsWith(".wav") || file.size > 10 * 1024 * 1024 || file.size < 44) {
-      setStatus("Choose a complete WAV recording up to 10 MiB and 30 seconds long.", true);
+    if (file.size > MAX_MEDIA_BYTES || file.size < 44) {
+      setStatus("Choose an audio or video file up to 50 MB.", true);
       return;
     }
-    transcribe(file);
+    transcribe(file, true);
   });
 
   record.addEventListener("click", () => {
@@ -675,8 +722,7 @@ export function initPlanner(): { ready: Promise<boolean> } {
       return true;
     })
     .catch(() => {
-      capabilities.textContent = "Ask BLR Air Window on ASI:One. Your request will be copied so you can paste it into the agent's chat. The quick forecast scan below also works here.";
-      submit.textContent = "Ask on ASI:One ↗";
+      capabilities.textContent = "The planning service is offline right now. The quick forecast scan below still works.";
       return false;
     })
     .finally(() => window.clearTimeout(healthTimer));

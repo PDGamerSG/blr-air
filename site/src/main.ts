@@ -18,13 +18,12 @@ import { initCityBoard, initMarquee, loadLive, MAP_LOCALITIES, renderHeroLive } 
 import { initScanner, promptFor } from "./ui/scanner";
 import { initPlanner } from "./ui/planner";
 import { initWheel } from "./ui/wheel";
-import { copyText, openAgent } from "./ui/agentLink";
+import { copyText } from "./ui/agentLink";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
 // The working planner does not depend on WebGL or the scroll animation loading.
-const planner = initPlanner();
-let plannerOnline = false;
+initPlanner();
 
 const $ = <T extends Element = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 const $$ = <T extends Element = HTMLElement>(sel: string) => [...document.querySelectorAll<T>(sel)];
@@ -59,12 +58,8 @@ function toast(msg: string) {
   toastTimer = window.setTimeout(() => toastEl.classList.remove("is-on"), 3200);
 }
 
-// On-page requests use the shared service; without it, fall back to ASI:One.
+// On-page requests always use the on-page planner; ASI:One chat stays on the extension links.
 function askAgent(prompt: string) {
-  if (!plannerOnline) {
-    void openAgent(prompt).then(toast);
-    return;
-  }
   const input = $<HTMLTextAreaElement>("#planner-query");
   input.value = prompt;
   $<HTMLInputElement>("#planner-venue").value = "";
@@ -72,10 +67,6 @@ function askAgent(prompt: string) {
   $<HTMLFormElement>("[data-planner-form]").requestSubmit();
   lenis.scrollTo("#planner", { offset: -90 });
 }
-
-planner.ready.then((ok) => {
-  plannerOnline = ok;
-});
 
 $("[data-copy-address]").addEventListener("click", () => copyText(AGENT_ADDRESS).then(() => toast("Agent address copied.")));
 const finalPrompt = promptFor("HSR Layout", { hours: 1, activity: "run", day: "next48", period: "any" });
