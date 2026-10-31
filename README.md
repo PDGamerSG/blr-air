@@ -188,11 +188,17 @@ The [submission kit](docs/submission.md) includes ten evaluation prompts, a rout
 
 ## Landing page
 
+**Website:** [blrairwindow.vercel.app](https://blrairwindow.vercel.app)
+
 `site/` contains a static, scroll-driven landing page (Three.js, GSAP, Blender-made models). It includes an in-browser scanner that applies the same scoring rules to live Open-Meteo data, and links to ASI:One and Agentverse. See [site/README.md](site/README.md).
 
 ```sh
 cd site && npm install && npm run dev
 ```
+
+The website and the agent deploy independently. Vercel builds only `site/` and serves `site/dist`, as configured in [vercel.json](vercel.json) and [.vercelignore](.vercelignore). It skips rebuilds when a commit doesn't touch `site/`. The agent's Docker image, wheel and CI never include `site/`.
+
+To deploy on Vercel, import this repository and name the project **blrairwindow** so the URL is `blrairwindow.vercel.app`. Leave Root Directory as the repository root; no environment variables are needed.
 
 ## Credits and licence
 

@@ -1,0 +1,9 @@
+# Vercel serves only the static landing page in site/.
+# The Python agent (blr_air/, Dockerfile, etc.) deploys separately on Agentverse.
+/*
+!/site
+!/vercel.json
+!/.vercelignore
+/site/node_modules
+/site/dist
+/site/blender
