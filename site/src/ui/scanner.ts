@@ -1,6 +1,6 @@
 import gsap from "gsap";
 import { AGENT_HANDLE, LOCALITIES } from "../config";
-import { demoForecast, fetchForecast, geocode, SOURCE, type Forecast, type Place } from "../air/openMeteo";
+import { fetchForecast, geocode, SOURCE, type Forecast, type Place } from "../air/openMeteo";
 import {
   aqiCategory,
   aqiColor,
@@ -187,21 +187,23 @@ export function initScanner(hooks: ScannerHooks) {
     e.preventDefault();
     if (busy) return;
     busy = true;
+    // Clear the previous result before any awaited lookup so a failure cannot leave stale data.
+    bars.replaceChildren();
+    stats.replaceChildren();
+    text.textContent = "";
+    windowText.textContent = "Checking current forecasts…";
+    ask.disabled = copy.disabled = true;
+    hooks.onResult(null);
+    gsap.killTweensOf(beam);
+    beam.style.opacity = "0";
     go.classList.add("is-busy");
     go.querySelector("span")!.textContent = "Scanning…";
     try {
       if (!(await resolveCity())) return;
       placeLabel.textContent = custom ? place.name : `${place.name}${place.name === "Bengaluru" ? "" : ", Bengaluru"}`;
       setStatus("Contacting Open-Meteo…", "");
-      let forecast: Forecast;
-      try {
-        forecast = await fetchForecast({ ...place, name: placeLabel.textContent! });
-        setStatus(`Live · fetched ${forecast.fetchedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`, "is-live");
-      } catch (err) {
-        if (custom) throw err;
-        forecast = demoForecast({ ...place, name: placeLabel.textContent! });
-        setStatus("Offline demo · synthetic data, not a forecast", "is-demo");
-      }
+      const forecast = await fetchForecast({ ...place, name: placeLabel.textContent! });
+      setStatus(`Live · fetched ${forecast.fetchedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`, "is-live");
       render(forecast);
     } catch (err) {
       setStatus((err as Error).message, "is-demo");

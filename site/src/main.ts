@@ -4,6 +4,7 @@ import "@fontsource/roboto-mono/700.css";
 import "@fontsource/kalam/400.css";
 import "@fontsource/kalam/700.css";
 import "./styles/main.css";
+import "./styles/planner.css";
 
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -15,9 +16,14 @@ import { World } from "./scene/World";
 import { drawDiagram } from "./ui/diagram";
 import { initCityBoard, initMarquee, loadLive, MAP_LOCALITIES, renderHeroLive } from "./ui/live";
 import { initScanner, promptFor } from "./ui/scanner";
+import { initPlanner } from "./ui/planner";
 import { initWheel } from "./ui/wheel";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
+
+// The working planner does not depend on WebGL or the scroll animation loading.
+const planner = initPlanner();
+let plannerOnline = false;
 
 const $ = <T extends Element = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 const $$ = <T extends Element = HTMLElement>(sel: string) => [...document.querySelectorAll<T>(sel)];
@@ -69,12 +75,32 @@ async function copyText(text: string) {
   }
 }
 
-// Copy first (while the page still has focus), then open ASI:One in a new tab.
+// On-page requests use the shared service; without it, fall back to ASI:One.
 function askAgent(prompt: string) {
-  const copied = copyText(prompt);
-  window.open(LINKS.asiOne, "_blank", "noopener");
-  copied.then((ok) => toast(ok ? "Prompt copied. Paste it into ASI:One with Agents on." : `Paste this into ASI:One: ${prompt}`));
+  if (!plannerOnline) {
+    // Copy first (while the page still has focus), then open ASI:One in a new tab.
+    const copied = copyText(prompt);
+    window.open(LINKS.asiOne, "_blank", "noopener");
+    copied.then((ok) => toast(ok ? "Prompt copied. Paste it into ASI:One with Agents on." : `Paste this into ASI:One: ${prompt}`));
+    return;
+  }
+  const input = $<HTMLTextAreaElement>("#planner-query");
+  input.value = prompt;
+  $<HTMLInputElement>("#planner-venue").value = "";
+  $<HTMLInputElement>("input[name=include_venue]").checked = false;
+  $<HTMLFormElement>("[data-planner-form]").requestSubmit();
+  lenis.scrollTo("#planner", { offset: -90 });
 }
+
+planner.ready.then((ok) => {
+  plannerOnline = ok;
+  if (ok) return;
+  const cta = $<HTMLAnchorElement>('.hero__ctas a[href="#planner"]');
+  cta.href = LINKS.asiOne;
+  cta.target = "_blank";
+  cta.rel = "noopener";
+  cta.innerHTML = 'Ask the agent <span aria-hidden="true">↗</span>';
+});
 
 $("[data-copy-address]").addEventListener("click", () => copyText(AGENT_ADDRESS).then(() => toast("Agent address copied.")));
 const finalPrompt = promptFor("HSR Layout", { hours: 1, activity: "run", day: "next48", period: "any" });

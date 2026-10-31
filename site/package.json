@@ -5,6 +5,7 @@
   "type": "module",
   "description": "Landing page for the BLR Air Window Fetch.ai agent (Stranger Builds Bangalore 2026).",
   "scripts": {
+    "test": "node --import tsx --test tests/*.test.ts",
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
@@ -21,6 +22,8 @@
   },
   "devDependencies": {
     "@types/three": "^0.187.0",
+    "happy-dom": "^21.0.4",
+    "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vite": "^8.3.5"
   }

@@ -1,0 +1,95 @@
+.planner {
+  max-width: 1200px;
+  margin: 0 auto 64px;
+  padding: clamp(20px, 4vw, 44px);
+  background: var(--ink-2);
+  scroll-margin-top: 90px;
+}
+
+.planner [hidden] { display: none !important; }
+.planner h3 { margin: 0 0 12px; font-size: clamp(22px, 3vw, 36px); line-height: 1.15; }
+.planner h4 { margin: 0 0 16px; font-size: clamp(22px, 3vw, 30px); line-height: 1.25; }
+.planner h5 { margin: 16px 0 8px; font-size: 17px; }
+.planner p { margin: 0 0 12px; max-width: 80ch; }
+.planner a { text-underline-offset: 4px; overflow-wrap: anywhere; }
+.planner__capabilities { color: var(--cyan); font: 12px/1.8 var(--mono); }
+.planner__form { margin: 24px 0 0; }
+.planner__form > label, .planner__options > label { display: block; margin: 14px 0 8px; font-weight: 700; }
+.planner__options label span { font-weight: 400; opacity: .7; }
+.planner textarea, .planner input[type=text] {
+  display: block;
+  width: 100%;
+  border: 1px solid rgb(255 247 239 / .25);
+  border-radius: 6px;
+  padding: 14px 16px;
+  color: var(--white);
+  background: var(--ink);
+  font: 16px/1.65 var(--wide);
+}
+.planner textarea { resize: vertical; min-height: 118px; max-height: 400px; }
+.planner textarea::placeholder, .planner input::placeholder { color: rgb(255 247 239 / .5); }
+.planner__examples, .planner__submit, .planner__actions, .planner__windows { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.planner__examples { margin: 12px 0 20px; }
+.planner__examples .chip { text-align: left; white-space: normal; }
+.planner__options { padding: 14px 0; border-block: 1px solid var(--line); }
+.planner summary { cursor: pointer; font-weight: 700; padding: 4px 0; }
+.planner__check { display: flex !important; align-items: flex-start; gap: 10px; }
+.planner__check input { width: 18px; height: 18px; flex-shrink: 0; margin-top: 4px; accent-color: var(--yellow); }
+.planner input[type=file] { font: 13px/1.7 var(--mono); max-width: 100%; padding: 5px 0; }
+.planner input[type=file]::file-selector-button { padding: 10px 14px; border-radius: 4px; border: 0; background: var(--cyan); color: var(--ink); cursor: pointer; margin-right: 12px; }
+.planner__hint { font: 12px/1.8 var(--mono); color: rgb(255 247 239 / .7); }
+.planner__submit { margin: 22px 0 12px; }
+.planner__status { margin: 18px 0 !important; color: var(--cyan); }
+.planner__status:empty { display: none; }
+.planner__status.is-error { color: var(--orange); }
+.planner__results:empty { display: none; }
+.planner__place { margin: 24px 0; padding: clamp(18px, 3vw, 28px); border: 1px solid var(--line); border-radius: 8px; background: var(--ink); }
+.planner__verdict { font-size: 19px; color: var(--cyan); font-weight: 700; }
+.planner__notice, .planner__warnings { padding: 14px 16px; border-left: 3px solid var(--orange); background: rgb(255 106 42 / .08); font-size: 14px; }
+.planner__warnings:empty { display: none; }
+.planner__warnings { margin: 16px 0; }
+.planner ul { padding-left: 22px; margin: 8px 0 12px; }
+.planner li { margin: 7px 0; }
+.planner__windows { margin: 16px 0; }
+.planner__windows [aria-pressed=true] { background: var(--yellow); border-color: var(--yellow); color: var(--ink); }
+.planner__time { font-weight: 700; font-size: clamp(18px, 2vw, 24px); }
+.planner__stats { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 20px 18px; margin: 20px 0; }
+.planner__stats div { min-width: 0; }
+.planner__stats dt { font: 11px/1.6 var(--mono); color: rgb(255 247 239 / .65); }
+.planner__stats dd { margin: 5px 0 0; font: 600 15px/1.5 var(--wide); overflow-wrap: anywhere; }
+.planner__actions { margin: 22px 0 16px; }
+.planner__actions > a { font-size: 13px; }
+.planner__explanation { margin: 18px 0; border-top: 1px solid var(--line); padding-top: 12px; }
+.planner__full { font: 13px/1.7 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+.planner__audio { display: block; width: 100%; margin: 20px 0; }
+.planner__scores { margin: 24px 0; }
+.planner__scores figcaption { font-size: 14px; font-weight: 700; }
+.planner__score-bars { padding: 16px 0; }
+.planner__score-row { display: grid; grid-template-columns: minmax(100px, 1.3fr) minmax(100px, 2fr) 56px; gap: 14px; align-items: center; margin: 15px 0; font: 12px/1.5 var(--mono); }
+.planner__score-name { overflow-wrap: anywhere; }
+.planner__score-track { height: 20px; background: var(--ink-3); border-radius: 3px; overflow: hidden; }
+.planner__score-fill { display: block; height: 20px; border-radius: 3px; }
+.planner__venue { margin: 22px 0; padding-top: 16px; border-top: 1px solid var(--line); }
+.planner__attribution { font: 500 18px/1.5 Arial, sans-serif; color: var(--white); letter-spacing: 0; }
+.planner__rating { font: 700 20px/1.5 var(--wide); }
+.planner__links { display: flex; flex-wrap: wrap; gap: 12px; font-size: 13px; }
+.planner__reviews { display: grid; gap: 16px; margin: 18px 0; }
+.planner__review { padding-left: 16px; border-left: 2px solid var(--line); }
+.planner__review-author { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; font-size: 14px; }
+.planner__review-author img { border-radius: 50%; object-fit: cover; }
+.planner__review blockquote { margin: 10px 0; font-size: 14px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+.planner__review > a { font-size: 12px; }
+.planner__quick-heading { max-width: 1200px; margin: 0 auto 24px; }
+.planner__quick-heading h3 { font-size: 26px; margin-bottom: 8px; }
+.planner__quick-heading p { font-size: 14px; max-width: 75ch; color: rgb(255 247 239 / .7); }
+.planner__legal { margin-top: 30px; max-width: 85ch; font: 13px/1.8 var(--mono); scroll-margin-top: 100px; }
+.planner__legal summary { cursor: pointer; color: var(--white); }
+.planner__legal p { color: rgb(255 247 239 / .7); }
+@media(max-width: 640px) {
+  .planner__stats { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .planner__score-row { grid-template-columns: minmax(78px, 1fr) minmax(65px, 1fr) 44px; gap: 8px; }
+  .planner__submit .btn, .planner__actions .btn { white-space: normal; text-align: center; }
+}
+@media(prefers-reduced-motion: reduce) {
+  .planner *, .planner *::before, .planner *::after { animation: none !important; transition: none !important; }
+}
