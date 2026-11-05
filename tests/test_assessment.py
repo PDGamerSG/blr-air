@@ -4,8 +4,8 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from blr_air.domain import Forecast, Location, RequestSpec, Window
-from blr_air.service import Recommendation
+from delhi_air.domain import Forecast, Location, RequestSpec, Window
+from delhi_air.service import Recommendation
 
 
 def recommendation(**changes):
@@ -26,14 +26,14 @@ def recommendation(**changes):
     )
     return Recommendation(
         RequestSpec(activity="run"),
-        Location("Cubbon Park, Bengaluru", 12.9763, 77.5929),
+        Location("Lodhi Garden, Delhi", 28.5931, 77.2197),
         Forecast((), None, "Asia/Kolkata", start - timedelta(hours=1)),
         replace(window, **changes),
     )
 
 
 def assessment(result):
-    from blr_air.assessment import assess
+    from delhi_air.assessment import assess
 
     return assess(result)
 
@@ -137,11 +137,11 @@ def test_location_and_reasons_are_explicit_and_json_serializable():
     )
     result = assessment(request)
     location = result["location"]
-    assert location["resolved_name"] == "Cubbon Park, Bengaluru"
-    assert location["latitude"] == 12.9763 and location["longitude"] == 77.5929
+    assert location["resolved_name"] == "Lodhi Garden, Delhi"
+    assert location["latitude"] == 28.5931 and location["longitude"] == 77.2197
     assert location["timezone"] == "Asia/Kolkata"
     assert location["maps_url"] == (
-        "https://www.google.com/maps/search/?api=1&query=12.9763%2C77.5929"
+        "https://www.google.com/maps/search/?api=1&query=28.5931%2C77.2197"
     )
     assert "street" in location["precision_note"].lower()
     reasons = " ".join(result["reasons"])

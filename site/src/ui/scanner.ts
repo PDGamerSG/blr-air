@@ -1,5 +1,5 @@
 import gsap from "gsap";
-import { AGENT_HANDLE, LOCALITIES } from "../config";
+import { AGENT_HANDLE, LOCALITIES, localityLabel } from "../config";
 import { fetchForecast, geocode, SOURCE, type Forecast, type Place } from "../air/openMeteo";
 import {
   aqiCategory,
@@ -39,7 +39,7 @@ function offset(t: number, tz: string) {
 
 const hm = (t: number, tz: string) => fmt(t, tz, { hour: "2-digit", minute: "2-digit" });
 
-// Mirrors blr_air/service.py describe() so the in-page verdict reads like the agent.
+// Mirrors delhi_air/service.py describe() so the in-page verdict reads like the agent.
 function describe(f: Forecast, w: Window, req: Request) {
   const tz = f.timezone;
   const lines = [`${f.place.name} · ${tz}`];
@@ -112,7 +112,7 @@ export function initScanner(hooks: ScannerHooks) {
   for (const l of LOCALITIES) {
     const o = document.createElement("option");
     o.value = l.name;
-    o.textContent = l.name === "Bengaluru" ? "Bengaluru (city centre)" : `${l.name}, Bengaluru`;
+    o.textContent = l.name === "Delhi" ? "Delhi (city centre)" : localityLabel(l.name);
     select.append(o);
   }
   select.addEventListener("change", () => {
@@ -200,7 +200,7 @@ export function initScanner(hooks: ScannerHooks) {
     go.querySelector("span")!.textContent = "Scanning…";
     try {
       if (!(await resolveCity())) return;
-      placeLabel.textContent = custom ? place.name : `${place.name}${place.name === "Bengaluru" ? "" : ", Bengaluru"}`;
+      placeLabel.textContent = custom ? place.name : place.name === "Delhi" ? "Delhi" : localityLabel(place.name);
       setStatus("Contacting Open-Meteo…", "");
       const forecast = await fetchForecast({ ...place, name: placeLabel.textContent! });
       setStatus(`Live · fetched ${forecast.fetchedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`, "is-live");

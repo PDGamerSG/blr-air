@@ -2,15 +2,15 @@ from datetime import UTC, datetime, timedelta
 
 import httpx
 
-from blr_air.domain import CurrentAir, Forecast, Hour, Location, RequestSpec
-from blr_air.service import AirService, describe, describe_comparison
+from delhi_air.domain import CurrentAir, Forecast, Hour, Location, RequestSpec
+from delhi_air.service import AirService, describe, describe_comparison
 
 NOW = datetime(2026, 10, 31, 1, 10, tzinfo=UTC)
 
 
 class ForecastProvider:
     async def locate(self, place):
-        return Location("HSR Layout, Bengaluru", 12.9116, 77.6389, "Asia/Kolkata")
+        return Location("Hauz Khas, Delhi", 28.5494, 77.2001, "Asia/Kolkata")
 
     async def forecast(self, location):
         return Forecast(
@@ -25,10 +25,10 @@ class ForecastProvider:
 
 class ComparisonProvider(ForecastProvider):
     async def locate(self, place):
-        return Location(place, 12.9116, 77.6389, "Asia/Kolkata")
+        return Location(place, 28.5494, 77.2001, "Asia/Kolkata")
 
     async def forecast(self, location):
-        base = 10 if location.name == "HSR Layout" else 60
+        base = 10 if location.name == "Hauz Khas" else 60
         return Forecast(
             tuple(
                 Hour(NOW.replace(minute=0) + timedelta(hours=h), base + h, 10, 0, 25)
@@ -57,16 +57,16 @@ async def test_service_renders_current_and_window_with_source_timezone_and_risk(
 async def test_copyable_recheck_request_preserves_user_limits_and_time_preferences():
     import re
 
-    from blr_air.demo import DemoProvider
-    from blr_air.parsing import parse_local
+    from delhi_air.demo import DemoProvider
+    from delhi_air.parsing import parse_local
 
     request = RequestSpec(
-        place="HSR Layout",
+        place="Hauz Khas",
         activity="cycle",
         hours=2,
         day="tomorrow",
         period="morning",
-        max_aqi=100,
+        max_aqi=250,
         max_rain=30,
         max_temperature=35,
         max_uv=5,
@@ -87,7 +87,7 @@ async def test_coordinate_requests_do_not_run_geocoding():
 
     async with httpx.AsyncClient() as client:
         result = await AirService(CoordinateProvider(), client).recommend(
-            RequestSpec(), location=Location("Coordinates", 12.91, 77.64), now=NOW
+            RequestSpec(), location=Location("Coordinates", 28.61, 77.24), now=NOW
         )
     assert result.location.name == "Coordinates"
 
@@ -95,8 +95,8 @@ async def test_coordinate_requests_do_not_run_geocoding():
 async def test_comparison_ranks_places_and_keeps_backup_windows():
     async with httpx.AsyncClient() as client:
         service = AirService(ComparisonProvider(), client)
-        result = await service.compare(RequestSpec(hours=1), ["HSR Layout", "Whitefield"], now=NOW)
-    assert result.items[0].recommendation.location.name == "HSR Layout"
+        result = await service.compare(RequestSpec(hours=1), ["Hauz Khas", "Noida"], now=NOW)
+    assert result.items[0].recommendation.location.name == "Hauz Khas"
     assert result.items[0].recommendation.backups
     assert (
         result.items[1].recommendation.window.us_aqi > result.items[0].recommendation.window.us_aqi
@@ -106,7 +106,7 @@ async def test_comparison_ranks_places_and_keeps_backup_windows():
 
 
 async def test_one_invalid_place_does_not_hide_successful_comparison_results():
-    from blr_air.domain import LocationError
+    from delhi_air.domain import LocationError
 
     class PartialProvider(ComparisonProvider):
         async def locate(self, place):
@@ -116,16 +116,16 @@ async def test_one_invalid_place_does_not_hide_successful_comparison_results():
 
     async with httpx.AsyncClient() as client:
         result = await AirService(PartialProvider(), client).compare(
-            RequestSpec(), ["Unknown", "HSR Layout"], now=NOW
+            RequestSpec(), ["Unknown", "Hauz Khas"], now=NOW
         )
     data = result.to_dict()
     assert data["status"] == "ok" and data["partial"] is True
-    assert data["winner"] == "HSR Layout"
+    assert data["winner"] == "Hauz Khas"
     assert data["places"][1]["status"] == "error"
 
 
 async def test_spoken_answer_preserves_bad_air_warning_and_source():
-    from blr_air.service import spoken_summary
+    from delhi_air.service import spoken_summary
 
     async with httpx.AsyncClient() as client:
         result = await AirService(ForecastProvider(), client).recommend(RequestSpec(), now=NOW)
@@ -136,7 +136,7 @@ async def test_spoken_answer_preserves_bad_air_warning_and_source():
 
 
 async def test_comparison_discloses_tied_scores_and_partial_coverage():
-    from blr_air.domain import LocationError
+    from delhi_air.domain import LocationError
 
     class TiedProvider(ComparisonProvider):
         async def locate(self, place):
@@ -146,9 +146,9 @@ async def test_comparison_discloses_tied_scores_and_partial_coverage():
 
     async with httpx.AsyncClient() as client:
         result = await AirService(TiedProvider(), client).compare(
-            RequestSpec(), ["Whitefield", "Koramangala", "Unknown"], now=NOW
+            RequestSpec(), ["Noida", "Dwarka", "Unknown"], now=NOW
         )
-    assert result.to_dict()["tied_places"] == ["Whitefield", "Koramangala"]
+    assert result.to_dict()["tied_places"] == ["Noida", "Dwarka"]
     assert "tie" in describe_comparison(result).lower()
     assert "could not" in describe_comparison(result).lower()
 
@@ -161,7 +161,7 @@ async def test_venue_coordinates_drive_forecast_and_reviews_stay_attributed():
             return {
                 "status": "ok",
                 "name": "Chosen Park",
-                "address": "Bengaluru, India",
+                "address": "Delhi, India",
                 "latitude": 13.1,
                 "longitude": 77.7,
                 "rating": 4.2,
@@ -193,7 +193,7 @@ async def test_venue_coordinates_drive_forecast_and_reviews_stay_attributed():
         )
     data = result.to_dict()
     assert data["venue"]["rating"] == 4.2
-    assert data["assessment"]["location"]["resolved_name"] == "Chosen Park, Bengaluru, India"
+    assert data["assessment"]["location"]["resolved_name"] == "Chosen Park, Delhi, India"
     text = describe(result)
     assert "Google Maps" in text and "A reviewer" in text and "Good paths." in text
     assert "opening" in text.lower() or "hours" in text.lower()
@@ -202,7 +202,7 @@ async def test_venue_coordinates_drive_forecast_and_reviews_stay_attributed():
 async def test_missing_review_access_does_not_hide_forecast():
     async with httpx.AsyncClient() as client:
         result = await AirService(ForecastProvider(), client).recommend(
-            RequestSpec(place="HSR Layout", include_venue=True), now=NOW
+            RequestSpec(place="Hauz Khas", include_venue=True), now=NOW
         )
     assert result.to_dict()["status"] == "ok"
     assert result.to_dict()["venue"]["status"] == "unavailable"
@@ -230,7 +230,7 @@ async def test_venue_without_address_still_produces_forecast():
 
 
 def test_customer_rating_never_fabricates_count_and_retains_attribution():
-    from blr_air.service import venue_description
+    from delhi_air.service import venue_description
 
     lines = venue_description(
         {
@@ -256,7 +256,7 @@ def test_customer_rating_never_fabricates_count_and_retains_attribution():
 
 
 def test_customer_rating_zero_count_is_reported_as_unavailable():
-    from blr_air.service import venue_description
+    from delhi_air.service import venue_description
 
     text = "\n".join(
         venue_description({"status": "ok", "name": "Park", "rating": 4.5, "rating_count": 0})

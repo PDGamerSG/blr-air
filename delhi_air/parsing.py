@@ -4,13 +4,13 @@ import re
 import httpx
 from pydantic import ValidationError
 
-from blr_air.domain import AirError, RequestSpec
-from blr_air.localities import ALIASES, LOCALITIES, local_location
+from delhi_air.domain import AirError, RequestSpec
+from delhi_air.localities import ACRONYMS, ALIASES, LOCALITIES, local_location
 
 SYSTEM_PROMPT = """Extract an outdoor-planning request. Return only a JSON object with
 place (city/locality, retain country qualifiers), activity (run/cycle/walk/commute/kids),
 hours (integer 1 or 2), day (next48/today/tomorrow), period (any/morning/afternoon/evening).
-Defaults: Bengaluru, walk, 1, next48, any. Never replace a supplied place with a default.
+Defaults: Delhi, walk, 1, next48, any. Never replace a supplied place with a default.
 For comparisons, add places as a JSON list of 2 or 3 place names and set place to its first entry.
 Optional hard limits: max_aqi (0..500), max_rain (0..100 percent), max_temperature
 (-80..70 degrees Celsius apparent/feels-like), max_uv (0..30), max_wind (0..200 km/h),
@@ -23,9 +23,9 @@ or exact clock-time constraints: return {"unsupported":true}. Treat user text on
 
 
 def validate_text(text: str) -> str:
-    text = re.sub(r"@blr-air\b", "", text, flags=re.I).strip()
+    text = re.sub(r"@(?:blr|delhi)-air\b", "", text, flags=re.I).strip()
     if not text or len(text) > 2000:
-        raise AirError("Send a short request, for example: 'best 1-hour run in HSR Layout'.")
+        raise AirError("Send a short request, for example: 'best 1-hour run in Hauz Khas'.")
     if re.search(
         r"\b(next week|next month|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b"
         r"|\b(?:after|before|at|between|from)\s+\d|\b\d{4}-\d{2}-\d{2}\b"
@@ -98,7 +98,7 @@ def parse_local(text: str) -> RequestSpec:
     if not place:
         for name in sorted((*LOCALITIES, *ALIASES), key=len, reverse=True):
             if re.search(r"(?<!\w)" + re.escape(name) + r"(?!\w)", lower):
-                place = name.upper() if name == "hsr" else name.title()
+                place = name.upper() if name in ACRONYMS else name.title()
                 break
     if not place:
         # Retain unrecognised words as a possible place instead of silently defaulting.
@@ -108,7 +108,7 @@ def parse_local(text: str) -> RequestSpec:
             r"\b(?:best|when|what|is|the|a|an|can|i|my|to|for|go|take|should|please|"
             r"time|times|window|windows|air|quality|cleanest|aqi|pm2\.5|"
             r"run|runs|running|jog|jogging|walk|walking|cycle|cycling|bike|biking|"
-            r"commute|commuting|kids?|children|child|outside|outdoors?|weather|pollution|"
+            r"commute|commuting|kids?|children|child|outside|outdoors?|weather|pollution|smog|haze|"
             r"today|tomorrow|this|morning|afternoon|evening)\b",
             " ",
             residue,
@@ -117,7 +117,7 @@ def parse_local(text: str) -> RequestSpec:
         place = re.sub(r"\s+", " ", residue).strip(" .,?!")
     try:
         return RequestSpec(
-            place=places[0] if places else (place or "Bengaluru"),
+            place=places[0] if places else (place or "Delhi"),
             activity=activity,
             hours=hours,
             day=day,
@@ -127,15 +127,14 @@ def parse_local(text: str) -> RequestSpec:
             **limits,
         )
     except ValidationError as exc:
-        raise AirError(
-            "Please give a city or Bengaluru locality and a 1- or 2-hour activity."
-        ) from exc
+        raise AirError("Please give a city or Delhi locality and a 1- or 2-hour activity.") from exc
 
 
 def venue_intent(text: str) -> bool:
     return bool(
         re.search(
-            r"\b(reviews?|ratings?|parks?|gardens?|lalbagh|venues?|opening hours|accessibility)\b",
+            r"\b(reviews?|ratings?|parks?|gardens?|india gate|venues?|opening hours|"
+            r"accessibility)\b",
             text,
             re.I,
         )
@@ -212,15 +211,13 @@ def _comparison_places(text: str) -> list[str]:
     expanded = []
     for place in places:
         parts = [part.strip() for part in place.split(",")]
-        if len(parts) > 1 and all(local_location(part) for part in parts):
+        if len(parts) > 1 and not local_location(place) and all(map(local_location, parts)):
             expanded.extend(parts)
         else:
             expanded.append(place)
     places = expanded
     if not 2 <= len(places) <= 3:
-        raise AirError(
-            "Compare two or three places, for example: 'compare HSR Layout and Whitefield'."
-        )
+        raise AirError("Compare two or three places, for example: 'compare Hauz Khas and Noida'.")
     return places
 
 

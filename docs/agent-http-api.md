@@ -1,11 +1,12 @@
 # Agent API for website integration
 
-The Python service exposes the same recommendation logic as CLI and uAgents chat. Start `uv run blr-air-web --port 8080` locally, or `docker compose up -d --build`. Compose exposes the web API at `http://127.0.0.1:8082` and the signed agent at port 8001; `WEB_PORT` changes the former. The agent's seed/address remains unchanged.
+The Python service exposes the same recommendation logic as CLI and uAgents chat. Start `uv run delhi-air-web --port 8080` locally, or `docker compose up -d --build`. Compose exposes the web API at `http://127.0.0.1:8082` and the signed agent at port 8001; `WEB_PORT` changes the former. The agent's seed/address remains unchanged.
 
 ## Contract
 
 - `GET /api/status`: configuration flags for language, voice, venues, calendar and comparisons. These flags show configured credentials, not successful provider authentication.
-- `POST /api/plan` with JSON `{"query":"compare HSR Layout and Whitefield tomorrow morning with AQI at most 100"}`. Alternatively supply `{"request":{"place":"HSR Layout","hours":1,"max_aqi":100}}`. Supply exactly one of `query` or `request`. All `RequestSpec` constraints work in the structured form.
+- `POST /api/ask` with JSON `{"text":"what is the AQI in Rohini?"}` runs the same conversation as the ASI:One chat agent, including its `help` and `updates` commands. `kind` is `answer` (with `text`), `plan` or `comparison` (with the `/api/plan` fields). Open requests such as `{"text":"a walk near Rohini"}` return a `plan` with a `search` object naming the chosen place and alternatives. Optional `latitude` and `longitude` anchor requests that name no area. Native clients such as the watch use this route.
+- `POST /api/plan` with JSON `{"query":"compare Hauz Khas and Noida tomorrow morning with AQI at most 100"}`. Alternatively supply `{"request":{"place":"Hauz Khas","hours":1,"max_aqi":100}}`. Supply exactly one of `query` or `request`. All `RequestSpec` constraints work in the structured form.
 - `include_venue: true` asks for genuine venue lookup. Named parks, customer reviews, ratings, opening hours and accessibility requests also trigger lookup automatically. Optional `venue_query` supplies a precise venue name/city for a single-place plan; this replaces the forecast location with the matched venue's coordinates. Compare venues by naming each in the query.
 - Successful JSON contains `plan_id`, `expires_at`, numeric `window`/`backups`, `assessment`, `venue` and `summary`. Comparisons return `places`, `tied_places` and `partial`. Each numeric window has its own assessment, including backups. Unavailable venues do not suppress a forecast when the location can otherwise be resolved.
 - `GET /api/calendar/{plan_id}?place_index=0&window_index=1` downloads the first backup of the first result. Index zero selects the best window. Comparison indexes follow returned order, including unavailable entries; selecting an unavailable place returns an error.
@@ -18,7 +19,7 @@ Errors are JSON `{"status":"error","error":"..."}`: 400 invalid JSON/schema, 403
 
 `ASI1_API_KEY` enables freeform/multilingual extraction. `SARVAM_API_KEY` enables audio. `GOOGLE_PLACES_API_KEY` must be a valid Google Cloud key with Places API (New) and billing enabled for genuine customer reviews, ratings, opening hours and accessibility. Requesting reviews uses a higher-priced Google SKU. Restrict this key to the server API; never bundle it in Vite or return it to users. Open-Meteo needs no key for the current noncommercial endpoint.
 
-The stored Google credential has not produced a usable venue response in the live check (an earlier value returned HTTP 400 `API_KEY_INVALID`; the latest supplied value timed out); the integration reports this and leaves reviews unavailable. ASI and Sarvam passed real calls. Claude is not required and its stored credential previously failed authentication. No Neo4j dependency is needed for hourly planning.
+Open-Meteo needs no key. Language, voice and venue features need the keys above on the server; `/api/status` shows which are configured. See the [verification record](verification.md) for what has been checked in this port.
 
 For a separate static Vercel frontend, route `/api/*` through a same-origin rewrite to an always-on HTTPS Python backend. Set `PUBLIC_ORIGIN` on that backend to the exact website origin. Do not point a production frontend at a user's localhost. The API currently uses one process and ephemeral in-memory selections: deploy one replica or use sticky routing; restarts expire selections. Static-only deployment cannot run Python requests or keep server secrets. Frontend hosting is managed in the separate website thread.
 
@@ -28,4 +29,4 @@ Display Google Maps attribution beside venue results and each supplied reviewer'
 
 ## Checks
 
-`uv run pytest -q` exercises shared service, validation, venue failures, voice boundaries and HTTP requests. `uv run python scripts/check_live.py --run-live` checks signed chat/typed requests, real ASI and Open-Meteo. `uv run python scripts/check_web_live.py --run-live --url http://127.0.0.1:8082` checks actual HTTP forecasts, precise backup calendar export, voice roundtrip and reports Google access separately. See `docs/web-live-checks.json` for the latest result. Developer traffic is not outside-user evidence.
+`uv run pytest -q` exercises shared service, validation, venue failures, voice boundaries and HTTP requests. `uv run python scripts/check_live.py --run-live` checks signed chat/typed requests, real ASI and Open-Meteo. `uv run python scripts/check_web_live.py --run-live --url http://127.0.0.1:8082` checks actual HTTP forecasts, precise backup calendar export, voice roundtrip and reports Google access separately. See `docs/bengaluru-archive/web-live-checks.json` for the latest result. Developer traffic is not outside-user evidence.

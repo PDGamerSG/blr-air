@@ -2,10 +2,10 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from blr_air.domain import Hour, NoWindowError, RequestSpec
-from blr_air.scoring import aqi_category, select_window, select_windows
+from delhi_air.domain import Hour, NoWindowError, RequestSpec
+from delhi_air.scoring import aqi_category, select_window, select_windows
 
-NOW = datetime(2026, 10, 31, 0, 40, tzinfo=UTC)  # 06:10 in Bengaluru
+NOW = datetime(2026, 10, 31, 0, 40, tzinfo=UTC)  # 06:10 in Delhi
 
 
 def hour(h, *, aqi=50, pm=10, rain=0, temp=25):

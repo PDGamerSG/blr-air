@@ -16,7 +16,7 @@ function setup(handler: (url: string, init?: RequestInit)=>Promise<Response>, pl
     ? new Response(JSON.stringify(plannerOnline ? {status:'ok',features:{language:true,voice:true,venues:true}} : {status:'error'}),{status:plannerOnline ? 200 : 503,headers:{'content-type':'application/json'}})
     : handler(String(url),init);
   initPlanner();
-  const submit=(query='run in HSR Layout')=>{
+  const submit=(query='run in Hauz Khas')=>{
     (window.document.querySelector('#planner-query') as HTMLTextAreaElement).value=query;
     window.document.querySelector('[data-planner-form]')!.dispatchEvent(new window.Event('submit',{cancelable:true}));
   };
@@ -27,7 +27,7 @@ function plan() {
   const assessment = {verdict:'Best available',aqi:{meaning:'Moderate air',advice:'Recheck conditions'},location:{maps_url:'https://www.google.com/maps/',precision_note:'Model grid'},warnings:[],reasons:['Complete hours'],checklist:['Recheck']};
   const window={start:'2026-11-01T08:00:00+05:30',end:'2026-11-01T09:00:00+05:30',us_aqi:80,max_aqi:80,pm2_5:20,rain_probability:0,temperature:25,score:90,aqi_category:'Moderate',assessment};
   const backup={...window,start:'2026-11-01T10:00:00+05:30',end:'2026-11-01T11:00:00+05:30',us_aqi:160,max_aqi:160,aqi_category:'Unhealthy',assessment:{...assessment,verdict:'Air remains adverse',aqi:{meaning:'Unhealthy air',advice:'Consider indoors'},warnings:['Pollution warning']}};
-  return {status:'ok',plan_id:'random-token',expires_at:new Date(Date.now()+60000).toISOString(),location:{name:'Chosen park',latitude:12.9,longitude:77.6},timezone:'Asia/Kolkata',window,backups:[backup],assessment,source:'Open-Meteo',fetched_at:new Date().toISOString(),summary:'The full answer',venue:{status:'ok',name:'Chosen park',address:'Bengaluru',rating:4.2,rating_count:120,google_maps_uri:'https://maps.google.com',reviews:[{text:'<img src=x onerror=alert(1)>paths',author:'Visitor',author_url:'javascript:alert(2)',published_at:'2026-10-01'}]}};
+  return {status:'ok',plan_id:'random-token',expires_at:new Date(Date.now()+60000).toISOString(),location:{name:'Chosen park',latitude:28.6,longitude:77.2},timezone:'Asia/Kolkata',window,backups:[backup],assessment,source:'Open-Meteo',fetched_at:new Date().toISOString(),summary:'The full answer',venue:{status:'ok',name:'Chosen park',address:'Delhi',rating:4.2,rating_count:120,google_maps_uri:'https://maps.google.com',reviews:[{text:'<img src=x onerror=alert(1)>paths',author:'Visitor',author_url:'javascript:alert(2)',published_at:'2026-10-01'}]}};
 }
 
 test('provider content stays text and backup selection changes assessment and export', async ()=>{
@@ -59,7 +59,7 @@ test('failed refresh clears previous assessment and reports server error',async(
   try {
     await turn();env.submit();await turn();
     assert.match(env.window.document.querySelector('[data-plan-results]')!.textContent!,/Chosen park/);
-    env.submit('run in HSR with AQI at most 0');await turn();
+    env.submit('run in CP with AQI at most 0');await turn();
     assert.equal(env.window.document.querySelector('[data-plan-results]')!.childElementCount,0);
     assert.match(env.window.document.querySelector('[data-plan-status]')!.textContent!,/No complete window/);
     assert.equal((env.window.document.querySelector('[data-plan-submit]') as HTMLButtonElement).disabled,false);
@@ -114,7 +114,7 @@ test('unavailable planner stays on the page instead of handing off to chat', asy
   env.window.open = ((url: string) => { opened.push(url); return null; }) as typeof env.window.open;
   try {
     await turn();
-    env.submit('best 2-hour run in HSR Layout tomorrow morning with AQI at most 100');
+    env.submit('best 2-hour run in Hauz Khas tomorrow morning with AQI at most 100');
     await turn();
     assert.deepEqual(requests, []);
     assert.deepEqual(opened, []);
@@ -138,7 +138,7 @@ test('spoken plan can be downloaded and the planner ends with the agent link', a
     const link = doc.querySelector('[data-plan-audio-download]') as HTMLAnchorElement;
     assert.equal((doc.querySelector('[data-plan-audio-actions]') as HTMLElement).hidden, false);
     assert.match(link.href, /^blob:/);
-    assert.equal(link.getAttribute('download'), 'blr-air-plan.wav');
+    assert.equal(link.getAttribute('download'), 'delhi-air-plan.wav');
     const agent = doc.querySelector('.planner__agent a[data-asi]');
     assert.ok(agent, 'agent link closes the planner');
     assert.equal(doc.querySelector('.planner__intro a[data-asi]'), null);

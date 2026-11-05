@@ -36,6 +36,7 @@ def material(name, color, emission=None):
     if m:
         return m
     m = bpy.data.materials.new(name)
+    m.use_nodes = True
     bsdf = m.node_tree.nodes.get("Principled BSDF")
     bsdf.inputs["Base Color"].default_value = linear(color)
     bsdf.inputs["Roughness"].default_value = 0.7
@@ -230,8 +231,8 @@ def build_ufo():
     export("ufo.glb")
 
 
-# --- Gaali (ಗಾಳಿ, "air"): one-eyed sky reader in a gas mask ---
-def build_gaali():
+# --- Hawa (हवा, "air"): one-eyed sky reader in a gas mask ---
+def build_hawa():
     reset()
     skin = material("skin", "#8dfc6a")
     belly = material("belly", "#d7ffb8")
@@ -243,26 +244,26 @@ def build_gaali():
     strap = material("strap", "#e20b1b")
     sensor = material("glow_sensor", "#ff5b9e", "#ff5b9e")
 
-    body = sphere("GaaliBody", skin, 1.0, (0, 0, 1.15), (1, 0.95, 1.12), 64, 32)
+    body = sphere("HawaBody", skin, 1.0, (0, 0, 1.15), (1, 0.95, 1.12), 64, 32)
     tummy = sphere("tummy", belly, 0.62, (0, -0.55, 0.85), (1, 0.5, 1.0), 48, 24)
     feet = [sphere(f"foot{s}", skin, 0.32, (s * 0.42, -0.12, 0.14), (1, 1.3, 0.55), 32, 16) for s in (-1, 1)]
     arms = [
         sphere(f"arm{s}", skin, 0.22, (s * 1.0, -0.15, 0.95), (0.8, 0.8, 1.5), 24, 12) for s in (-1, 1)
     ]
-    join("GaaliBody", [body, tummy, *feet, *arms])
+    join("HawaBody", [body, tummy, *feet, *arms])
 
-    sphere("GaaliEye", eye_white, 0.46, (0, -0.7, 1.6), (1, 0.72, 1), 48, 24)
-    sphere("GaaliPupil", pupil, 0.16, (0.03, -1.02, 1.56), (1, 0.5, 1.15), 32, 16)
-    sphere("GaaliShine", shine, 0.05, (0.1, -1.1, 1.64), seg=12, rings=6)
+    sphere("HawaEye", eye_white, 0.46, (0, -0.7, 1.6), (1, 0.72, 1), 48, 24)
+    sphere("HawaPupil", pupil, 0.16, (0.03, -1.02, 1.56), (1, 0.5, 1.15), 32, 16)
+    sphere("HawaShine", shine, 0.05, (0.1, -1.1, 1.64), seg=12, rings=6)
 
     lid = sphere("lid", skin, 0.47, (0, -0.68, 1.78), (1.06, 0.78, 0.55), 32, 16)
-    lid.name = "GaaliLid"
+    lid.name = "HawaLid"
 
     ant = []
     for s in (-1, 1):
         ant.append(tube(f"ant{s}", skin, [(s * 0.3, 0, 2.15), (s * 0.55, 0.05, 2.7), (s * 0.9, 0.15, 3.0)], 0.045))
         ant.append(sphere(f"tip{s}", sensor, 0.13, (s * 0.9, 0.15, 3.02), seg=20, rings=10))
-    join("GaaliAntennae", ant)
+    join("HawaAntennae", ant)
 
     snout = cylinder("snout", mask, 0.3, 0.42, (0, -0.98, 1.05), (math.radians(90), 0, 0), 32)
     grill = torus("grill", filt, 0.24, 0.05, (0, -1.2, 1.05), (math.radians(90), 0, 0), 32, 8)
@@ -271,68 +272,75 @@ def build_gaali():
         cans.append(cylinder(f"can{s}", mask, 0.2, 0.28, (s * 0.5, -0.86, 0.92), (math.radians(90), 0, s * math.radians(35)), 24))
         cans.append(cylinder(f"cap{s}", filt, 0.21, 0.06, (s * 0.58, -0.98, 0.92), (math.radians(90), 0, s * math.radians(35)), 24))
     band = torus("band", strap, 0.98, 0.05, (0, 0.02, 1.15), (math.radians(8), 0, 0), 64, 8)
-    join("GaaliMask", [snout, grill, *cans, band])
-    export("gaali.glb")
+    join("HawaMask", [snout, grill, *cans, band])
+    export("hawa.glb")
 
 
-# --- Vidhana Soudha, simplified to read at a distance ---
-def build_vidhana():
+# --- India Gate, simplified to read at a distance ---
+def carve(body, cutter):
+    mod = body.modifiers.new("cut", "BOOLEAN")
+    mod.operation = "DIFFERENCE"
+    mod.object = cutter
+    mod.solver = "EXACT"
+    bpy.ops.object.select_all(action="DESELECT")
+    body.select_set(True)
+    bpy.context.view_layer.objects.active = body
+    bpy.ops.object.modifier_apply(modifier=mod.name)
+    bpy.data.objects.remove(cutter, do_unlink=True)
+
+
+def build_india_gate():
     reset()
-    stone = material("stone", "#ead9c8")
-    shade = material("stone_shade", "#c9b49c")
-    dome = material("dome", "#f2e6d4")
-    window = material("window", "#3a2b3f")
-    finial = material("glow_finial", "#ffe62b", "#ffe62b")
+    stone = material("stone", "#e6c8a0")
+    shade = material("stone_shade", "#b98f66")
+    shadow = material("panel", "#3a2b3f")
+    flame = material("glow_flame", "#ffb02e", "#ff8a1f")
+    base = 0.44
+    quarter = math.radians(90)
+
+    gate = box("gate", stone, (3.0, 1.3, 2.9), (0, 0, base + 1.45))
+    # The main arch runs front to back; the smaller arch crosses it through both piers.
+    carve(gate, box("cut_main", stone, (1.25, 2.0, 1.75), (0, 0, base + 0.875)))
+    carve(gate, cylinder("cut_crown", stone, 0.625, 2.0, (0, 0, base + 1.75), (quarter, 0, 0), 48))
+    carve(gate, box("cut_side", stone, (4.0, 0.5, 0.9), (0, 0, base + 0.45)))
+    carve(gate, cylinder("cut_side_crown", stone, 0.25, 4.0, (0, 0, base + 0.9), (0, quarter, 0), 32))
 
     parts = [
-        box("plinth", shade, (6.4, 2.6, 0.3), (0, 0, 0.15)),
-        box("main", stone, (5.8, 2.0, 1.1), (0, 0, 0.85)),
-        box("cornice", shade, (6.0, 2.2, 0.12), (0, 0, 1.46)),
-        box("tower", stone, (1.6, 1.4, 0.8), (0, 0, 1.92)),
-        box("tower_cap", shade, (1.75, 1.55, 0.1), (0, 0, 2.36)),
-        box("portico", stone, (1.9, 0.7, 1.35), (0, -1.3, 0.95)),
-        box("steps1", shade, (2.6, 0.5, 0.1), (0, -1.9, 0.05)),
-        box("steps2", shade, (2.3, 0.4, 0.2), (0, -1.75, 0.1)),
+        gate,
+        box("step1", shade, (4.4, 2.6, 0.12), (0, 0, 0.06)),
+        box("step2", shade, (3.9, 2.1, 0.12), (0, 0, 0.18)),
+        box("plinth", shade, (3.5, 1.7, 0.2), (0, 0, 0.34)),
+        box("impost", shade, (3.06, 1.36, 0.06), (0, 0, base + 2.22)),
+        box("cornice", shade, (3.24, 1.54, 0.12), (0, 0, 3.4)),
+        box("attic1", stone, (2.7, 1.15, 0.45), (0, 0, 3.685)),
+        box("attic_cap", shade, (2.8, 1.25, 0.05), (0, 0, 3.93)),
+        box("attic2", stone, (2.3, 0.95, 0.3), (0, 0, 4.1)),
+        box("attic3", stone, (1.9, 0.8, 0.25), (0, 0, 4.375)),
+        box("name_panel", shadow, (1.3, 0.03, 0.18), (0, -0.585, 3.685)),
+        sphere("dome", stone, 0.5, (0, 0, 4.5), (1, 0.8, 0.45), 40, 20),
+        cylinder("bowl", shade, 0.2, 0.1, (0, 0, 4.76), verts=24),
     ]
-    parts.append(prism("pediment", shade, 2.1, 0.5, 0.8, (0, -1.3, 1.62)))
-    for i in range(6):
-        x = -0.8 + i * 0.32
-        parts.append(cylinder(f"col{i}", stone, 0.07, 1.25, (x, -1.68, 0.85), verts=12))
-    for row in (0.65, 1.1):
-        for i in range(14):
-            x = -2.7 + i * 0.41
-            if -1.1 < x < 1.1:
-                continue
-            parts.append(box(f"win{row}{i}", window, (0.16, 0.05, 0.24), (x, -1.01, row)))
-    for sx in (-1, 1):
-        for sy in (-1, 1):
-            parts.append(box(f"pav{sx}{sy}", stone, (0.6, 0.6, 0.45), (sx * 2.6, sy * 0.7, 1.72)))
-            parts.append(sphere(f"cdome{sx}{sy}", dome, 0.3, (sx * 2.6, sy * 0.7, 1.95), (1, 1, 1.1), 24, 12))
-    body = join("Vidhana", parts)
-    drum = cylinder("drum", shade, 0.62, 0.35, (0, 0, 2.58), verts=40)
-    big = sphere("bigdome", dome, 0.7, (0, 0, 2.75), (1, 1, 1.05), 48, 24)
-    spike = cone("spike", shade, 0.08, 0.0, 0.35, (0, 0, 3.6), verts=12)
-    join("Vidhana", [body, drum, big, spike])
-    sphere("VidhanaFinial", finial, 0.07, (0, 0, 3.8), seg=12, rings=6)
-    export("vidhana.glb")
+    join("IndiaGate", parts)
+    sphere("IndiaGateFlame", flame, 0.09, (0, 0, 4.88), (1, 1, 1.4), seg=16, rings=8)
+    export("india-gate.glb")
 
 
-# --- Pink trumpet tree (Tabebuia rosea), Bengaluru's spring signature ---
+# --- Amaltas (Cassia fistula), the golden tree that lines Delhi's avenues in early summer ---
 def build_tree():
     reset()
     bark = material("bark", "#5a2d1e")
-    pink = material("bloom", "#ff5b9e")
-    light = material("bloom_light", "#ff9ccb")
+    gold = material("bloom", "#ffc61a")
+    light = material("bloom_light", "#ffe680")
     trunk = cone("trunk", bark, 0.14, 0.07, 1.2, (0, 0, 0.6), verts=10, smooth=False)
     b1 = cone("b1", bark, 0.06, 0.03, 0.7, (0.22, 0, 1.2), (0, math.radians(35), 0), 8, smooth=False)
     b2 = cone("b2", bark, 0.06, 0.03, 0.7, (-0.2, 0.1, 1.25), (math.radians(-15), math.radians(-35), 0), 8, smooth=False)
     join("TreeTrunk", [trunk, b1, b2])
     blobs = [
-        ((0, 0, 1.75), 0.62, pink),
+        ((0, 0, 1.75), 0.62, gold),
         ((0.5, 0.1, 1.55), 0.45, light),
-        ((-0.48, 0.15, 1.6), 0.46, pink),
+        ((-0.48, 0.15, 1.6), 0.46, gold),
         ((0.15, -0.38, 1.6), 0.42, light),
-        ((-0.1, 0.42, 1.62), 0.4, pink),
+        ((-0.1, 0.42, 1.62), 0.4, gold),
         ((0.1, 0.05, 2.15), 0.38, light),
     ]
     canopy = [ico(f"c{i}", m, r, p, subdivisions=1) for i, (p, r, m) in enumerate(blobs)]
@@ -341,7 +349,7 @@ def build_tree():
 
 
 build_ufo()
-build_gaali()
-build_vidhana()
+build_hawa()
+build_india_gate()
 build_tree()
 print("exported to", os.path.abspath(OUT))

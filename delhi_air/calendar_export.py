@@ -4,8 +4,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from uuid import NAMESPACE_URL, uuid5
 
-from blr_air.domain import AirError
-from blr_air.service import LIMITATION, SOURCE, Recommendation, request_prompt
+from delhi_air.domain import AirError
+from delhi_air.service import LIMITATION, SOURCE, Recommendation, request_prompt
 
 
 def _text(value: str) -> str:
@@ -59,7 +59,7 @@ def write_calendar(
     activity = recommendation.request.activity
     location = recommendation.location
     identity = (
-        f"https://blr-air.local/window/{location.latitude}/{location.longitude}/"
+        f"https://delhi-air.local/window/{location.latitude}/{location.longitude}/"
         f"{start.isoformat()}/{end.isoformat()}/{activity}"
     )
     source = "Synthetic offline demo" if forecast.is_demo else SOURCE
@@ -71,7 +71,7 @@ def write_calendar(
         f"temperature up to {window.temperature:.1f}°C.",
         f"Source: {source}. Forecast retrieved {fetched.isoformat()}.",
         "This event is a forecast snapshot and does not update. "
-        "Re-check BLR Air before going outside; conditions can change.",
+        "Re-check Delhi Air before going outside; conditions can change.",
         "On the event date, send: "
         + request_prompt(recommendation.request.model_copy(update={"day": "today"})),
         "A best available window can still have unhealthy air and is not a guarantee of safety.",
@@ -82,14 +82,14 @@ def write_calendar(
     lines = [
         "BEGIN:VCALENDAR",
         "VERSION:2.0",
-        "PRODID:-//BLR Air//Outdoor Window//EN",
+        "PRODID:-//Delhi Air//Outdoor Window//EN",
         "CALSCALE:GREGORIAN",
         "BEGIN:VEVENT",
         f"UID:{uuid5(NAMESPACE_URL, identity)}@blr-air",
         f"DTSTAMP:{fetched:%Y%m%dT%H%M%SZ}",
         f"DTSTART:{start:%Y%m%dT%H%M%SZ}",
         f"DTEND:{end:%Y%m%dT%H%M%SZ}",
-        "SUMMARY:" + _text(f"{'DEMO — ' if forecast.is_demo else ''}BLR Air: {activity}"),
+        "SUMMARY:" + _text(f"{'DEMO — ' if forecast.is_demo else ''}Delhi Air: {activity}"),
         "LOCATION:" + _text(location.name),
         "DESCRIPTION:" + _text("\n".join(description)),
     ]
@@ -99,7 +99,7 @@ def write_calendar(
                 "BEGIN:VALARM",
                 f"TRIGGER:-PT{reminder_minutes}M",
                 "ACTION:DISPLAY",
-                "DESCRIPTION:Re-check BLR Air: forecast conditions may have changed.",
+                "DESCRIPTION:Re-check Delhi Air: forecast conditions may have changed.",
                 "END:VALARM",
             ]
         )

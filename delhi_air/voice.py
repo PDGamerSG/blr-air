@@ -12,7 +12,7 @@ from pathlib import Path
 
 import httpx
 
-from blr_air.domain import AirError
+from delhi_air.domain import AirError
 
 API_URL = "https://api.sarvam.ai"
 MAX_INPUT_BYTES = 10 * 1024 * 1024
@@ -192,7 +192,7 @@ class SarvamVoice:
         temporary = None
         try:
             with tempfile.NamedTemporaryFile(
-                dir=output.parent, prefix=".blr-voice-", delete=False
+                dir=output.parent, prefix=".delhi-voice-", delete=False
             ) as f:
                 temporary = Path(f.name)
                 f.write(data)

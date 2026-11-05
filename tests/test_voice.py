@@ -8,7 +8,7 @@ from email.parser import BytesParser
 import httpx
 import pytest
 
-from blr_air.domain import AirError
+from delhi_air.domain import AirError
 
 
 def wav_bytes(*, seconds=0.1, sample_rate=16000, channels=1, width=2):
@@ -29,7 +29,7 @@ def recording(tmp_path):
 
 
 async def test_transcribe_sends_real_wav_as_multipart_and_returns_trimmed_text(recording):
-    from blr_air.voice import SarvamVoice
+    from delhi_air.voice import SarvamVoice
 
     def respond(request):
         assert str(request.url) == "https://api.sarvam.ai/speech-to-text"
@@ -52,7 +52,7 @@ async def test_transcribe_sends_real_wav_as_multipart_and_returns_trimmed_text(r
             200,
             json={
                 "request_id": "example",
-                "transcript": "  run in HSR Layout tomorrow  ",
+                "transcript": "  run in Hauz Khas tomorrow  ",
                 "language_code": "en-IN",
                 "language_probability": 0.95,
             },
@@ -60,7 +60,7 @@ async def test_transcribe_sends_real_wav_as_multipart_and_returns_trimmed_text(r
 
     async with httpx.AsyncClient(transport=httpx.MockTransport(respond)) as client:
         assert await SarvamVoice(client, "test-key").transcribe(recording) == (
-            "run in HSR Layout tomorrow"
+            "run in Hauz Khas tomorrow"
         )
 
 
@@ -77,7 +77,7 @@ async def test_transcribe_sends_real_wav_as_multipart_and_returns_trimmed_text(r
     ids=["empty", "wrong-format", "truncated", "zero-frames", "long", "8-bit"],
 )
 async def test_invalid_wav_is_rejected_before_upload(recording, data):
-    from blr_air.voice import SarvamVoice
+    from delhi_air.voice import SarvamVoice
 
     recording.write_bytes(data)
 
@@ -90,7 +90,7 @@ async def test_invalid_wav_is_rejected_before_upload(recording, data):
 
 
 async def test_file_size_limit_is_checked_before_reading_or_upload(recording):
-    from blr_air.voice import SarvamVoice
+    from delhi_air.voice import SarvamVoice
 
     with recording.open("wb") as handle:
         handle.truncate(11 * 1024 * 1024)
@@ -103,7 +103,7 @@ async def test_file_size_limit_is_checked_before_reading_or_upload(recording):
 
 @pytest.mark.parametrize("filename", ["request.mp3", "missing.wav", "."])
 async def test_only_local_regular_wav_files_are_accepted(tmp_path, filename):
-    from blr_air.voice import SarvamVoice
+    from delhi_air.voice import SarvamVoice
 
     async with httpx.AsyncClient(
         transport=httpx.MockTransport(lambda request: pytest.fail())
@@ -114,7 +114,7 @@ async def test_only_local_regular_wav_files_are_accepted(tmp_path, filename):
 
 @pytest.mark.parametrize("payload", [{}, {"transcript": None}, {"transcript": "  "}, []])
 async def test_bad_transcript_fails_without_inventing_a_request(recording, payload):
-    from blr_air.voice import SarvamVoice
+    from delhi_air.voice import SarvamVoice
 
     async with httpx.AsyncClient(
         transport=httpx.MockTransport(lambda request: httpx.Response(200, json=payload))
@@ -124,7 +124,7 @@ async def test_bad_transcript_fails_without_inventing_a_request(recording, paylo
 
 
 async def test_synthesize_requests_documented_voice_and_saves_valid_private_wav(tmp_path):
-    from blr_air.voice import SarvamVoice
+    from delhi_air.voice import SarvamVoice
 
     audio = wav_bytes(sample_rate=24000)
 
@@ -171,7 +171,7 @@ async def test_synthesize_requests_documented_voice_and_saves_valid_private_wav(
     ids=["empty", "invalid-base64", "not-wav", "truncated", "many", "string"],
 )
 async def test_invalid_speech_response_never_creates_output(tmp_path, audios):
-    from blr_air.voice import SarvamVoice
+    from delhi_air.voice import SarvamVoice
 
     output = tmp_path / "answer.wav"
     async with httpx.AsyncClient(
@@ -187,7 +187,7 @@ async def test_invalid_speech_response_never_creates_output(tmp_path, audios):
 
 @pytest.mark.parametrize("text", ["", "   ", "x" * 2501], ids=["empty", "blank", "long"])
 async def test_tts_text_limit_fails_before_provider_call(tmp_path, text):
-    from blr_air.voice import SarvamVoice
+    from delhi_air.voice import SarvamVoice
 
     async with httpx.AsyncClient(
         transport=httpx.MockTransport(lambda request: pytest.fail())
@@ -198,7 +198,7 @@ async def test_tts_text_limit_fails_before_provider_call(tmp_path, text):
 
 @pytest.mark.parametrize("is_symlink", [False, True])
 async def test_output_never_overwrites_existing_file_or_symlink(tmp_path, is_symlink):
-    from blr_air.voice import SarvamVoice
+    from delhi_air.voice import SarvamVoice
 
     target = tmp_path / "original.wav"
     target.write_bytes(b"existing data")
@@ -215,7 +215,7 @@ async def test_output_never_overwrites_existing_file_or_symlink(tmp_path, is_sym
 
 @pytest.mark.parametrize("status", [302, 401, 403, 422, 429, 503])
 async def test_provider_errors_and_redirects_do_not_expose_secrets(recording, status):
-    from blr_air.voice import SarvamVoice
+    from delhi_air.voice import SarvamVoice
 
     requests = []
 
@@ -238,7 +238,7 @@ async def test_provider_errors_and_redirects_do_not_expose_secrets(recording, st
 
 
 async def test_network_timeout_is_actionable_air_error(recording):
-    from blr_air.voice import SarvamVoice
+    from delhi_air.voice import SarvamVoice
 
     def timeout(request):
         raise httpx.ReadTimeout("secret-test-key", request=request)
@@ -250,7 +250,7 @@ async def test_network_timeout_is_actionable_air_error(recording):
 
 
 async def test_empty_api_key_is_actionable(tmp_path):
-    from blr_air.voice import SarvamVoice
+    from delhi_air.voice import SarvamVoice
 
     async with httpx.AsyncClient() as client:
         with pytest.raises(AirError, match="SARVAM_API_KEY"):
@@ -258,7 +258,7 @@ async def test_empty_api_key_is_actionable(tmp_path):
 
 
 async def test_output_created_during_request_is_preserved_and_temporary_file_cleaned(tmp_path):
-    from blr_air.voice import SarvamVoice
+    from delhi_air.voice import SarvamVoice
 
     output = tmp_path / "answer.wav"
 
@@ -280,7 +280,7 @@ async def test_output_created_during_request_is_preserved_and_temporary_file_cle
 
 
 async def test_kannada_uses_matching_speaker_and_preserves_native_text(tmp_path):
-    from blr_air.voice import SarvamVoice
+    from delhi_air.voice import SarvamVoice
 
     def respond(request):
         payload = json.loads(request.content)
@@ -302,7 +302,7 @@ async def test_kannada_uses_matching_speaker_and_preserves_native_text(tmp_path)
 
 
 async def test_malformed_provider_json_is_an_air_error(recording):
-    from blr_air.voice import SarvamVoice
+    from delhi_air.voice import SarvamVoice
 
     async with httpx.AsyncClient(
         transport=httpx.MockTransport(lambda request: httpx.Response(200, content=b"not JSON"))

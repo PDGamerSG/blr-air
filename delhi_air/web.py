@@ -5,6 +5,7 @@ import asyncio
 import json
 import logging
 import os
+import re
 import secrets
 import tempfile
 import time
@@ -19,13 +20,14 @@ from aiohttp import web
 from dotenv import load_dotenv
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
-from blr_air.calendar_export import write_calendar
-from blr_air.domain import AirError, ProviderError, RequestSpec
-from blr_air.parsing import parse_request
-from blr_air.providers import OpenMeteo
-from blr_air.service import AirService, ComparisonResult, spoken_summary
-from blr_air.venues import GooglePlaces
-from blr_air.voice import MAX_INPUT_BYTES, SarvamVoice
+from delhi_air.agent_runtime import chat_guidance
+from delhi_air.calendar_export import write_calendar
+from delhi_air.domain import AirError, ProviderError, RequestSpec
+from delhi_air.parsing import parse_request, venue_intent
+from delhi_air.providers import OpenMeteo
+from delhi_air.service import AirService, ComparisonResult, spoken_summary
+from delhi_air.venues import GooglePlaces
+from delhi_air.voice import MAX_INPUT_BYTES, SarvamVoice
 
 LOG = logging.getLogger(__name__)
 
@@ -42,6 +44,14 @@ class PlanInput(BaseModel):
         if (self.query is None) == (self.request is None):
             raise ValueError("Provide either a text query or structured request.")
         return self
+
+
+class AskInput(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    text: str = Field(min_length=1, max_length=2000)
+    # Where the asker is, for "near me" and requests that name no area.
+    latitude: float | None = Field(default=None, ge=-90, le=90, allow_inf_nan=False)
+    longitude: float | None = Field(default=None, ge=-180, le=180, allow_inf_nan=False)
 
 
 class Selection(BaseModel):
@@ -249,6 +259,37 @@ def create_app(*, service=None, voice=None, static_dir=None, rate_limit=30, venu
                 data.update(plan_id=token, expires_at=expires.isoformat())
             return web.json_response(data, status=200 if data["status"] == "ok" else 422)
 
+    async def ask(request):
+        """The same conversation the ASI:One agent has, for clients such as the watch."""
+        payload = AskInput.model_validate(await json_body(request))
+        guidance = chat_guidance(payload.text)
+        if guidance is not None:
+            return web.json_response({"status": "ok", "kind": "answer", "text": guidance})
+        if slots.locked():
+            return error("The agent is busy. Please retry shortly.", 503, {"Retry-After": "5"})
+        if getattr(service.venues, "api_key", "") and venue_intent(payload.text):
+            comparing = re.search(r"\b(?:compare|vs|versus)\b", payload.text, re.I)
+            if not reserve_venue_budget(request, 3 if comparing else 1):
+                return error(
+                    "Venue lookups are temporarily limited because they use a paid provider. "
+                    "Please retry later.",
+                    429,
+                    {"Retry-After": "60"},
+                )
+        async with slots, asyncio.timeout(50):
+            near = None
+            if payload.latitude is not None and payload.longitude is not None:
+                near = (payload.latitude, payload.longitude)
+            result = await service.chat(payload.text, near=near)
+            if isinstance(result, str):
+                return web.json_response({"status": "ok", "kind": "answer", "text": result})
+            data = result.to_dict()
+            data["kind"] = "comparison" if isinstance(result, ComparisonResult) else "plan"
+            if data["status"] == "ok":
+                token, expires = store.put(result)
+                data.update(plan_id=token, expires_at=expires.isoformat())
+            return web.json_response(data, status=200 if data["status"] == "ok" else 422)
+
     def selected(selection):
         try:
             result = store.get(selection.plan_id)
@@ -283,7 +324,7 @@ def create_app(*, service=None, voice=None, static_dir=None, rate_limit=30, venu
         except ValueError:
             raise web.HTTPBadRequest(reason="Choose a valid place and window.") from None
         result = selected(selection)
-        with tempfile.TemporaryDirectory(prefix="blr-calendar-") as folder:
+        with tempfile.TemporaryDirectory(prefix="delhi-calendar-") as folder:
             path = write_calendar(result, Path(folder) / "outdoor-window.ics")
             data = path.read_bytes()
         return web.Response(
@@ -308,7 +349,7 @@ def create_app(*, service=None, voice=None, static_dir=None, rate_limit=30, venu
             return error("Voice is busy. Please retry shortly.", 503)
         async with slots, asyncio.timeout(70):
             data = await request.read()
-            with tempfile.TemporaryDirectory(prefix="blr-speech-") as folder:
+            with tempfile.TemporaryDirectory(prefix="delhi-speech-") as folder:
                 path = Path(folder) / "request.wav"
                 path.write_bytes(data)
                 transcript = await voice.transcribe(path)
@@ -324,7 +365,7 @@ def create_app(*, service=None, voice=None, static_dir=None, rate_limit=30, venu
         if slots.locked():
             return error("Speech is busy. Please retry shortly.", 503)
         async with slots, asyncio.timeout(70):
-            with tempfile.TemporaryDirectory(prefix="blr-answer-") as folder:
+            with tempfile.TemporaryDirectory(prefix="delhi-answer-") as folder:
                 path = await voice.synthesize(spoken_summary(result), Path(folder) / "answer.wav")
                 data = path.read_bytes()
         return web.Response(
@@ -350,6 +391,7 @@ def create_app(*, service=None, voice=None, static_dir=None, rate_limit=30, venu
         [
             web.get("/api/status", status),
             web.post("/api/plan", plan),
+            web.post("/api/ask", ask),
             web.get("/api/calendar/{token}", calendar),
             web.post("/api/transcribe", transcribe),
             web.post("/api/speech", speech),
@@ -367,7 +409,7 @@ def create_app(*, service=None, voice=None, static_dir=None, rate_limit=30, venu
 
 def main():
     load_dotenv()
-    parser = argparse.ArgumentParser(description="Serve the BLR Air website and private API")
+    parser = argparse.ArgumentParser(description="Serve the Delhi Air website and private API")
     parser.add_argument("--host", default=os.getenv("WEB_HOST", "127.0.0.1"))
     parser.add_argument("--port", type=int, default=int(os.getenv("PORT", "8080")))
     parser.add_argument("--site-dir", default=os.getenv("SITE_DIR", "site/dist"))

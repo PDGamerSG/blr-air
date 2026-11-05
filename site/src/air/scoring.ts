@@ -1,4 +1,4 @@
-// Browser port of blr_air/scoring.py. Keep the rules identical so the page never
+// Browser port of delhi_air/scoring.py. Keep the rules identical so the page never
 // promises something the agent would answer differently.
 
 export type Activity = "run" | "cycle" | "walk" | "commute" | "kids";

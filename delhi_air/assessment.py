@@ -3,10 +3,10 @@
 from typing import TYPE_CHECKING
 from urllib.parse import urlencode
 
-from blr_air.scoring import aqi_category
+from delhi_air.scoring import aqi_category
 
 if TYPE_CHECKING:
-    from blr_air.service import Recommendation
+    from delhi_air.service import Recommendation
 
 
 AQI_GUIDANCE = {

@@ -1,9 +1,9 @@
 // Same-origin /api proxy for the Vercel-hosted site.
 //
 // The planner calls /api/* on its own origin. Vercel rewrites those paths here and this
-// function forwards them to the Python web service (blr_air/web.py) at BLR_AIR_API_ORIGIN,
+// function forwards them to the Python web service (delhi_air/web.py) at DELHI_AIR_API_ORIGIN,
 // an always-on HTTPS backend. Set that backend's PUBLIC_ORIGIN to this site's exact origin
-// (https://blrairwindow.vercel.app): the browser's Origin header is forwarded unchanged.
+// (https://delhiairwindow.vercel.app): the browser's Origin header is forwarded unchanged.
 // Without a configured backend the API answers with JSON errors, so the planner reports
 // itself unavailable while the rest of the page keeps working.
 
@@ -17,7 +17,7 @@ function fail(status, error) {
 
 function backendOrigin() {
   try {
-    const url = new URL(process.env.BLR_AIR_API_ORIGIN ?? "");
+    const url = new URL(process.env.DELHI_AIR_API_ORIGIN ?? "");
     const loopback = ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
     if (url.username || url.password) return null;
     return url.protocol === "https:" || (url.protocol === "http:" && loopback) ? url.origin : null;

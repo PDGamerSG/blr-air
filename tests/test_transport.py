@@ -5,9 +5,9 @@ from uuid import uuid4
 from uagents import Protocol
 from uagents_core.models import Model
 
-from blr_air.agent_runtime import LocalRegistration
-from blr_air.models import WindowRequest
-from blr_air.transport import ResilientAgent
+from delhi_air.agent_runtime import LocalRegistration
+from delhi_air.models import WindowRequest
+from delhi_air.transport import ResilientAgent
 
 
 async def test_malformed_message_returns_error_and_does_not_kill_message_queue(
@@ -42,10 +42,10 @@ async def test_malformed_message_returns_error_and_does_not_kill_message_queue(
     agent.include(protocol, publish_manifest=False)
     digest = Model.build_schema_digest(WindowRequest)
     await agent._message_queue.put(
-        (digest, agent.address, '{"latitude":12.9,"longitude":77.6,"hours":3}', uuid4())
+        (digest, agent.address, '{"latitude":28.6,"longitude":77.2,"hours":3}', uuid4())
     )
     await agent._message_queue.put(
-        (digest, agent.address, '{"latitude":12.9,"longitude":77.6,"hours":1}', uuid4())
+        (digest, agent.address, '{"latitude":28.6,"longitude":77.2,"hours":1}', uuid4())
     )
     task = asyncio.create_task(agent._process_message_queue())
     try:

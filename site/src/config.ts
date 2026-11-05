@@ -16,8 +16,8 @@ export const LINKS = {
   cams: "https://atmosphere.copernicus.eu/",
 } as const;
 
-// Online submissions for Stranger Builds close on Sunday 8 November (India time).
-export const SUBMISSIONS_CLOSE = new Date("2026-11-08T23:59:59+05:30");
+// Online submissions close Sun 8 Nov, 23:59 Argentina time, which is 02:59 UTC on Monday.
+export const SUBMISSIONS_CLOSE = new Date("2026-11-09T02:59:00Z");
 
 export interface Locality {
   name: string;
@@ -25,39 +25,44 @@ export interface Locality {
   lon: number;
 }
 
-// Mirrors blr_air/localities.py: approximate neighbourhood centroids, not sensor locations.
+// Mirrors delhi_air/localities.py: approximate neighbourhood centroids, not sensor locations.
 export const LOCALITIES: Locality[] = [
-  { name: "HSR Layout", lat: 12.9116, lon: 77.6389 },
-  { name: "Koramangala", lat: 12.9352, lon: 77.6245 },
-  { name: "Indiranagar", lat: 12.9784, lon: 77.6408 },
-  { name: "Whitefield", lat: 12.9698, lon: 77.75 },
-  { name: "Electronic City", lat: 12.8452, lon: 77.6602 },
-  { name: "Jayanagar", lat: 12.925, lon: 77.5938 },
-  { name: "JP Nagar", lat: 12.9063, lon: 77.5857 },
-  { name: "BTM Layout", lat: 12.9166, lon: 77.6101 },
-  { name: "Bellandur", lat: 12.9304, lon: 77.6784 },
-  { name: "Marathahalli", lat: 12.9591, lon: 77.6974 },
-  { name: "Sarjapur", lat: 12.86, lon: 77.786 },
-  { name: "Yelahanka", lat: 13.1005, lon: 77.5963 },
-  { name: "Hebbal", lat: 13.0354, lon: 77.5988 },
-  { name: "Malleshwaram", lat: 13.0031, lon: 77.5643 },
-  { name: "Rajajinagar", lat: 12.9915, lon: 77.553 },
-  { name: "Banashankari", lat: 12.9255, lon: 77.5468 },
-  { name: "Basavanagudi", lat: 12.9422, lon: 77.5738 },
-  { name: "Cubbon Park", lat: 12.9763, lon: 77.5929 },
-  { name: "Lalbagh", lat: 12.9507, lon: 77.5848 },
-  { name: "Bengaluru", lat: 12.9716, lon: 77.5946 },
+  { name: "Hauz Khas", lat: 28.5494, lon: 77.2001 },
+  { name: "Connaught Place", lat: 28.6315, lon: 77.2167 },
+  { name: "Chandni Chowk", lat: 28.6506, lon: 77.2303 },
+  { name: "Karol Bagh", lat: 28.6514, lon: 77.1907 },
+  { name: "Civil Lines", lat: 28.6796, lon: 77.2244 },
+  { name: "Rohini", lat: 28.7366, lon: 77.1132 },
+  { name: "Punjabi Bagh", lat: 28.6683, lon: 77.1313 },
+  { name: "Janakpuri", lat: 28.6219, lon: 77.0878 },
+  { name: "Dwarka", lat: 28.5921, lon: 77.046 },
+  { name: "Vasant Kunj", lat: 28.52, lon: 77.159 },
+  { name: "Saket", lat: 28.5245, lon: 77.2066 },
+  { name: "Lodhi Garden", lat: 28.5931, lon: 77.2197 },
+  { name: "India Gate", lat: 28.6129, lon: 77.2295 },
+  { name: "Lajpat Nagar", lat: 28.5677, lon: 77.2433 },
+  { name: "Okhla", lat: 28.5361, lon: 77.2711 },
+  { name: "Mayur Vihar", lat: 28.609, lon: 77.295 },
+  { name: "Anand Vihar", lat: 28.6469, lon: 77.3152 },
+  { name: "Noida", lat: 28.5355, lon: 77.391 },
+  { name: "Gurugram", lat: 28.4595, lon: 77.0266 },
+  { name: "Ghaziabad", lat: 28.6692, lon: 77.4538 },
+  { name: "Faridabad", lat: 28.4089, lon: 77.3178 },
+  { name: "Delhi", lat: 28.6139, lon: 77.209 },
 ];
 
+const NCR_CITIES = new Set(["Noida", "Gurugram", "Ghaziabad", "Faridabad"]);
+export const localityLabel = (name: string) => `${name}, ${NCR_CITIES.has(name) ? "Delhi NCR" : "Delhi"}`;
+
 export const PROMPTS = [
-  { text: "best 1-hour window to run in HSR Layout", tag: "RUN" },
-  { text: "best 2-hour cycling window in Koramangala tomorrow morning", tag: "CYCLE" },
-  { text: "when is the air cleanest in Whitefield", tag: "CURIOUS" },
-  { text: "can I take kids outside in Jayanagar tomorrow morning", tag: "KIDS" },
-  { text: "best time to commute in Electronic City today", tag: "COMMUTE" },
-  { text: "walk in Indiranagar tomorrow evening", tag: "WALK" },
+  { text: "best 1-hour window to run in Hauz Khas", tag: "RUN" },
+  { text: "best 2-hour cycling window in Dwarka tomorrow morning", tag: "CYCLE" },
+  { text: "when is the air cleanest in Noida", tag: "CURIOUS" },
+  { text: "can I take kids outside in Saket tomorrow morning", tag: "KIDS" },
+  { text: "best time to commute in Okhla today", tag: "COMMUTE" },
+  { text: "walk in Lajpat Nagar tomorrow evening", tag: "WALK" },
   { text: "best 2-hour walk in Melbourne, Australia", tag: "GLOBAL" },
   { text: "best time to run in New York, US tomorrow morning", tag: "GLOBAL" },
   { text: "best window to walk in Paris, France today", tag: "GLOBAL" },
-  { text: "best 2-hour cycling window in Hebbal this evening", tag: "CYCLE" },
+  { text: "best 2-hour cycling window in Rohini this evening", tag: "CYCLE" },
 ];

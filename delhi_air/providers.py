@@ -1,13 +1,14 @@
 import asyncio
 import math
+import re
 import time
 from datetime import UTC, datetime
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import httpx
 
-from blr_air.domain import CurrentAir, Forecast, Hour, Location, LocationError, ProviderError
-from blr_air.localities import local_location
+from delhi_air.domain import CurrentAir, Forecast, Hour, Location, LocationError, ProviderError
+from delhi_air.localities import local_location
 
 AIR_URL = "https://air-quality-api.open-meteo.com/v1/air-quality"
 WEATHER_URL = "https://api.open-meteo.com/v1/forecast"
@@ -20,6 +21,16 @@ def number(value, *, minimum=0, maximum=10000):
         and not isinstance(value, bool)
         and math.isfinite(value)
         and minimum <= value <= maximum
+    )
+
+
+def near_delhi(hit: dict) -> bool:
+    latitude, longitude = hit.get("latitude"), hit.get("longitude")
+    return (
+        number(latitude, minimum=-90, maximum=90)
+        and number(longitude, minimum=-180, maximum=180)
+        and abs(latitude - 28.6) <= 0.6
+        and abs(longitude - 77.2) <= 0.6
     )
 
 
@@ -138,14 +149,23 @@ class OpenMeteo:
         if result := local_location(place):
             return result
         parts = [part.strip() for part in place.split(",") if part.strip()]
+        if re.fullmatch(r"(?:sector|sec)\s*-?\s*\d+[a-z]?", parts[0], re.I):
+            raise LocationError(f"Which city is {parts[0]} in? Try 'Sector 62, Noida'.")
         data = await self.get_json(
             GEOCODING_URL, {"name": parts[0], "count": 10, "language": "en", "format": "json"}
         )
-        for hit in data.get("results") or []:
+        hits = data.get("results") or []
+        if len(parts) == 1:
+            # "Mehrauli" should mean the one in Delhi, not a village of the same name elsewhere.
+            hits = sorted(hits, key=lambda hit: not near_delhi(hit))
+        for hit in hits:
             qualifiers = {
                 str(hit.get(field, "")).casefold()
                 for field in ("admin1", "admin2", "country", "country_code")
             }
+            # The geocoder calls it "National Capital Territory of Delhi".
+            if "delhi" in str(hit.get("admin1", "")).casefold():
+                qualifiers |= {"delhi", "new delhi", "delhi ncr", "ncr"}
             aliases = {"uk": "gb", "usa": "us", "u.s.": "us", "u.k.": "gb"}
             if any(
                 aliases.get(part.casefold(), part.casefold()) not in qualifiers
@@ -163,8 +183,8 @@ class OpenMeteo:
             )
             return Location(name, hit["latitude"], hit["longitude"], hit.get("timezone"))
         raise LocationError(
-            f"I couldn't find '{place}'. Try a city, 'city, country', or a Bengaluru locality "
-            "such as HSR Layout or Whitefield."
+            f"I couldn't find '{place}'. Try a city, 'city, country', or a Delhi locality "
+            "such as Hauz Khas or Noida."
         )
 
     async def forecast(self, location: Location) -> Forecast:

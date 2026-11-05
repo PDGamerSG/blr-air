@@ -70,7 +70,7 @@ function askAgent(prompt: string) {
 }
 
 $("[data-copy-address]").addEventListener("click", () => copyText(AGENT_ADDRESS).then(() => toast("Agent address copied.")));
-const finalPrompt = promptFor("HSR Layout", { hours: 1, activity: "run", day: "next48", period: "any" });
+const finalPrompt = promptFor("Hauz Khas", { hours: 1, activity: "run", day: "next48", period: "any" });
 $(".final__prompt code").textContent = finalPrompt;
 $("[data-prompt-copy]").addEventListener("click", () => copyText(finalPrompt).then(() => toast("Copied. Now paste it into ASI:One.")));
 
@@ -192,6 +192,7 @@ if (world) world.onBeaconHover = (i) => board.setHot(i);
 loadLive()
   .then(({ city, map }) => {
     renderHeroLive(city);
+    renderFinale(city);
     marquee.fill(map);
     board.setReadings(map);
     worldReady.then(() => world?.city?.setAqi(map, aqiColor));
@@ -200,17 +201,27 @@ loadLive()
     // The page still works without live readings; beacons just stay cyan.
   });
 
-// "App vs Gaali" cards: live Bengaluru reading and the real best slot before noon tomorrow.
-const centre = LOCALITIES.find((l) => l.name === "Bengaluru")!;
+// The finale follows the real air: at Delhi's usual readings the mask stays on.
+function renderFinale(city: { aqi: number } | null) {
+  if (!city) return;
+  const clean = city.aqi <= 100;
+  if (world) world.maskAllowed = clean ? 1 : 0;
+  $(".final__lede").textContent = clean
+    ? `Delhi is at AQI ${city.aqi.toFixed(0)}, so Hawa took the mask off. Your turn: ask when to go outside.`
+    : `Delhi is at AQI ${city.aqi.toFixed(0)}, so Hawa is keeping the mask on. Ask for the least-bad window, or stay in.`;
+}
+
+// "App vs Hawa" cards: live Delhi reading and the real best slot before noon tomorrow.
+const centre = LOCALITIES.find((l) => l.name === "Delhi")!;
 const pad = (n: number) => String(n).padStart(2, "0");
-fetchForecast({ name: "Bengaluru", lat: centre.lat, lon: centre.lon })
+fetchForecast({ name: "Delhi", lat: centre.lat, lon: centre.lon })
   .then((f) => {
     const w = selectWindow(f.hours, { hours: 1, activity: "walk", day: "tomorrow", period: "morning" }, f.timezone, Date.now() / 1000);
     if (f.current) {
       const at = localTime(f.current.t, f.timezone);
       $("[data-compare-now-big]").innerHTML = `<s>AQI ${f.current.aqi.toFixed(0)}.</s>`;
       $("[data-compare-now-text]").textContent = `${aqiCategory(f.current.aqi)}. Right now. Good luck.`;
-      $("[data-compare-now-note]").textContent = `live · Bengaluru · ${pad(at.hour)}:${pad(at.minute)} IST`;
+      $("[data-compare-now-note]").textContent = `live · Delhi · ${pad(at.hour)}:${pad(at.minute)} IST`;
     }
     if (w) {
       const at = localTime(w.start, f.timezone);
@@ -225,7 +236,7 @@ fetchForecast({ name: "Bengaluru", lat: centre.lat, lon: centre.lon })
   });
 
 // ---------- scanner ----------
-// The first visit scans HSR Layout automatically so the chart is never empty.
+// The first visit scans Hauz Khas automatically so the chart is never empty.
 new IntersectionObserver((entries, io) => {
   if (entries.some((e) => e.isIntersecting)) {
     io.disconnect();
@@ -420,7 +431,7 @@ addEventListener("pointermove", (e) => {
 addEventListener("click", (e) => {
   if (!world || (e.target as HTMLElement).closest("a, button, input, select, .panel, .wheel, .card, .signal")) return;
   world.setPointer(e.clientX, e.clientY);
-  if (world.hitUfo()) toast("Zap! Gaali says: keep scrolling, the air gets better.");
+  if (world.hitUfo()) toast("Zap! Hawa says: keep scrolling, the air gets better.");
 });
 
 // ---------- motion toggle ----------
@@ -450,4 +461,4 @@ addEventListener("resize", relayout);
 new ResizeObserver(relayout).observe($("main"));
 
 // Exposed in dev for console debugging and scripted screenshots.
-if (import.meta.env.DEV) Object.assign(window, { __blr: { world, lenis, MAP_LOCALITIES } });
+if (import.meta.env.DEV) Object.assign(window, { __delhi: { world, lenis, MAP_LOCALITIES } });

@@ -11,13 +11,13 @@ from pathlib import Path
 import httpx
 from dotenv import load_dotenv
 
-from blr_air.localities import local_location
+from delhi_air.localities import local_location
 
 
 async def run(url, output):
     import os
 
-    from blr_air.voice import SarvamVoice
+    from delhi_air.voice import SarvamVoice
 
     checks = []
     async with httpx.AsyncClient(timeout=80) as client:
@@ -38,7 +38,7 @@ async def run(url, output):
         response = await client.post(
             url + "/api/plan",
             json={
-                "query": "compare HSR Layout and Whitefield for a walk "
+                "query": "compare Hauz Khas and Noida for a walk "
                 "tomorrow morning with daylight only"
             },
         )
@@ -75,19 +75,19 @@ async def run(url, output):
         invalid = await client.post(url + "/api/plan", json={"request": {"hours": 3}})
         assert invalid.status_code == 400
         impossible = await client.post(
-            url + "/api/plan", json={"request": {"place": "HSR Layout", "max_aqi": 0}}
+            url + "/api/plan", json={"request": {"place": "Hauz Khas", "max_aqi": 0}}
         )
         assert impossible.status_code == 422
         forbidden = await client.post(
             url + "/api/plan",
-            json={"query": "run in HSR"},
+            json={"query": "run in CP"},
             headers={"Origin": "https://unrelated.example"},
         )
         assert forbidden.status_code == 403
         checks.append({"name": "invalid_limits_and_foreign_origin", "status": "passed"})
         venue = await client.post(
             url + "/api/plan",
-            json={"query": "walk in Cubbon Park tomorrow morning", "include_venue": True},
+            json={"query": "walk in Lodhi Garden tomorrow morning", "include_venue": True},
         )
         venue.raise_for_status()
         venue_data = venue.json()["venue"]
@@ -122,9 +122,9 @@ async def run(url, output):
             )
         if status["features"]["voice"]:
             voice = SarvamVoice(client, os.environ["SARVAM_API_KEY"])
-            with tempfile.TemporaryDirectory(prefix="blr-web-live-") as directory:
+            with tempfile.TemporaryDirectory(prefix="delhi-web-live-") as directory:
                 request = await voice.synthesize(
-                    "Find a one hour running window in Bengaluru tomorrow morning.",
+                    "Find a one hour running window in Delhi tomorrow morning.",
                     Path(directory) / "request.wav",
                 )
                 transcription = await client.post(
@@ -137,9 +137,7 @@ async def run(url, output):
                 spoken_plan = await client.post(url + "/api/plan", json={"query": transcript})
                 spoken_plan.raise_for_status()
                 interpreted = spoken_plan.json()["request"]
-                assert local_location(interpreted["place"]) == local_location("Bengaluru"), (
-                    transcript
-                )
+                assert local_location(interpreted["place"]) == local_location("Delhi"), transcript
                 assert (
                     interpreted["hours"],
                     interpreted["activity"],

@@ -1,6 +1,7 @@
 // Keyless Open-Meteo calls straight from the browser (CORS is open), mirroring
-// blr_air/providers.py: same endpoints, same fields, same validation rules.
+// delhi_air/providers.py: same endpoints, same fields, same validation rules.
 import type { Hour } from "./scoring";
+import { LOCALITIES } from "../config";
 
 const AIR_URL = "https://air-quality-api.open-meteo.com/v1/air-quality";
 const WEATHER_URL = "https://api.open-meteo.com/v1/forecast";
@@ -121,44 +122,39 @@ export async function fetchCurrentMany(places: { lat: number; lon: number }[]): 
   });
 }
 
+const ALIASES: Record<string, string> = {
+  "new delhi": "Delhi", "delhi ncr": "Delhi", ncr: "Delhi", dilli: "Delhi", cp: "Connaught Place",
+  "rajiv chowk": "Connaught Place", "old delhi": "Chandni Chowk", "lodi garden": "Lodhi Garden",
+  "lodi gardens": "Lodhi Garden", "lodhi gardens": "Lodhi Garden", "hauz khas village": "Hauz Khas",
+  hkv: "Hauz Khas", gurgaon: "Gurugram", ggn: "Gurugram",
+};
+
+// Built-in names first, as the agent does: the geocoder sends "Gurgaon" to Maharashtra.
+function localPlace(query: string): Place | null {
+  const key = query.toLowerCase().replace(/[.]/g, "").trim().replace(/[,\s]+india$/, "");
+  const name = (k: string) => ALIASES[k] ?? k;
+  const stripped = key.replace(/[,\s]+(?:new delhi|delhi ncr|delhi|ncr|uttar pradesh|haryana)$/, "");
+  for (const candidate of [name(key), name(stripped)]) {
+    const hit = LOCALITIES.find((l) => l.name.toLowerCase() === candidate.toLowerCase());
+    if (hit) return { name: hit.name, lat: hit.lat, lon: hit.lon, timezone: "Asia/Kolkata" };
+  }
+  return null;
+}
+
 export async function geocode(query: string): Promise<Place> {
+  const known = localPlace(query);
+  if (known) return known;
   const parts = query.split(",").map((p) => p.trim()).filter(Boolean);
   if (!parts.length) throw new Error("Type a city, e.g. 'Paris, France'.");
   const data = (await getJson(GEOCODING_URL, { name: parts[0], count: 10, language: "en", format: "json" })) as Json;
   for (const hit of (data.results as Json[] | undefined) ?? []) {
     const qualifiers = new Set(["admin1", "admin2", "country", "country_code"].map((f) => String(hit[f] ?? "").toLowerCase()));
+    // The geocoder calls it "National Capital Territory of Delhi".
+    if (String(hit.admin1 ?? "").toLowerCase().includes("delhi")) ["delhi", "new delhi", "delhi ncr", "ncr"].forEach((q) => qualifiers.add(q));
     if (parts.slice(1).some((p) => !qualifiers.has(p.toLowerCase()))) continue;
     if (!isNum(hit.latitude, -90, 90) || !isNum(hit.longitude, -180, 180)) continue;
     const name = [...new Set(["name", "admin1", "country"].map((k) => hit[k]).filter(Boolean).map(String))].join(", ");
     return { name, lat: hit.latitude, lon: hit.longitude, timezone: hit.timezone as string | undefined };
   }
-  throw new Error(`Couldn't find '${query}'. Try 'city, country' or a Bengaluru locality.`);
-}
-
-// Clearly-labelled synthetic Bengaluru data, the same shape as blr_air/demo.py,
-// used only when the live fetch fails so the scanner still demonstrates the rules.
-export function demoForecast(place: Place): Forecast {
-  const now = Date.now() / 1000;
-  const ist = 19800;
-  const start = Math.floor((now + ist) / 3600) * 3600 - ist;
-  const hours: Hour[] = [];
-  for (let i = 0; i < 72; i++) {
-    const t = start + i * 3600;
-    const h = new Date((t + ist) * 1000).getUTCHours();
-    hours.push({
-      t,
-      aqi: 45 + Math.abs(h - 9) * 5,
-      pm: 12 + Math.abs(h - 9),
-      rain: h < 14 ? 10 : 65,
-      temp: 24 + Math.max(0, 5 - Math.abs(h - 14)),
-    });
-  }
-  return {
-    place,
-    hours,
-    current: { t: start, aqi: hours[0].aqi, pm: hours[0].pm },
-    timezone: "Asia/Kolkata",
-    fetchedAt: new Date(),
-    demo: true,
-  };
+  throw new Error(`Couldn't find '${query}'. Try 'city, country' or a Delhi locality.`);
 }

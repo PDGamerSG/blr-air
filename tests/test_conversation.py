@@ -4,8 +4,8 @@ from datetime import UTC, datetime, timedelta
 import httpx
 import pytest
 
-from blr_air.domain import AirError, CurrentAir, Forecast, Hour, Location, ProviderError
-from blr_air.service import AirService, Recommendation
+from delhi_air.domain import AirError, CurrentAir, Forecast, Hour, Location, ProviderError
+from delhi_air.service import AirService, Recommendation
 
 
 class NoForecast:
@@ -61,11 +61,11 @@ async def test_conditions_lookup_does_not_add_a_country_not_supplied_by_the_user
     provider = WeatherProvider()
     async with httpx.AsyncClient(
         transport=httpx.MockTransport(
-            lambda _: completion({"kind": "conditions", "place": "HSR Layout, India", "day": "now"})
+            lambda _: completion({"kind": "conditions", "place": "Hauz Khas, India", "day": "now"})
         )
     ) as client:
-        await AirService(provider, client, api_key="test").chat("What's the AQI in HSR Layout now?")
-    assert provider.places == ["HSR Layout"]
+        await AirService(provider, client, api_key="test").chat("What's the AQI in Hauz Khas now?")
+    assert provider.places == ["Hauz Khas"]
 
 
 async def test_unclear_question_gets_a_clarification_instead_of_default_city():
@@ -84,7 +84,7 @@ class WeatherProvider:
 
     async def locate(self, place):
         self.places.append(place)
-        return Location("HSR Layout, Bengaluru", 12.9116, 77.6389, "Asia/Kolkata")
+        return Location("Hauz Khas, Delhi", 28.5494, 77.2001, "Asia/Kolkata")
 
     async def forecast(self, location):
         now = datetime.now(UTC).replace(minute=0, second=0, microsecond=0)
@@ -100,28 +100,28 @@ async def test_current_air_question_returns_current_model_not_a_future_best_wind
     provider = WeatherProvider()
     async with httpx.AsyncClient(
         transport=httpx.MockTransport(
-            lambda _: completion({"kind": "conditions", "place": "HSR Layout", "day": "now"})
+            lambda _: completion({"kind": "conditions", "place": "Hauz Khas", "day": "now"})
         )
     ) as client:
         result = await AirService(provider, client, api_key="test").chat(
-            "What's the AQI in HSR now?"
+            "What's the AQI in CP now?"
         )
     assert isinstance(result, str)
     assert "145" in result and "44.0" in result
     assert "current model" in result.lower()
     assert "Best available" not in result
     assert "Open-Meteo" in result and "Forecast retrieved" in result
-    assert provider.places == ["HSR Layout"]
+    assert provider.places == ["Hauz Khas"]
 
 
 async def test_weather_question_returns_requested_day_without_calendar_or_activity_window():
     async with httpx.AsyncClient(
         transport=httpx.MockTransport(
-            lambda _: completion({"kind": "conditions", "place": "HSR Layout", "day": "tomorrow"})
+            lambda _: completion({"kind": "conditions", "place": "Hauz Khas", "day": "tomorrow"})
         )
     ) as client:
         result = await AirService(WeatherProvider(), client, api_key="test").chat(
-            "Will I need an umbrella in HSR tomorrow?"
+            "Will I need an umbrella in CP tomorrow?"
         )
     assert isinstance(result, str)
     assert "80%" in result and "26.0" in result
@@ -138,7 +138,7 @@ async def test_naturally_worded_plan_still_preserves_explicit_limits():
             {"kind": "plan"}
             if len(calls) == 1
             else {
-                "place": "HSR Layout",
+                "place": "Hauz Khas",
                 "activity": "run",
                 "hours": 1,
                 "day": "tomorrow",
@@ -148,7 +148,7 @@ async def test_naturally_worded_plan_still_preserves_explicit_limits():
 
     async with httpx.AsyncClient(transport=httpx.MockTransport(respond)) as client:
         result = await AirService(WeatherProvider(), client, api_key="test").chat(
-            "I'd love a jog around HSR tomorrow morning; keep AQI at most 150"
+            "I'd love a jog around CP tomorrow morning; keep AQI at most 150"
         )
     assert isinstance(result, Recommendation)
     assert result.request.max_aqi == 150
@@ -203,11 +203,11 @@ async def test_current_conditions_provider_failure_cannot_be_replaced_with_model
 
     def respond(request):
         calls.append(request)
-        return completion({"kind": "conditions", "place": "HSR Layout", "day": "now"})
+        return completion({"kind": "conditions", "place": "Hauz Khas", "day": "now"})
 
     async with httpx.AsyncClient(transport=httpx.MockTransport(respond)) as client:
         with pytest.raises(ProviderError, match="Open-Meteo is unavailable"):
-            await AirService(Unavailable(), client, api_key="test").chat("AQI in HSR now?")
+            await AirService(Unavailable(), client, api_key="test").chat("AQI in CP now?")
     assert len(calls) == 1
 
 
@@ -226,6 +226,6 @@ async def test_conversation_provider_outage_preserves_local_planning_and_aqi_exp
     ) as client:
         service = AirService(WeatherProvider(), client, api_key="test")
         definition = await service.chat("What does US AQI 150 mean?")
-        plan = await service.chat("run in HSR Layout tomorrow morning with AQI at most 150")
+        plan = await service.chat("run in Hauz Khas tomorrow morning with AQI at most 150")
     assert "Unhealthy for sensitive groups" in definition
     assert isinstance(plan, Recommendation) and plan.request.max_aqi == 150

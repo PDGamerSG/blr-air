@@ -11,16 +11,16 @@ from zoneinfo import ZoneInfo
 import httpx
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from blr_air.assessment import AQI_GUIDANCE
-from blr_air.domain import AirError, ProviderError
-from blr_air.parsing import parse_local, validate_text
-from blr_air.scoring import aqi_category
+from delhi_air.assessment import AQI_GUIDANCE
+from delhi_air.domain import AirError, ProviderError
+from delhi_air.parsing import parse_local, validate_text
+from delhi_air.scoring import aqi_category
 
 if TYPE_CHECKING:
-    from blr_air.service import AirService
+    from delhi_air.service import AirService
 
 
-SYSTEM_PROMPT = """You are BLR Air Window, a helpful conversational assistant with live
+SYSTEM_PROMPT = """You are Delhi Air Window, a helpful conversational assistant with live
 air-quality/weather tools and an outdoor-window planner. Users can ask naturally; example
 prompts are suggestions, not a required format. You can also answer ordinary general
 questions, explain concepts, calculate, translate, and help write short text.
@@ -40,7 +40,7 @@ Return only one JSON object, choosing the appropriate kind:
    exercise explanations and general comparisons belong to answer, not plan.
 3. {"kind":"conditions","place":"the supplied city/locality, retaining country",
    "day":"now|today|tomorrow"} for actual AQI, pollution, temperature, rain or weather
-   questions about a named place. This includes 'do I need an umbrella in HSR tomorrow?'.
+   questions about a named place. This includes 'do I need an umbrella in CP tomorrow?'.
    Use now for current conditions. All measurements are fetched by code; never write them
    into an answer. The tool supports today/tomorrow, not later dates or exact time filters.
 4. {"kind":"clarify","text":"one short question"} when the request needs a location or
@@ -86,7 +86,7 @@ class ChatIntent(BaseModel):
 
 
 def clean_message(text: str) -> str:
-    text = re.sub(r"@blr-air\b", "", text, flags=re.I).strip()
+    text = re.sub(r"@(?:blr|delhi)-air\b", "", text, flags=re.I).strip()
     if not text or len(text) > 2000:
         raise AirError("Please send a question or request of up to 2,000 characters.")
     return text
@@ -139,7 +139,7 @@ def local_intent(text: str) -> ChatIntent:
     if planning and not explanation:
         return ChatIntent(kind="plan")
     weather = re.search(
-        r"\b(?:aqi|air quality|weather|rain|temperature|umbrella|pollution)\b", text, re.I
+        r"\b(?:aqi|air quality|weather|rain|temperature|umbrella|pollution|smog|haze)\b", text, re.I
     )
     conceptual = explanation and not re.search(
         r"\b(?:in|near|at|for|now|today|tomorrow|umbrella)\b", text, re.I
@@ -148,7 +148,7 @@ def local_intent(text: str) -> ChatIntent:
         validate_text(text)
         cleaned = re.sub(r"\b(?:right now|now|currently|like)\b", "", text, flags=re.I)
         request = parse_local(cleaned)
-        # parse_local defaults to Bengaluru; current-condition questions need a supplied place.
+        # parse_local defaults to Delhi; current-condition questions need a supplied place.
         supplied = re.search(r"\b(?:in|near|at|for)\s+\w", cleaned, re.I)
         bare = re.fullmatch(r"(?:aqi|weather|air quality|rain)\s+([\w ,'-]+)[?!.]*", cleaned, re.I)
         if supplied or (bare and bare[1].strip().casefold() not in {"today", "tomorrow"}):
@@ -226,7 +226,7 @@ async def chat_intent(text: str, service: "AirService") -> ChatIntent:
 
 
 async def describe_conditions(service: "AirService", intent: ChatIntent) -> str:
-    from blr_air.service import forecast_note
+    from delhi_air.service import forecast_note
 
     try:
         async with asyncio.timeout(23):

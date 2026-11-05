@@ -1,11 +1,11 @@
 {
-  "name": "blr-air-window-site",
+  "name": "delhi-air-window-site",
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Landing page for the BLR Air Window Fetch.ai agent (Stranger Builds Bangalore 2026).",
+  "description": "Landing page for the Delhi Air Window Fetch.ai agent (Stranger Builds Bangalore 2026).",
   "scripts": {
-    "test": "node --import tsx --test tests/*.test.ts",
+    "test": "node --import tsx --test tests/planner.test.ts",
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",

@@ -11,10 +11,10 @@ from uagents_core.contrib.protocols.chat import (
     TextContent,
 )
 
-from blr_air.agent_runtime import AgentHandlers
-from blr_air.domain import ProviderError
-from blr_air.models import ComparisonRequest, ComparisonResponse, WindowRequest, WindowResponse
-from blr_air.telemetry import Usage
+from delhi_air.agent_runtime import AgentHandlers
+from delhi_air.domain import ProviderError
+from delhi_air.models import ComparisonRequest, ComparisonResponse, WindowRequest, WindowResponse
+from delhi_air.telemetry import Usage
 
 
 class Context:
@@ -40,7 +40,7 @@ async def test_chat_acknowledges_then_returns_error_text_and_closes_session(tmp_
     incoming = ChatMessage(
         timestamp=datetime.now(UTC),
         msg_id=uuid4(),
-        content=[TextContent(type="text", text="run in HSR Layout")],
+        content=[TextContent(type="text", text="run in Hauz Khas")],
     )
     await handler.on_chat(ctx, "agent-test", incoming)
     assert isinstance(ctx.sent[0], ChatAcknowledgement)
@@ -144,7 +144,7 @@ async def test_different_questions_reach_the_model_and_receive_their_own_answers
 
     import httpx
 
-    from blr_air.service import AirService
+    from delhi_air.service import AirService
 
     answers = {
         "Can you remind me what photosynthesis means?": "Plants turn light into chemical energy.",
@@ -195,7 +195,7 @@ async def test_different_questions_reach_the_model_and_receive_their_own_answers
 async def test_typed_provider_failure_returns_structured_error(tmp_path):
     ctx = Context()
     handler = AgentHandlers(BrokenService(), Usage(tmp_path / "usage.sqlite", "test-salt"))
-    await handler.on_window(ctx, "planner", WindowRequest(latitude=12.91, longitude=77.64))
+    await handler.on_window(ctx, "planner", WindowRequest(latitude=28.61, longitude=77.24))
     reply = ctx.sent[0]
     assert isinstance(reply, WindowResponse)
     assert reply.status == "error" and reply.error_code == "provider_unavailable"
@@ -205,21 +205,19 @@ async def test_typed_provider_failure_returns_structured_error(tmp_path):
 async def test_typed_comparison_returns_ranked_places(tmp_path):
     import httpx
 
-    from blr_air.demo import DemoProvider
-    from blr_air.service import AirService
+    from delhi_air.demo import DemoProvider
+    from delhi_air.service import AirService
 
     ctx = Context()
     async with httpx.AsyncClient() as client:
         handler = AgentHandlers(
             AirService(DemoProvider(), client), Usage(tmp_path / "usage.sqlite", "test-salt")
         )
-        await handler.on_compare(
-            ctx, "planner", ComparisonRequest(places=["HSR Layout", "Whitefield"])
-        )
+        await handler.on_compare(ctx, "planner", ComparisonRequest(places=["Hauz Khas", "Noida"]))
     reply = ctx.sent[0]
     assert isinstance(reply, ComparisonResponse)
-    assert reply.status == "ok" and reply.winner == "HSR Layout"
-    assert [item.place for item in reply.results] == ["HSR Layout", "Whitefield"]
+    assert reply.status == "ok" and reply.winner == "Hauz Khas"
+    assert [item.place for item in reply.results] == ["Hauz Khas", "Noida"]
     assert reply.results[0].backups[0].start
     assert reply.results[0].source == "Synthetic offline demo"
 
@@ -227,10 +225,10 @@ async def test_typed_comparison_returns_ranked_places(tmp_path):
 async def test_typed_plan_exposes_assessment_and_venue_status(tmp_path):
     import httpx
 
-    from blr_air.demo import DemoProvider
-    from blr_air.models import DetailedPlanRequest
-    from blr_air.service import AirService
-    from blr_air.venues import GooglePlaces
+    from delhi_air.demo import DemoProvider
+    from delhi_air.models import DetailedPlanRequest
+    from delhi_air.service import AirService
+    from delhi_air.venues import GooglePlaces
 
     ctx = Context()
     async with httpx.AsyncClient(
@@ -241,7 +239,7 @@ async def test_typed_plan_exposes_assessment_and_venue_status(tmp_path):
             Usage(tmp_path / "usage.sqlite", "test-salt"),
         )
         await handler.on_compare(
-            ctx, "planner", DetailedPlanRequest(places=["Cubbon Park"], include_venue=True)
+            ctx, "planner", DetailedPlanRequest(places=["Lodhi Garden"], include_venue=True)
         )
     item = ctx.sent[0].results[0]
     assert item.assessment and item.assessment["aqi"]["category"]
@@ -251,16 +249,16 @@ async def test_typed_plan_exposes_assessment_and_venue_status(tmp_path):
 async def test_single_place_plan_enforces_limits(tmp_path):
     import httpx
 
-    from blr_air.demo import DemoProvider
-    from blr_air.models import PlanRequest
-    from blr_air.service import AirService
+    from delhi_air.demo import DemoProvider
+    from delhi_air.models import PlanRequest
+    from delhi_air.service import AirService
 
     ctx = Context()
     async with httpx.AsyncClient() as client:
         handler = AgentHandlers(
             AirService(DemoProvider(), client), Usage(tmp_path / "usage.sqlite", "test-salt")
         )
-        await handler.on_compare(ctx, "planner", PlanRequest(places=["HSR Layout"], max_aqi=1))
+        await handler.on_compare(ctx, "planner", PlanRequest(places=["Hauz Khas"], max_aqi=1))
     assert ctx.sent[0].status == "error"
     assert ctx.sent[0].results == []
 
@@ -268,9 +266,9 @@ async def test_single_place_plan_enforces_limits(tmp_path):
 async def test_chat_review_request_returns_aqi_guidance_and_honest_provider_failure(tmp_path):
     import httpx
 
-    from blr_air.demo import DemoProvider
-    from blr_air.service import AirService
-    from blr_air.venues import GooglePlaces
+    from delhi_air.demo import DemoProvider
+    from delhi_air.service import AirService
+    from delhi_air.venues import GooglePlaces
 
     ctx = Context()
     async with httpx.AsyncClient(
@@ -289,7 +287,7 @@ async def test_chat_review_request_returns_aqi_guidance_and_honest_provider_fail
                 content=[
                     TextContent(
                         type="text",
-                        text="walk in Cubbon Park tomorrow with reviews and AQI at most 150",
+                        text="walk in Lodhi Garden tomorrow with reviews and AQI at most 250",
                     )
                 ],
             ),
@@ -315,7 +313,7 @@ async def test_chat_review_request_returns_aqi_guidance_and_honest_provider_fail
 )
 def test_typed_contract_validates_coordinates_and_duration(overrides):
     with pytest.raises(ValidationError):
-        WindowRequest(**{"latitude": 12.91, "longitude": 77.64, **overrides})
+        WindowRequest(**{"latitude": 28.61, "longitude": 77.24, **overrides})
 
 
 def test_usage_persists_counts_without_storing_raw_sender_or_prompt(tmp_path):

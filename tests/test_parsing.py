@@ -1,23 +1,23 @@
 import httpx
 import pytest
 
-from blr_air.domain import AirError
-from blr_air.parsing import parse_local, parse_request
+from delhi_air.domain import AirError
+from delhi_air.parsing import parse_local, parse_request
 
 
 @pytest.mark.parametrize(
     "text,place,activity,hours,day,period",
     [
         (
-            "@blr-air best 1-hour window to run in HSR Layout",
-            "HSR Layout",
+            "@blr-air best 1-hour window to run in Hauz Khas",
+            "Hauz Khas",
             "run",
             1,
             "next48",
             "any",
         ),
-        ("best 2-hour cycling window in Koramangala", "Koramangala", "cycle", 2, "next48", "any"),
-        ("When is the air cleanest in Whitefield?", "Whitefield", "walk", 1, "next48", "any"),
+        ("best 2-hour cycling window in Dwarka", "Dwarka", "cycle", 2, "next48", "any"),
+        ("When is the air cleanest in Noida?", "Noida", "walk", 1, "next48", "any"),
         (
             "Can I take the kids outside in Melbourne tomorrow morning?",
             "Melbourne",
@@ -28,7 +28,7 @@ from blr_air.parsing import parse_local, parse_request
         ),
         ("run in Paris, France today", "Paris, France", "run", 1, "today", "any"),
         ("London", "London", "walk", 1, "next48", "any"),
-        ("best time to run", "Bengaluru", "run", 1, "next48", "any"),
+        ("best time to run", "Delhi", "run", 1, "next48", "any"),
         ("AQI in Atlantis", "Atlantis", "walk", 1, "next48", "any"),
         ("walk in New York in the next 48 hours", "New York", "walk", 1, "next48", "any"),
     ],
@@ -41,11 +41,11 @@ def test_parses_documented_and_global_requests(text, place, activity, hours, day
 @pytest.mark.parametrize(
     "text",
     [
-        "run for 3 hours in HSR Layout",
+        "run for 3 hours in Hauz Khas",
         "",
         "x" * 2001,
         "run in Paris next week",
-        "run in HSR after 10pm",
+        "run in CP after 10pm",
     ],
 )
 def test_unsupported_requests_ask_for_supported_input(text):
@@ -72,7 +72,7 @@ async def test_asi_can_parse_freeform_language_with_validated_json():
                     "choices": [
                         {
                             "message": {
-                                "content": '{"place":"HSR Layout","hours":2,"activity":"run",'
+                                "content": '{"place":"Hauz Khas","hours":2,"activity":"run",'
                                 '"day":"tomorrow","period":"morning"}'
                             }
                         }
@@ -81,7 +81,7 @@ async def test_asi_can_parse_freeform_language_with_validated_json():
             )
         )
     ) as client:
-        q = await parse_request("HSR mein kal subah do ghante running", client, api_key="test-key")
+        q = await parse_request("CP mein kal subah do ghante running", client, api_key="test-key")
     assert q.hours == 2
     assert q.day == "tomorrow"
 
@@ -91,7 +91,7 @@ async def test_invalid_asi_schema_falls_back_to_deterministic_parser():
         transport=httpx.MockTransport(
             lambda request: httpx.Response(
                 200,
-                json={"choices": [{"message": {"content": '{"place":"Bengaluru","hours":999}'}}]},
+                json={"choices": [{"message": {"content": '{"place":"Delhi","hours":999}'}}]},
             )
         )
     ) as client:
@@ -115,8 +115,8 @@ def test_preserves_city_in_alternative_word_orders(text, city):
 @pytest.mark.parametrize(
     "text",
     [
-        "best 1-hour run between 6am and 8am in HSR Layout tomorrow",
-        "best run day after tomorrow in HSR Layout",
+        "best 1-hour run between 6am and 8am in Hauz Khas tomorrow",
+        "best run day after tomorrow in Hauz Khas",
         "best 90-minute walk in Paris",
         "walk in Paris from 6 to 8",
     ],
@@ -142,8 +142,8 @@ async def test_incomplete_asi_extraction_cannot_overwrite_supplied_city(content)
 @pytest.mark.parametrize(
     "text,places",
     [
-        ("compare HSR Layout and Koramangala for a run", ["HSR Layout", "Koramangala"]),
-        ("best window in Whitefield vs Indiranagar", ["Whitefield", "Indiranagar"]),
+        ("compare Hauz Khas and Dwarka for a run", ["Hauz Khas", "Dwarka"]),
+        ("best window in Noida vs Lajpat Nagar", ["Noida", "Lajpat Nagar"]),
     ],
 )
 def test_parses_local_place_comparisons(text, places):
@@ -159,8 +159,8 @@ async def test_asi_can_return_multiple_places():
                     "choices": [
                         {
                             "message": {
-                                "content": '{"place":"HSR Layout",'
-                                '"places":["HSR Layout","Whitefield"],'
+                                "content": '{"place":"Hauz Khas",'
+                                '"places":["Hauz Khas","Noida"],'
                                 '"hours":1,"activity":"run","day":"next48","period":"any"}'
                             }
                         }
@@ -169,10 +169,8 @@ async def test_asi_can_return_multiple_places():
             )
         )
     ) as client:
-        result = await parse_request(
-            "compare HSR Layout and Whitefield", client, api_key="test-key"
-        )
-    assert result.places == ["HSR Layout", "Whitefield"]
+        result = await parse_request("compare Hauz Khas and Noida", client, api_key="test-key")
+    assert result.places == ["Hauz Khas", "Noida"]
 
 
 def test_extracts_user_limits_without_geocoding_constraint_words():
@@ -215,16 +213,16 @@ async def test_asi_cannot_drop_explicit_local_limits():
 
 @pytest.mark.parametrize("wording", ["AQI less than 50", "maximum AQI 50", "AQI no more than 50"])
 def test_common_maximum_phrasings_never_silently_drop_a_limit(wording):
-    assert parse_local(f"run in HSR Layout with {wording}").max_aqi == 50
+    assert parse_local(f"run in Hauz Khas with {wording}").max_aqi == 50
 
 
 def test_repeated_limits_choose_stricter_bound():
-    assert parse_local("run in HSR Layout with AQI under 100 and AQI under 50").max_aqi == 50
+    assert parse_local("run in Hauz Khas with AQI under 100 and AQI under 50").max_aqi == 50
 
 
 def test_unparsed_numeric_limit_is_rejected_instead_of_ignored():
     with pytest.raises(AirError):
-        parse_local("run in HSR Layout with AQI between 50 and 80")
+        parse_local("run in Hauz Khas with AQI between 50 and 80")
 
 
 async def test_asi_comparison_cannot_be_contaminated_by_limit_clause():
@@ -236,8 +234,8 @@ async def test_asi_comparison_cannot_be_contaminated_by_limit_clause():
                     "choices": [
                         {
                             "message": {
-                                "content": '{"place":"HSR Layout",'
-                                '"places":["HSR Layout","Whitefield"],'
+                                "content": '{"place":"Hauz Khas",'
+                                '"places":["Hauz Khas","Noida"],'
                                 '"hours":1,"activity":"run","day":"next48","period":"any","max_aqi":50}'
                             }
                         }
@@ -247,14 +245,14 @@ async def test_asi_comparison_cannot_be_contaminated_by_limit_clause():
         )
     ) as client:
         result = await parse_request(
-            "compare HSR Layout and Whitefield AQI under 50", client, api_key="test"
+            "compare Hauz Khas and Noida AQI under 50", client, api_key="test"
         )
-    assert result.places == ["HSR Layout", "Whitefield"]
+    assert result.places == ["Hauz Khas", "Noida"]
 
 
 def test_local_three_locality_comparison_accepts_comma_list():
-    result = parse_local("compare HSR Layout, Whitefield and Koramangala for a run")
-    assert result.places == ["HSR Layout", "Whitefield", "Koramangala"]
+    result = parse_local("compare Hauz Khas, Noida and Dwarka for a run")
+    assert result.places == ["Hauz Khas", "Noida", "Dwarka"]
 
 
 @pytest.mark.parametrize(
@@ -301,8 +299,8 @@ async def test_asi_fahrenheit_conversion_is_not_overridden_with_celsius_number()
     "text,place",
     [
         ("reviews of Central Park, New York", "Central Park, New York"),
-        ("walk in Cubbon Park tomorrow with customer reviews", "Cubbon Park"),
-        ("show ratings for Lalbagh", "Lalbagh"),
+        ("walk in Lodhi Garden tomorrow with customer reviews", "Lodhi Garden"),
+        ("show ratings for India Gate", "India Gate"),
     ],
 )
 def test_venue_review_intent_retains_location(text, place):
@@ -312,7 +310,7 @@ def test_venue_review_intent_retains_location(text, place):
 
 
 def test_review_phrase_cannot_consume_following_limits_and_date():
-    q = parse_local("run in Cubbon Park with reviews tomorrow morning AQI at most 30")
+    q = parse_local("run in Lodhi Garden with reviews tomorrow morning AQI at most 30")
     assert (q.day, q.period, q.max_aqi) == ("tomorrow", "morning", 30)
 
 

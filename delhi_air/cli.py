@@ -10,12 +10,12 @@ import httpx
 from dotenv import load_dotenv
 from pydantic import ValidationError
 
-from blr_air.demo import DemoProvider
-from blr_air.domain import AirError, Location, RequestSpec
-from blr_air.parsing import parse_request
-from blr_air.providers import OpenMeteo, number
-from blr_air.service import AirService, ComparisonResult, describe
-from blr_air.venues import GooglePlaces
+from delhi_air.demo import DemoProvider
+from delhi_air.domain import AirError, Location, RequestSpec
+from delhi_air.parsing import parse_request
+from delhi_air.providers import OpenMeteo, number
+from delhi_air.service import AirService, ComparisonResult, describe
+from delhi_air.venues import GooglePlaces
 
 
 def initialize(path: Path):
@@ -30,7 +30,7 @@ def initialize(path: Path):
             f"CALLER_SEED={secrets.token_urlsafe(48)}\n"
             "ASI1_API_KEY=\nASI1_BASE_URL=https://api.asi1.ai/v1\n"
             "SARVAM_API_KEY=\n"
-            "BLR_AIR_ADDRESS=\nAGENT_PORT=8001\nDATA_DIR=data\n"
+            "DELHI_AIR_ADDRESS=\nAGENT_PORT=8001\nDATA_DIR=data\n"
         )
     print(f"Created private {path}. Back it up: changing AGENT_SEED_PHRASE changes the address.")
 
@@ -40,7 +40,7 @@ def doctor():
 
     seed = os.getenv("AGENT_SEED_PHRASE")
     print(f"Python: {sys.version.split()[0]}")
-    print(f"Agent identity: {'configured' if seed else 'missing; run python -m blr_air init'}")
+    print(f"Agent identity: {'configured' if seed else 'missing; run python -m delhi_air init'}")
     if seed:
         print(f"Agent address: {Identity.from_seed(seed, 0).address}")
     print(
@@ -57,7 +57,7 @@ async def run(args):
         query = args.query
         voice = None
         if args.audio_input or args.audio_output:
-            from blr_air.voice import SarvamVoice
+            from delhi_air.voice import SarvamVoice
 
             if args.demo:
                 raise AirError("Voice calls use a live API; omit --demo for audio.")
@@ -132,13 +132,13 @@ async def run(args):
         if args.audio_input:
             data["transcript"] = query
         if args.calendar:
-            from blr_air.calendar_export import write_calendar
+            from delhi_air.calendar_export import write_calendar
 
             if selected is None:
                 raise AirError("No eligible window to export to a calendar.")
             data["calendar_file"] = str(write_calendar(selected, args.calendar))
         if args.audio_output:
-            from blr_air.service import spoken_summary
+            from delhi_air.service import spoken_summary
 
             data["audio_file"] = str(
                 await voice.synthesize(spoken_summary(result), args.audio_output)
@@ -163,7 +163,7 @@ def main():
         default=None,
         help="Natural-language request, or init / doctor / stats",
     )
-    parser.add_argument("--place", help="City or Bengaluru locality")
+    parser.add_argument("--place", help="City or Delhi locality")
     parser.add_argument("--compare", action="append", help="Compare 2–3 places; repeat this option")
     parser.add_argument("--hours", type=int, choices=(1, 2))
     parser.add_argument("--activity", choices=("run", "cycle", "walk", "commute", "kids"))
@@ -172,9 +172,9 @@ def main():
     parser.add_argument("--latitude", type=float)
     parser.add_argument("--longitude", type=float)
     parser.add_argument("--json", action="store_true", help="Machine-readable result")
-    parser.add_argument("--demo", action="store_true", help="Synthetic offline Bengaluru demo")
+    parser.add_argument("--demo", action="store_true", help="Synthetic offline Delhi demo")
     parser.add_argument("--max-aqi", type=float, help="Maximum hourly US AQI")
-    parser.add_argument("--max-rain", type=float, help="Maximum hourly rain probability (%)")
+    parser.add_argument("--max-rain", type=float, help="Maximum hourly rain probability (%%)")
     parser.add_argument("--max-temperature", type=float, help="Maximum feels-like temperature (°C)")
     parser.add_argument("--max-uv", type=float, help="Maximum hourly UV index")
     parser.add_argument("--max-wind", type=float, help="Maximum wind speed (km/h)")
@@ -191,7 +191,7 @@ def main():
     if (args.latitude is None) != (args.longitude is None):
         parser.error("--latitude and --longitude must be supplied together")
     if args.demo and args.latitude is not None:
-        parser.error("--demo uses synthetic Bengaluru data; omit coordinates")
+        parser.error("--demo uses synthetic Delhi data; omit coordinates")
     if args.compare and not 2 <= len(args.compare) <= 3:
         parser.error("Repeat --compare for two or three places")
     if args.compare and args.place:
@@ -202,11 +202,11 @@ def main():
     if args.query == "doctor":
         sys.exit(doctor())
     if args.query == "stats":
-        from blr_air.telemetry import Usage
+        from delhi_air.telemetry import Usage
 
         seed = os.getenv("AGENT_SEED_PHRASE")
         if not seed:
-            parser.error("Run python -m blr_air init first")
+            parser.error("Run python -m delhi_air init first")
         stats = Usage(Path(os.getenv("DATA_DIR", "data")) / "usage.sqlite", seed).stats()
         print(json.dumps(stats, indent=2))
         return

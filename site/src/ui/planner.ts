@@ -80,6 +80,8 @@ interface Plan extends PlaceResult {
   expires_at: string;
   places?: PlaceResult[];
   tied_places?: string[];
+  shared_air_model?: string[][];
+  air_model_note?: string;
   partial?: boolean;
 }
 
@@ -477,7 +479,7 @@ export function initPlanner(): { ready: Promise<boolean> } {
         if (!response.ok) throw await responseError(response);
         if (!response.headers.get("content-type")?.includes("text/calendar")) throw new Error("The server did not return a calendar file. Please refresh your plan.");
         return response.blob();
-      }, (blob) => { download(blob, "blr-air-window.ics"); setStatus("Calendar downloaded. Import it into your calendar for a one-hour recheck reminder. The event description includes your prompt; the saved forecast does not update itself."); }, "Preparing your calendar…");
+      }, (blob) => { download(blob, "delhi-air-window.ics"); setStatus("Calendar downloaded. Import it into your calendar for a one-hour recheck reminder. The event description includes your prompt; the saved forecast does not update itself."); }, "Preparing your calendar…");
     });
     const speak = el("button", "btn btn--small btn--ghost", "Listen to selected plan");
     speak.type = "button";
@@ -518,6 +520,10 @@ export function initPlanner(): { ready: Promise<boolean> } {
     if (!plan.plan_id || !plan.window && !Array.isArray(plan.places)) throw new Error("The service returned an incomplete plan. Please retry.");
     output.replaceChildren();
     const places = plan.places ?? [plan];
+    for (const names of plan.shared_air_model ?? []) {
+      output.append(el("p", "planner__notice", `Same air forecast: ${names.join(" and ")} fall in one air-quality model cell, so the forecast cannot say which has cleaner air. Any ranking between them comes from weather alone.`));
+    }
+    if (plan.air_model_note) output.append(el("p", "planner__notice", plan.air_model_note));
     if (plan.partial) output.append(el("p", "planner__notice", "Some places could not be evaluated. The recommendation covers available results only."));
     if (plan.tied_places?.length) output.append(el("p", "planner__notice", `Forecast score tie: ${plan.tied_places.join(", ")}. Input order breaks the tie; the model does not establish that the first place is cleaner.`));
     if (places.filter((p) => p.window).length > 1) output.append(renderScoreChart(places));

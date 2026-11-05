@@ -1,6 +1,6 @@
-"""Shared wire models for external agents; the installed package is blr_air.models."""
+"""Shared wire models for external agents; the installed package is delhi_air.models."""
 
-from blr_air.models import (
+from delhi_air.models import (
     DetailedPlanRequest,
     DetailedPlanResponse,
     PlanRequest,

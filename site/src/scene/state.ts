@@ -33,7 +33,7 @@ export interface SceneState {
   moon: number;
   sun: number;
   sunY: number;
-  gaali: number;
+  hawa: number;
   mask: number; // 0 = mask on, 1 = mask off
 }
 
@@ -66,7 +66,7 @@ const NIGHT: SceneState = {
   moon: 1,
   sun: 0,
   sunY: -20,
-  gaali: 0,
+  hawa: 0,
   mask: 0,
 };
 
@@ -135,8 +135,8 @@ export const SCENES: Record<string, { start: SceneState; end?: SceneState }> = {
     end: at({ ...DEEP, cam: [-2.5, 1.2, 11.5], look: [0.5, 5.2, 0], shift: 0.15, ufo: [-1.2, 3.0, 1], ufoScale: 0.8, beam: 0.5, haze: 0.25, moon: 0 }),
   },
   final: {
-    start: at({ ...DAWN, cam: [0, 1.3, 11.5], look: [1.4, 2.3, 0], shift: 0.3, ufo: [2.6, 3.9, 2.2], ufoScale: 0.62, beam: 1, beamColor: "#7cff5b", haze: 0.15, hazeOpacity: 0.25, gaali: 1, mask: 0, sunY: 4 }),
-    end: at({ ...DAWN, cam: [0, 1.1, 11], look: [1.4, 2.2, 0], shift: 0.3, ufo: [2.6, 3.8, 2.2], ufoScale: 0.62, beam: 1, beamColor: "#7cff5b", haze: 0.05, hazeOpacity: 0.2, gaali: 1, mask: 1, sunY: 16 }),
+    start: at({ ...DAWN, cam: [0, 1.3, 11.5], look: [1.4, 2.3, 0], shift: 0.3, ufo: [2.6, 3.9, 2.2], ufoScale: 0.62, beam: 1, beamColor: "#7cff5b", haze: 0.15, hazeOpacity: 0.25, hawa: 1, mask: 0, sunY: 4 }),
+    end: at({ ...DAWN, cam: [0, 1.1, 11], look: [1.4, 2.2, 0], shift: 0.3, ufo: [2.6, 3.8, 2.2], ufoScale: 0.62, beam: 1, beamColor: "#7cff5b", haze: 0.05, hazeOpacity: 0.2, hawa: 1, mask: 1, sunY: 16 }),
   },
 };
 

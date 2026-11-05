@@ -1,4 +1,4 @@
-"""Unpublished, ephemeral BLR Air process for scripts/check_live.py only."""
+"""Unpublished, ephemeral Delhi Air process for scripts/check_live.py only."""
 
 import argparse
 import secrets
@@ -6,7 +6,7 @@ from pathlib import Path
 
 from uagents.resolver import RulesBasedResolver
 
-from blr_air.agent_runtime import create_agent
+from delhi_air.agent_runtime import create_agent
 
 
 def main():

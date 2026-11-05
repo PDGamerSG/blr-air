@@ -39,9 +39,9 @@ from uagents_core.envelope import Envelope
 from uagents_core.identity import Identity
 from uagents_core.models import ERROR_MESSAGE_DIGEST, Model
 
-from blr_air.domain import AirError, LocationError, RequestSpec
-from blr_air.localities import local_location
-from blr_air.models import (
+from delhi_air.domain import AirError, LocationError, RequestSpec
+from delhi_air.localities import local_location
+from delhi_air.models import (
     DetailedPlanRequest,
     DetailedPlanResponse,
     PlanRequest,
@@ -49,9 +49,9 @@ from blr_air.models import (
     WindowRequest,
     WindowResponse,
 )
-from blr_air.parsing import parse_local, parse_request
-from blr_air.providers import AIR_URL, GEOCODING_URL, WEATHER_URL, OpenMeteo
-from blr_air.service import SOURCE, AirService
+from delhi_air.parsing import parse_local, parse_request
+from delhi_air.providers import AIR_URL, GEOCODING_URL, WEATHER_URL, OpenMeteo
+from delhi_air.service import SOURCE, AirService
 
 ROOT = Path(__file__).resolve().parents[1]
 V1_SCHEMA_DIGESTS = {
@@ -98,7 +98,7 @@ async def docker_stats():
         "exec",
         "-T",
         "agent",
-        "blr-air",
+        "delhi-air",
         "stats",
         cwd=ROOT,
         stdout=asyncio.subprocess.PIPE,
@@ -174,7 +174,7 @@ def verify_plan(response, request, now):
             place.status == "ok" and place.rank == rank and place.source == SOURCE,
             "Plan result status, rank or live source is incorrect",
         )
-        require(place.timezone == "Asia/Kolkata", "Bengaluru plan returned a different timezone")
+        require(place.timezone == "Asia/Kolkata", "Delhi plan returned a different timezone")
         require(
             bool(place.resolved_name) and bool(place.fetched_at),
             "Plan omitted resolved location or retrieval time",
@@ -263,17 +263,17 @@ class LiveChecks:
         require(bool(key), "ASI1_API_KEY is required to prove the live parser succeeds")
         async with httpx.AsyncClient(event_hooks={"response": [self.audit]}) as client:
             with patch(
-                "blr_air.parsing.parse_local",
+                "delhi_air.parsing.parse_local",
                 side_effect=AssertionError("ASI parsing fell back to deterministic parsing"),
             ):
                 result = await parse_request(
-                    "कल सुबह HSR Layout में दो घंटे साइकिल चलाने का सबसे अच्छा समय बताइए।",
+                    "कल सुबह Hauz Khas में दो घंटे साइकिल चलाने का सबसे अच्छा समय बताइए।",
                     client,
                     api_key=key,
                     base_url=os.getenv("ASI1_BASE_URL", "https://api.asi1.ai/v1"),
                 )
         require(
-            local_location(result.place) == local_location("HSR Layout"),
+            local_location(result.place) == local_location("Hauz Khas"),
             "ASI did not retain the requested locality",
         )
         require(
@@ -295,9 +295,9 @@ class LiveChecks:
             service = AirService(provider, client)
             # Non-Indian zones include the US DST transition when run on 31 October 2026.
             cases = [
-                RequestSpec(place="HSR Layout", activity="run", hours=1),
+                RequestSpec(place="Hauz Khas", activity="run", hours=1),
                 RequestSpec(
-                    place="Koramangala", activity="cycle", hours=2, day="tomorrow", period="morning"
+                    place="Dwarka", activity="cycle", hours=2, day="tomorrow", period="morning"
                 ),
                 RequestSpec(
                     place="Melbourne, Australia",
@@ -327,8 +327,8 @@ class LiveChecks:
                 require(
                     result.forecast.timezone
                     == {
-                        "HSR Layout": "Asia/Kolkata",
-                        "Koramangala": "Asia/Kolkata",
+                        "Hauz Khas": "Asia/Kolkata",
+                        "Dwarka": "Asia/Kolkata",
                         "Melbourne, Australia": "Australia/Melbourne",
                         "New York, US": "America/New_York",
                         "Paris, France": "Europe/Paris",
@@ -371,7 +371,7 @@ class LiveChecks:
 
     async def invalid_requests(self):
         try:
-            parse_local("best 3-hour window to run in HSR Layout")
+            parse_local("best 3-hour window to run in Hauz Khas")
         except AirError as exc:
             duration_reason = str(exc)
         else:
@@ -399,8 +399,8 @@ class LiveChecks:
             )
             target = body["address"]
             request = WindowRequest(
-                latitude=12.9116,
-                longitude=77.6389,
+                latitude=28.5494,
+                longitude=77.2001,
                 hours=2,
                 day="tomorrow",
                 period="morning",
@@ -475,11 +475,11 @@ class LiveChecks:
         await web.TCPSite(runner, "127.0.0.1", receiver_port).start()
         agent_port = free_port()
         process = None
-        temporary = tempfile.TemporaryDirectory(prefix="blr-air-live-")
+        temporary = tempfile.TemporaryDirectory(prefix="delhi-air-live-")
         try:
             work = Path(temporary.name)
             environment = os.environ.copy()
-            for name in ("AGENT_SEED_PHRASE", "CALLER_SEED", "BLR_AIR_ADDRESS", "DATA_DIR"):
+            for name in ("AGENT_SEED_PHRASE", "CALLER_SEED", "DELHI_AIR_ADDRESS", "DATA_DIR"):
                 environment.pop(name, None)
             environment["PYTHONPATH"] = str(ROOT)
             with (work / "agent.log").open("wb") as output:
@@ -556,7 +556,7 @@ class LiveChecks:
                         return msg, text
 
                     valid, answer = await chat(
-                        "best 1-hour window to run in HSR Layout with reviews"
+                        "best 1-hour window to run in Hauz Khas with reviews"
                     )
                     require(
                         "Best available" in answer and "Open-Meteo" in answer,
@@ -568,7 +568,7 @@ class LiveChecks:
                         "Chat omitted location context or requested venue information",
                     )
                     self.partial["aqi_location_assessment_and_venue_status_in_chat"] = True
-                    _, duration_error = await chat("best 3-hour window to run in HSR Layout")
+                    _, duration_error = await chat("best 3-hour window to run in Hauz Khas")
                     require(
                         "1" in duration_error and "2" in duration_error,
                         "Chat did not explain its unsupported duration",
@@ -601,7 +601,7 @@ class LiveChecks:
                     )
                     # A serially processed typed response is a barrier: previous no-reply
                     # handlers have completed, avoiding arbitrary sleeps to infer silence.
-                    typed = WindowRequest(latitude=12.9116, longitude=77.6389)
+                    typed = WindowRequest(latitude=28.5494, longitude=77.2001)
                     barrier = make_envelope(identity, target["address"], typed)
                     await post_envelope(client, endpoint + "/submit", barrier)
                     typed_answer = await next_message(WindowResponse, barrier.session)
@@ -661,7 +661,7 @@ class LiveChecks:
                     plans = []
                     for request in (
                         PlanRequest(
-                            places=["HSR Layout"],
+                            places=["Hauz Khas"],
                             hours=2,
                             daylight_only=True,
                             max_aqi=500,
@@ -670,7 +670,7 @@ class LiveChecks:
                             max_uv=30,
                             max_wind=200,
                         ),
-                        PlanRequest(places=["HSR Layout", "Whitefield"], daylight_only=True),
+                        PlanRequest(places=["Hauz Khas", "Noida"], daylight_only=True),
                     ):
                         now = datetime.now(UTC)
                         plan_env = make_envelope(identity, target["address"], request)
@@ -681,7 +681,7 @@ class LiveChecks:
                             {"request": request.model_dump(), "response": plan.model_dump()}
                         )
                     self.partial["plans"] = plans
-                    impossible = PlanRequest(places=["HSR Layout"], max_temperature=-80)
+                    impossible = PlanRequest(places=["Hauz Khas"], max_temperature=-80)
                     impossible_env = make_envelope(identity, target["address"], impossible)
                     await post_envelope(client, endpoint + "/submit", impossible_env)
                     impossible_reply = await next_message(PlanResponse, impossible_env.session)
@@ -708,7 +708,9 @@ class LiveChecks:
                         },
                         "Plan/legacy responses were not reflected in usage counters",
                     )
-                    detail_request = DetailedPlanRequest(places=["Cubbon Park"], include_venue=True)
+                    detail_request = DetailedPlanRequest(
+                        places=["Lodhi Garden"], include_venue=True
+                    )
                     detail_env = make_envelope(identity, target["address"], detail_request)
                     await post_envelope(client, endpoint + "/submit", detail_env)
                     detailed_answer = await next_message(DetailedPlanResponse, detail_env.session)

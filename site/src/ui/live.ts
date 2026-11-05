@@ -9,8 +9,8 @@ export interface LiveReading {
   pm: number;
 }
 
-// Beacons cover every locality except the "Bengaluru" city-centre alias.
-export const MAP_LOCALITIES = LOCALITIES.filter((l) => l.name !== "Bengaluru");
+// Beacons cover every locality except the "Delhi" city-centre alias.
+export const MAP_LOCALITIES = LOCALITIES.filter((l) => l.name !== "Delhi");
 
 export async function loadLive(): Promise<{ city: LiveReading | null; map: (LiveReading | null)[] }> {
   const values = await fetchCurrentMany(LOCALITIES);
@@ -19,7 +19,7 @@ export async function loadLive(): Promise<{ city: LiveReading | null; map: (Live
     const v = byName.get(name);
     return v ? { name, ...v } : null;
   };
-  return { city: read("Bengaluru"), map: MAP_LOCALITIES.map((l) => read(l.name)) };
+  return { city: read("Delhi"), map: MAP_LOCALITIES.map((l) => read(l.name)) };
 }
 
 export function renderHeroLive(reading: LiveReading | null) {

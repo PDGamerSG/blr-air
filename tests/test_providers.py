@@ -3,8 +3,8 @@ from datetime import UTC, datetime
 import httpx
 import pytest
 
-from blr_air.domain import LocationError, ProviderError
-from blr_air.providers import OpenMeteo, merge_forecasts
+from delhi_air.domain import LocationError, ProviderError
+from delhi_air.providers import OpenMeteo, merge_forecasts
 
 
 def payloads():
@@ -70,9 +70,9 @@ async def test_locality_resolution_does_not_need_network():
         raise AssertionError("local lookup should not call HTTP")
 
     async with httpx.AsyncClient(transport=httpx.MockTransport(offline)) as client:
-        result = await OpenMeteo(client).locate("HSR Layout, Bangalore")
-        assert result.name == "HSR Layout, Bengaluru"
-        assert result.latitude == pytest.approx(12.9116)
+        result = await OpenMeteo(client).locate("Hauz Khas, Delhi")
+        assert result.name == "Hauz Khas, Delhi"
+        assert result.latitude == pytest.approx(28.5494)
 
 
 async def test_global_geocoding_retains_country_and_timezone():
@@ -100,7 +100,7 @@ async def test_global_geocoding_retains_country_and_timezone():
         assert "Australia" in result.name
 
 
-async def test_unknown_place_never_falls_back_to_bengaluru():
+async def test_unknown_place_never_falls_back_to_delhi():
     async with httpx.AsyncClient(
         transport=httpx.MockTransport(lambda request: httpx.Response(200, json={"results": []}))
     ) as client:

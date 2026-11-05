@@ -3,20 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>BLR Air Window — find the cleanest hour to go outside</title>
+    <title>Delhi Air Window — find the cleanest hour to go outside</title>
     <meta
       name="description"
       content="A Fetch.ai agent that reads the next 48 hours of AQI, PM2.5, rain and heat and finds the best 1–2 hour window to run, cycle, walk, commute or take the kids out. Built at Stranger Builds Bangalore."
     />
     <meta name="theme-color" content="#080b0d" />
-    <meta property="og:title" content="BLR Air Window — breathe on schedule" />
-    <meta property="og:description" content="The sky over Bengaluru has better hours. An agent that finds them." />
+    <meta property="og:title" content="Delhi Air Window — breathe on schedule" />
+    <meta property="og:description" content="The sky over Delhi has better hours. An agent that finds them." />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://blrairwindow.vercel.app/" />
-    <meta property="og:image" content="https://blrairwindow.vercel.app/og.jpg" />
+    <meta property="og:url" content="https://delhiairwindow.vercel.app/" />
+    <meta property="og:image" content="https://delhiairwindow.vercel.app/og.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:image" content="https://blrairwindow.vercel.app/og.jpg" />
-    <link rel="canonical" href="https://blrairwindow.vercel.app/" />
+    <meta name="twitter:image" content="https://delhiairwindow.vercel.app/og.jpg" />
+    <link rel="canonical" href="https://delhiairwindow.vercel.app/" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
   </head>
   <body>
@@ -33,7 +33,7 @@
           <circle cx="148" cy="63" r="5" fill="#ffe62b" />
         </svg>
       </div>
-      <p class="preloader__label">Reading the sky over Bengaluru</p>
+      <p class="preloader__label">Reading the sky over Delhi</p>
       <p class="preloader__count"><span id="loadCount">000</span><small>%</small></p>
     </div>
 
@@ -44,8 +44,8 @@
     <div class="toast" role="status" aria-live="polite"></div>
 
     <header class="nav">
-      <a class="nav__logo" href="#top" aria-label="BLR Air Window, back to top">
-        <span class="nav__mark" aria-hidden="true"></span>BLR&nbsp;AIR <em>WINDOW</em>
+      <a class="nav__logo" href="#top" aria-label="Delhi Air Window, back to top">
+        <span class="nav__mark" aria-hidden="true"></span>DELHI&nbsp;AIR <em>WINDOW</em>
       </a>
       <nav class="nav__links" aria-label="Sections">
         <a href="#signals">How</a>
@@ -74,7 +74,7 @@
             <span class="hero__line hero__line--indent" data-split>on schedule.</span>
           </h1>
           <p class="hero__lede reveal">
-            The sky over Bengaluru has better hours. <strong>BLR Air Window</strong> reads the next 48 hours of AQI, PM2.5,
+            The sky over Delhi has better hours. <strong>Delhi Air Window</strong> reads the next 48 hours of AQI, PM2.5,
             rain and heat, then tells you the cleanest 1–2 hours to
             <span class="rotator" aria-live="off"><span>run.</span></span>
           </p>
@@ -84,18 +84,18 @@
           </div>
         </div>
         <div class="hero__live sticker" style="--r: 3deg" hidden>
-          <span class="sticker__label"><span class="dot dot--live"></span> Live · Bengaluru</span>
+          <span class="sticker__label"><span class="dot dot--live"></span> Live · Delhi</span>
           <strong class="hero__aqi">—</strong>
           <span class="hero__aqi-meta">US AQI, modelled</span>
           <span class="hero__aqi-cat"></span>
         </div>
         <p class="hero__pilot sticker sticker--paper" style="--r: -4deg">
-          Piloted by <b>Gaali</b> <span lang="kn">ಗಾಳಿ</span><small>“air”, in Kannada</small>
+          Piloted by <b>Hawa</b> <span lang="hi">हवा</span><small>“air”, in Hindi</small>
         </p>
         <a class="scroll-hint" href="#haze"><span>Scroll to descend</span><i aria-hidden="true"></i></a>
       </section>
 
-      <div class="marquee" aria-label="Bengaluru localities the agent knows">
+      <div class="marquee" aria-label="Delhi localities the agent knows">
         <div class="marquee__track"></div>
       </div>
 
@@ -113,14 +113,14 @@
             <article class="card card--muted" data-step="1">
               <p class="card__kicker">What an app tells you</p>
               <p class="card__big" data-compare-now-big><s>AQI —.</s></p>
-              <p data-compare-now-text>Loading live Bengaluru air quality…</p>
-              <span class="card__note" data-compare-now-note>live · Bengaluru</span>
+              <p data-compare-now-text>Loading live Delhi air quality…</p>
+              <span class="card__note" data-compare-now-note>live · Delhi</span>
             </article>
             <article class="card card--answer" data-step="2">
-              <p class="card__kicker">What Gaali tells you</p>
+              <p class="card__kicker">What Hawa tells you</p>
               <p class="card__big" data-compare-go-big>Go at —.</p>
               <p data-compare-go-text>Finding the cleanest 1-hour slot before noon tomorrow…</p>
-              <span class="card__note" data-compare-go-note>live · Bengaluru</span>
+              <span class="card__note" data-compare-go-note>live · Delhi</span>
             </article>
           </div>
           <p class="haze__foot" data-step="2">
@@ -134,7 +134,7 @@
       <section class="signals" id="signals" data-scene="signals" data-sticky>
         <div class="sticky">
           <header class="section-head">
-            <p class="eyebrow">01 <i>✦</i> How Gaali reads the sky</p>
+            <p class="eyebrow">01 <i>✦</i> How Hawa reads the sky</p>
             <h2 class="title" data-split>Four signals.<br />One window.</h2>
           </header>
           <div class="signals__cards">
@@ -159,7 +159,7 @@
             <article class="signal" data-i="3" style="--c: var(--yellow)">
               <p class="signal__n">04 / 04</p>
               <h3>Heat</h3>
-              <p>Every degree above 30&nbsp;°C costs five points. Bengaluru afternoons, we see you.</p>
+              <p>Every degree above 30&nbsp;°C costs five points. Delhi in May, we see you.</p>
               <code>+ 5 × max(0, °C − 30)</code>
             </article>
           </div>
@@ -190,16 +190,16 @@
 
         <section class="planner panel" id="planner" aria-labelledby="planner-title">
           <div class="planner__intro">
-            <h3 id="planner-title">Tell Gaali what you have in mind.</h3>
+            <h3 id="planner-title">Tell Hawa what you have in mind.</h3>
             <p class="planner__capabilities" data-planner-capabilities role="status">Checking available services…</p>
           </div>
           <form class="planner__form" data-planner-form>
             <label for="planner-query">Your request</label>
-            <textarea id="planner-query" name="query" rows="3" maxlength="2000" required placeholder="Compare Cubbon Park and Lalbagh for a walk tomorrow morning, with AQI at most 100 and daylight only."></textarea>
+            <textarea id="planner-query" name="query" rows="3" maxlength="2000" required placeholder="Compare Lodhi Garden and India Gate for a walk tomorrow morning, with AQI at most 250 and daylight only."></textarea>
             <div class="planner__examples" aria-label="Example requests">
-              <button type="button" class="chip" data-plan-example="Compare HSR Layout and Whitefield for a run tomorrow morning with AQI at most 100, rain at most 30%, daylight only">Compare two places</button>
-              <button type="button" class="chip" data-plan-example="Best 1-hour walk in Cubbon Park tomorrow morning with daylight only" data-example-venue="Cubbon Park, Bengaluru">Plan a park visit</button>
-              <button type="button" class="chip" data-plan-example="Best 2-hour cycling window in Koramangala tomorrow morning with wind at most 20 km/h and UV at most 5">Plan a bike ride</button>
+              <button type="button" class="chip" data-plan-example="Compare Hauz Khas and Noida for a run tomorrow morning with AQI at most 250, rain at most 30%, daylight only">Compare two places</button>
+              <button type="button" class="chip" data-plan-example="Best 1-hour walk in Lodhi Garden tomorrow morning with daylight only" data-example-venue="Lodhi Garden, Delhi">Plan a park visit</button>
+              <button type="button" class="chip" data-plan-example="Best 2-hour cycling window in Dwarka tomorrow morning with wind at most 20 km/h and UV at most 5">Plan a bike ride</button>
             </div>
             <div class="planner__voice">
               <label for="planner-audio">Or say it: upload a voice note or video</label>
@@ -211,7 +211,7 @@
               <summary>Venue reviews</summary>
               <label class="planner__check"><input type="checkbox" name="include_venue" /> Include real venue ratings, customer reviews and opening hours</label>
               <label for="planner-venue">Specific venue to look up <span>(optional)</span></label>
-              <input id="planner-venue" name="venue_query" type="text" maxlength="160" placeholder="Cubbon Park, Bengaluru" />
+              <input id="planner-venue" name="venue_query" type="text" maxlength="160" placeholder="Lodhi Garden, Delhi" />
               <p class="planner__hint">Ratings describe the venue. Air-quality advice describes the forecast. Opening hours shown by the provider need checking for your visit date.</p>
             </details>
             <div class="planner__submit">
@@ -223,9 +223,9 @@
           <p class="planner__status" data-plan-status role="status" aria-live="polite"></p>
           <div class="planner__results" data-plan-results></div>
           <audio class="planner__audio" data-plan-audio controls hidden aria-label="Spoken outdoor plan"></audio>
-          <p class="planner__hint" data-plan-audio-actions hidden><a data-plan-audio-download href="#" download="blr-air-plan.wav">Download spoken plan (WAV)</a></p>
+          <p class="planner__hint" data-plan-audio-actions hidden><a data-plan-audio-download href="#" download="delhi-air-plan.wav">Download spoken plan (WAV)</a></p>
           <p class="planner__hint">Forecasts can change. Review the matched place and conditions before leaving. <a href="#privacy">Privacy and terms</a>.</p>
-          <p class="planner__agent">Prefer to chat? <a data-asi href="%ASI_AGENT_URL%" target="_blank" rel="noopener">Open the BLR Air Window agent on ASI:One ↗</a> <a data-agentverse href="%AGENTVERSE_PROFILE_URL%" target="_blank" rel="noopener">Agentverse profile ↗</a></p>
+          <p class="planner__agent">Prefer to chat? <a data-asi href="%ASI_AGENT_URL%" target="_blank" rel="noopener">Open the Delhi Air Window agent on ASI:One ↗</a> <a data-agentverse href="%AGENTVERSE_PROFILE_URL%" target="_blank" rel="noopener">Agentverse profile ↗</a></p>
         </section>
 
         <div class="planner__quick-heading">
@@ -238,7 +238,7 @@
             <fieldset>
               <legend>Where</legend>
               <div class="select">
-                <select name="place" aria-label="Bengaluru locality"></select>
+                <select name="place" aria-label="Delhi locality"></select>
               </div>
               <div class="city-search">
                 <input name="city" type="text" placeholder="…or any city, e.g. Paris, France" aria-label="Any city" />
@@ -302,6 +302,7 @@
                 <span><i style="--c: #ff6a2a"></i>Sensitive</span>
                 <span><i style="--c: #e20b1b"></i>Unhealthy</span>
                 <span><i style="--c: #a14bd8"></i>Very</span>
+                <span><i style="--c: #7a0510"></i>Hazardous</span>
                 <span><i class="legend-off"></i>Outside your hours</span>
                 <span class="chart__hint">Bar height = hourly cost. Shorter is better.</span>
               </div>
@@ -309,7 +310,7 @@
             </div>
 
             <article class="result panel" aria-live="polite">
-              <p class="result__kicker">Gaali's verdict</p>
+              <p class="result__kicker">Hawa's verdict</p>
               <p class="result__window">Press <b>Scan the sky</b>.</p>
               <dl class="result__stats"></dl>
               <pre class="result__text"></pre>
@@ -326,10 +327,10 @@
       <section class="city" id="city" data-scene="city" data-sticky>
         <div class="sticky">
           <header class="section-head city__head">
-            <p class="eyebrow">03 <i>✦</i> Bengaluru, mapped</p>
-            <h2 class="title" data-split>20 neighbourhoods on call</h2>
+            <p class="eyebrow">03 <i>✦</i> Delhi, mapped</p>
+            <h2 class="title" data-split>21 neighbourhoods on call</h2>
             <p class="section-head__lede">
-              From Yelahanka to Electronic City, the agent knows 20 locality centroids by name. Anywhere else on Earth works
+              From Rohini to Faridabad, the agent knows 21 locality centroids across Delhi NCR by name. Anywhere else on Earth works
               through geocoding. Beacon height shows <em>current modelled</em> US AQI.
             </p>
           </header>
@@ -355,16 +356,16 @@
           </p>
         </header>
         <div class="hire__board panel panel--paper">
-          <svg class="hire__sketch" viewBox="0 0 1200 560" role="img" aria-label="Diagram: you chat on ASI:One, which routes to the BLR Air agent; a planner agent sends WindowRequest directly; the agent reads Open-Meteo and CAMS forecasts and replies."></svg>
+          <svg class="hire__sketch" viewBox="0 0 1200 560" role="img" aria-label="Diagram: you chat on ASI:One, which routes to the Delhi Air agent; a planner agent sends WindowRequest directly; the agent reads Open-Meteo and CAMS forecasts and replies."></svg>
         </div>
         <div class="hire__cols">
           <article class="panel hire__card">
             <p class="card__kicker">For humans</p>
             <h3>Chat on ASI:One</h3>
             <ol class="steps">
-              <li>Open the <a data-asi href="%ASI_AGENT_URL%" target="_blank" rel="noopener">BLR Air Window extension on ASI:One</a> and start a chat.</li>
+              <li>Open the <a data-asi href="%ASI_AGENT_URL%" target="_blank" rel="noopener">Delhi Air Window extension on ASI:One</a> and start a chat.</li>
               <li>Mention <code class="handle"></code> or open the agent's Agentverse profile and choose <b>Chat with Agent</b>.</li>
-              <li>Ask like a person: <q>best 2-hour cycling window in Koramangala tomorrow morning</q>.</li>
+              <li>Ask like a person: <q>best 2-hour cycling window in Dwarka tomorrow morning</q>.</li>
             </ol>
             <div class="hire__actions">
               <a class="btn btn--small" data-asi href="%ASI_AGENT_URL%" target="_blank" rel="noopener">Open extension ↗</a>
@@ -372,15 +373,15 @@
             </div>
           </article>
           <article class="panel hire__card hire__card--code">
-            <p class="card__kicker">For agents · protocol <code>blr-air-window v0.1.0</code></p>
-            <pre class="code"><code><span class="k">from</span> blr_air.models <span class="k">import</span> WindowRequest
+            <p class="card__kicker">For agents · protocol <code>delhi-air-window v0.1.0</code></p>
+            <pre class="code"><code><span class="k">from</span> delhi_air.models <span class="k">import</span> WindowRequest
 
 request = <span class="f">WindowRequest</span>(
-    latitude=<span class="n">12.9116</span>, longitude=<span class="n">77.6389</span>,
+    latitude=<span class="n">28.5494</span>, longitude=<span class="n">77.2001</span>,
     hours=<span class="n">2</span>, activity=<span class="s">"run"</span>,
     day=<span class="s">"tomorrow"</span>, period=<span class="s">"morning"</span>,
 )
-<span class="k">await</span> ctx.<span class="f">send</span>(BLR_AIR_ADDRESS, request)
+<span class="k">await</span> ctx.<span class="f">send</span>(DELHI_AIR_ADDRESS, request)
 
 <span class="c"># ← WindowResponse(status="ok", start, end, timezone,</span>
 <span class="c">#     us_aqi, pm2_5, rain_probability, temperature,</span>
@@ -400,7 +401,7 @@ request = <span class="f">WindowRequest</span>(
           <header class="section-head section-head--center">
             <p class="eyebrow">05 <i>✦</i> Incoming transmissions</p>
             <h2 class="title" data-split>Say it like a human</h2>
-            <p class="section-head__lede">Drag the wheel or keep scrolling. Tap a card to ask Gaali.</p>
+            <p class="section-head__lede">Drag the wheel or keep scrolling. Tap a card to ask Hawa.</p>
           </header>
           <div class="wheel" tabindex="0" aria-label="Example prompts carousel. Use arrow keys to rotate.">
             <div class="wheel__ring"></div>
@@ -413,7 +414,7 @@ request = <span class="f">WindowRequest</span>(
         <div class="file panel panel--paper">
           <p class="file__stamp" aria-hidden="true">Declassified</p>
           <header>
-            <p class="file__ref">FILE NO. BLR-AIR-0.1.0 · HONESTY DEPT.</p>
+            <p class="file__ref">FILE NO. DELHI-AIR-0.1.0 · HONESTY DEPT.</p>
             <h2 class="file__title">The fine print, unredacted</h2>
           </header>
           <ul class="file__list">
@@ -432,7 +433,7 @@ request = <span class="f">WindowRequest</span>(
         <div class="builds__grid">
           <div class="builds__copy">
             <p class="eyebrow">06 <i>✦</i> Origin story</p>
-            <h2 class="title" data-split>Born at Stranger&nbsp;Builds</h2>
+            <h2 class="title" data-split>Grown from Stranger&nbsp;Builds</h2>
             <p class="builds__meta">
               Bangalore <i>✦</i> Bharat1.ai, RGA Tech Park <i>✦</i> Sat 31 Oct 2026 <i>✦</i> Fetch.ai challenge:
               <b>Get your agent hired.</b>
@@ -475,7 +476,7 @@ request = <span class="f">WindowRequest</span>(
             <span data-split>The window</span>
             <span data-split>is open.</span>
           </h2>
-          <p class="final__lede">Gaali took the mask off. Your turn: ask when to go outside.</p>
+          <p class="final__lede">Hawa is reading the sky. Ask when to go outside.</p>
           <div class="final__ctas">
             <a class="btn btn--xl" data-asi href="%ASI_AGENT_URL%" target="_blank" rel="noopener">Open extension ↗</a>
             <a class="btn btn--xl btn--cyan" data-agentverse href="%AGENTVERSE_PROFILE_URL%" target="_blank" rel="noopener">Agentverse ↗</a>
@@ -492,7 +493,7 @@ request = <span class="f">WindowRequest</span>(
     <footer class="footer">
       <div class="footer__cols">
         <p>
-          <b>BLR Air Window</b> · built for Stranger Builds Bangalore 2026 · code MIT.<br />
+          <b>Delhi Air Window</b> · ported from BLR Air Window, built for Stranger Builds Bangalore 2026 · code MIT.<br />
           Weather and geocoding by <a data-openmeteo href="#" target="_blank" rel="noopener">Open-Meteo</a>. Air quality from
           <a data-cams href="#" target="_blank" rel="noopener">CAMS</a> via Open-Meteo. Agent transport by Fetch.ai uAgents;
           optional language parsing by ASI:One.
@@ -509,10 +510,10 @@ request = <span class="f">WindowRequest</span>(
       </div>
       <details class="planner__legal" id="privacy">
         <summary>Privacy and terms of use</summary>
-        <p>BLR Air helps you choose an outdoor window from model forecasts. It is not medical advice, a venue booking or a guarantee of safe conditions. Recheck conditions and venue access before travelling.</p>
+        <p>Delhi Air helps you choose an outdoor window from model forecasts. It is not medical advice, a venue booking or a guarantee of safe conditions. Recheck conditions and venue access before travelling.</p>
         <p>Your request is processed by this server and, when configured, ASI:One for language understanding. Place names or coordinates go to Open-Meteo for forecasts. Venue queries go to Google Places when requested. Uploaded recordings and spoken replies use Sarvam. Do not include sensitive personal information.</p>
         <p>Website plans are kept temporarily in server memory so you can download a calendar or spoken answer; they expire and are lost on restart. The application does not persist your recordings or customer-review content. Infrastructure and third-party services have their own data policies. Agent-to-agent usage counters store keyed sender hashes and aggregate counts.</p>
-        <p>Google Maps venue data includes attributed ratings and a limited, relevance-ranked sample of customer reviews. Reviews are written by their authors and are not verified or endorsed by BLR Air. Google Maps content is subject to the <a href="https://maps.google.com/help/terms_maps/" target="_blank" rel="noopener noreferrer">Google Maps terms</a> and <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google Privacy Policy</a>.</p>
+        <p>Google Maps venue data includes attributed ratings and a limited, relevance-ranked sample of customer reviews. Reviews are written by their authors and are not verified or endorsed by Delhi Air. Google Maps content is subject to the <a href="https://maps.google.com/help/terms_maps/" target="_blank" rel="noopener noreferrer">Google Maps terms</a> and <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google Privacy Policy</a>.</p>
       </details>
     </footer>
 

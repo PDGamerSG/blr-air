@@ -6,16 +6,16 @@ The mailbox process must remain running. A laptop going to sleep makes the agent
 
 ```sh
 uv sync --frozen
-uv run blr-air init
-uv run blr-air doctor
-uv run blr-air-agent
+uv run delhi-air init
+uv run delhi-air doctor
+uv run delhi-air-agent
 ```
 
 `init` creates `.env` with mode 0600. Back it up securely. Do not put it in Git or a container image. `AGENT_SEED_PHRASE` determines the agent address. `CALLER_SEED` identifies the separate demo planner. `ASI1_API_KEY` is optional and can be added without changing either identity.
 
 Follow the startup Inspector link, then **Connect → Mailbox → Finish**. Verify the address matches `doctor` and the Agentverse dashboard says Active. Publish the supplied profile README and claim an available handle. Mailbox registration and ASI:One routing require your authenticated account; process logs alone do not establish either.
 
-For the identity created in this workspace, the [Inspector connection link](https://agentverse.ai/inspect/?uri=http%3A//127.0.0.1%3A8001&address=agent1q2z89ttne7p57zq7r473lrc5jan899raacv6sjqj9eymk7kdqzkwkxhcwg3) points to the running Compose service. Open it on this machine while Docker is running. The current account-connection state is recorded in [verification.md](verification.md).
+For the identity created in this workspace, the [Inspector connection link](https://agentverse.ai/inspect/?uri=http%3A//127.0.0.1%3A8001&address=agent1q2z89ttne7p57zq7r473lrc5jan899raacv6sjqj9eymk7kdqzkwkxhcwg3) opens the connection flow while the local agent is running.
 
 ## Docker Compose on an always-on machine
 
@@ -25,7 +25,7 @@ Copy the project and the same private `.env` to the host. Stop the original proc
 docker compose up -d --build
 docker compose logs --tail 100 agent
 curl -fsS http://127.0.0.1:8001/healthz
-docker compose exec agent blr-air stats
+docker compose exec agent delhi-air stats
 ```
 
 The service restarts automatically and stores usage plus uAgents state in `agent-data`. It runs as a non-root user. Port 8001 is exposed only on the host's loopback interface. Mailbox traffic is outbound, so no public endpoint or tunnel is required. When registering from a remote host, use SSH local forwarding for the Inspector:
@@ -52,7 +52,7 @@ Stop the normal service first if it is using the same port or identity. `docker 
 - uAgents 0.26.1 mixes Pydantic v1 wire models with a v2 exception handler. `ResilientAgent` catches the missed v1 validation error, responds on the same session and leaves the queue running. The opt-in live checks send an invalid signed request to a disposable agent and then a valid one; an HTTP health response alone would not detect the original dead queue.
 - Keep the process alive through judging. Use the host's own uptime monitoring and verify Active status in Agentverse regularly.
 
-Changing an environment key requires `docker compose up -d --force-recreate`; merely restarting a container does not reload the env file. `SARVAM_API_KEY` is optional and used by the CLI and website voice paths. New clones can leave it empty. The existing agent address and `blr-air-window` wire schemas remain stable when enabling the separate `blr-air-plan` protocol.
+Changing an environment key requires `docker compose up -d --force-recreate`; merely restarting a container does not reload the env file. `SARVAM_API_KEY` is optional and used by the CLI and website voice paths. New clones can leave it empty. The existing agent address and `delhi-air-window` wire schemas remain stable when enabling the separate `delhi-air-plan` protocol.
 
 ## Updating
 

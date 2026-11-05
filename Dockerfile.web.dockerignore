@@ -4,8 +4,8 @@
 !uv.lock
 !README.md
 !LICENSE
-!blr_air/
-!blr_air/**
+!delhi_air/
+!delhi_air/**
 !site/
 !site/**
 site/node_modules

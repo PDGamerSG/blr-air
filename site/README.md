@@ -1,6 +1,6 @@
-# BLR Air Window — landing page
+# Delhi Air Window — landing page
 
-A scroll-driven page and working planning interface for the BLR Air Window agent, styled after Stranger Builds. The main planner calls the Python service through same-origin `/api` routes, so natural-language requests use the shared agent logic. The quick scanner and city beacons also make keyless Open-Meteo calls directly from the browser.
+A scroll-driven page and working planning interface for the Delhi Air Window agent, styled after Stranger Builds. The main planner calls the Python service through same-origin `/api` routes, so natural-language requests use the shared agent logic. The quick scanner and city beacons also make keyless Open-Meteo calls directly from the browser.
 
 The planner shows the interpreted request, current modelled air quality, outdoor assessment, warning conditions, best/backup windows, place comparisons and source freshness. Users can download the exact selected window as an iCalendar event or ask Sarvam to speak it. A local WAV recording can be transcribed into an editable request. Optional real venue results show Google Maps ratings, opening hours, accessibility fields and attributed customer-review excerpts separately from the air-quality assessment.
 
@@ -8,16 +8,16 @@ The planner shows the interpreted request, current modelled air quality, outdoor
 
 | # | Section | What happens |
 | --- | --- | --- |
-| 01 | Orbit | A UFO hovers over a toon-shaded Bengaluru at night. A live sticker shows the current modelled AQI. |
+| 01 | Orbit | A UFO hovers over a toon-shaded Delhi at night. A live sticker shows the current modelled AQI. |
 | 02 | Haze | The camera dives into PM2.5 smog: "AQI is a number. You need a time." |
 | 03 | Four signals | AQI, PM2.5, rain and heat orbit the UFO while the cost formula assembles term by term. |
 | 04 | Planner and scanner | Natural-language planning through the shared Python service, with comparisons, reviews and downloads. A separate keyless quick scanner shows a single-place 48-hour forecast. |
-| 05 | City | A top-down map of Bengaluru: the Outer Ring Road, lakes, Cubbon Park, Lalbagh, Vidhana Soudha, and live AQI beacons. Click a locality to scan it. |
+| 05 | City | A top-down map of Delhi NCR: the Yamuna, Ring Road, Outer Ring Road, Kartavya Path, the Ridge, Asola Bhatti, India Gate, and live AQI beacons. Click a locality to scan it. |
 | 06 | Hire | A hand-drawn rough.js diagram of the chat and typed-protocol paths, plus the `WindowRequest` snippet. |
 | 07 | Prompts | A 3D drum of example prompts. Drag, scroll or press arrow keys; tap to send a request to the on-page agent. |
 | 08 | Fine print | Redactions wipe away to reveal the honest limitations. |
 | 09 | Origin | Stranger Builds context, a submissions countdown, and the five-step journey. |
-| 10 | Landing | Dawn breaks. Gaali (ಗಾಳಿ, "air") takes off the gas mask under a green beam, and the final CTAs appear. |
+| 10 | Landing | Dawn breaks over Delhi. Hawa (हवा, "air") removes the gas mask only if the live city AQI is 100 or below; otherwise the mask stays on and the copy says so. |
 
 ## Run
 
@@ -29,7 +29,7 @@ npm run build     # static output in site/dist
 npm run preview
 ```
 
-Run the Python web service on `127.0.0.1:8080` alongside Vite for development; Vite proxies `/api` there. On Vercel, `/api/*` goes through the same-origin proxy in `../api/proxy.mjs` to `BLR_AIR_API_ORIGIN`; see the root README. Production should serve `site/dist/` and `/api` from the same origin using the Python service or a reverse proxy. A standalone static host can show the landing page and keyless quick scanner, but cannot run the full planner without routing `/api` to the server. No API keys belong in browser code or `VITE_*` variables.
+Run the Python web service on `127.0.0.1:8080` alongside Vite for development; Vite proxies `/api` there. On Vercel, `/api/*` goes through the same-origin proxy in `../api/proxy.mjs` to `DELHI_AIR_API_ORIGIN`; see the root README. Production should serve `site/dist/` and `/api` from the same origin using the Python service or a reverse proxy. A standalone static host can show the landing page and keyless quick scanner, but cannot run the full planner without routing `/api` to the server. No API keys belong in browser code or `VITE_*` variables.
 
 The server reports configured language, voice and venue capabilities at `/api/status`. Missing optional credentials produce visible unavailability messages. The interface never substitutes synthetic forecasts for a failed full-agent request. An interrupted or new request clears previous full-agent results; transient plan IDs expire, so downloads require a fresh plan afterward.
 
@@ -43,7 +43,7 @@ For social previews, set `og:image` in `index.html` to an absolute URL once the 
 
 ## 3D models
 
-The UFO, Gaali, Vidhana Soudha and the pink trumpet tree are generated procedurally by a Blender script:
+The UFO, Hawa, India Gate and the golden amaltas tree are generated procedurally by a Blender script:
 
 ```sh
 npm run models    # blender --background --python blender/build_models.py -- public/models

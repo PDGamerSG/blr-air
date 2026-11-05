@@ -1,0 +1,4098 @@
+[
+{
+"name": "Asola-Bhatti Wildlife Sanctuary",
+"latitude": 28.45449,
+"longitude": 77.21681,
+"kind": "protected_area",
+"area_m2": 77406100.0,
+"cycling": true
+},
+{
+"name": "Central Ridge Reserve Forest",
+"latitude": 28.61957,
+"longitude": 77.17963,
+"kind": "nature_reserve",
+"area_m2": 16171100.0,
+"cycling": true
+},
+{
+"name": "Aravalli Biodiversity Park",
+"latitude": 28.55663,
+"longitude": 77.15315,
+"kind": "protected_area",
+"area_m2": 4577100.0,
+"cycling": true
+},
+{
+"name": "Okhla Bird Sanctuary",
+"latitude": 28.55849,
+"longitude": 77.30762,
+"kind": "nature_reserve",
+"area_m2": 4363500.0,
+"cycling": true
+},
+{
+"name": "Aravali Biodiversity Park",
+"latitude": 28.49469,
+"longitude": 77.11825,
+"kind": "nature_reserve",
+"area_m2": 4279100.0,
+"cycling": true
+},
+{
+"name": "Surajpur Wetlands Reserve Forest",
+"latitude": 28.52454,
+"longitude": 77.4846,
+"kind": "nature_reserve",
+"area_m2": 3966100.0,
+"cycling": true
+},
+{
+"name": "NTPC Eco Park",
+"latitude": 28.51991,
+"longitude": 77.3194,
+"kind": "park",
+"area_m2": 3607700.0,
+"cycling": true
+},
+{
+"name": "Yamuna Biodiversity Park",
+"latitude": 28.73947,
+"longitude": 77.21412,
+"kind": "nature_reserve",
+"area_m2": 2245800.0,
+"cycling": true
+},
+{
+"name": "Sanjay Lake Park",
+"latitude": 28.61683,
+"longitude": 77.29959,
+"kind": "park",
+"area_m2": 1339300.0,
+"cycling": true
+},
+{
+"name": "Nihal Vihar Park",
+"latitude": 28.65926,
+"longitude": 77.07276,
+"kind": "park",
+"area_m2": 1197700.0,
+"cycling": true
+},
+{
+"name": "City Forest",
+"latitude": 28.69895,
+"longitude": 77.39134,
+"kind": "nature_reserve",
+"area_m2": 1078600.0,
+"cycling": true
+},
+{
+"name": "Swarn Jayanti Park",
+"latitude": 28.72305,
+"longitude": 77.11886,
+"kind": "park",
+"area_m2": 1014200.0,
+"cycling": true
+},
+{
+"name": "Noida Botanical Garden",
+"latitude": 28.56235,
+"longitude": 77.32912,
+"kind": "park",
+"area_m2": 1001100.0,
+"cycling": true
+},
+{
+"name": "Bharat Vandana Park",
+"latitude": 28.57118,
+"longitude": 77.05908,
+"kind": "park",
+"area_m2": 902300.0,
+"cycling": true
+},
+{
+"name": "D.D.A. Park Panchsheel",
+"latitude": 28.5488,
+"longitude": 77.22345,
+"kind": "park",
+"area_m2": 899000.0,
+"cycling": true
+},
+{
+"name": "DDA Dwarka Cycle Track",
+"latitude": 28.58717,
+"longitude": 77.05027,
+"kind": "track",
+"area_m2": 888400.0,
+"cycling": true
+},
+{
+"name": "Biodiversity Park",
+"latitude": 28.51412,
+"longitude": 77.39555,
+"kind": "park",
+"area_m2": 867000.0,
+"cycling": true
+},
+{
+"name": "Aastha Kunj",
+"latitude": 28.55474,
+"longitude": 77.25571,
+"kind": "park",
+"area_m2": 860200.0,
+"cycling": true
+},
+{
+"name": "Indraprastha Park",
+"latitude": 28.60099,
+"longitude": 77.25389,
+"kind": "park",
+"area_m2": 810300.0,
+"cycling": true
+},
+{
+"name": "Tilpath Valley Biodiversity Park",
+"latitude": 28.48829,
+"longitude": 77.21335,
+"kind": "nature_reserve",
+"area_m2": 725100.0,
+"cycling": true
+},
+{
+"name": "Shivaji Marg Park Part 2",
+"latitude": 28.66733,
+"longitude": 77.15545,
+"kind": "park",
+"area_m2": 693700.0,
+"cycling": true
+},
+{
+"name": "Raj Ghat",
+"latitude": 28.64474,
+"longitude": 77.24977,
+"kind": "park",
+"area_m2": 693500.0,
+"cycling": true
+},
+{
+"name": "Deer Park",
+"latitude": 28.5567,
+"longitude": 77.19433,
+"kind": "park",
+"area_m2": 669700.0,
+"cycling": true
+},
+{
+"name": "Shalimar Bagh",
+"latitude": 28.71819,
+"longitude": 77.15027,
+"kind": "park",
+"area_m2": 659600.0,
+"cycling": true
+},
+{
+"name": "Ashoka Garden",
+"latitude": 28.68432,
+"longitude": 77.17894,
+"kind": "park",
+"area_m2": 603000.0,
+"cycling": true
+},
+{
+"name": "Lal Bahadur Shastri Marg",
+"latitude": 28.52349,
+"longitude": 77.22917,
+"kind": "track",
+"area_m2": 561400.0,
+"cycling": true
+},
+{
+"name": "Jheel Park",
+"latitude": 28.58893,
+"longitude": 77.16132,
+"kind": "park",
+"area_m2": 551800.0,
+"cycling": true
+},
+{
+"name": "Qila Rai Pithora",
+"latitude": 28.51943,
+"longitude": 77.19472,
+"kind": "park",
+"area_m2": 536000.0,
+"cycling": true
+},
+{
+"name": "Rose Garden",
+"latitude": 28.55045,
+"longitude": 77.19434,
+"kind": "nature_reserve",
+"area_m2": 505600.0,
+"cycling": true
+},
+{
+"name": "Smriti Van",
+"latitude": 28.60672,
+"longitude": 77.33852,
+"kind": "park",
+"area_m2": 456800.0,
+"cycling": true
+},
+{
+"name": "Red Fort Complex",
+"latitude": 28.65703,
+"longitude": 77.24111,
+"kind": "protected_area",
+"area_m2": 452300.0,
+"cycling": true
+},
+{
+"name": "Nehru Park",
+"latitude": 28.59132,
+"longitude": 77.1927,
+"kind": "park",
+"area_m2": 414600.0,
+"cycling": true
+},
+{
+"name": "Buddha Jayanti Park",
+"latitude": 28.61567,
+"longitude": 77.17741,
+"kind": "park",
+"area_m2": 390800.0,
+"cycling": true
+},
+{
+"name": "Forest Area",
+"latitude": 28.51352,
+"longitude": 77.17253,
+"kind": "park",
+"area_m2": 381400.0,
+"cycling": true
+},
+{
+"name": "Lodhi Gardens",
+"latitude": 28.59348,
+"longitude": 77.21956,
+"kind": "park",
+"area_m2": 378800.0,
+"cycling": true
+},
+{
+"name": "Vaishnavi DDA Park & Nursery",
+"latitude": 28.69872,
+"longitude": 77.17577,
+"kind": "park",
+"area_m2": 374100.0,
+"cycling": true
+},
+{
+"name": "Jawaharlal Nehru Stadium",
+"latitude": 28.58336,
+"longitude": 77.23329,
+"kind": "stadium",
+"area_m2": 355200.0,
+"cycling": true
+},
+{
+"name": "Mehrauli Archaeological Park",
+"latitude": 28.5212,
+"longitude": 77.18588,
+"kind": "park",
+"area_m2": 348100.0,
+"cycling": true
+},
+{
+"name": "District Park, Gulabi Bagh",
+"latitude": 28.67707,
+"longitude": 77.18525,
+"kind": "park",
+"area_m2": 343100.0,
+"cycling": true
+},
+{
+"name": "Baansera",
+"latitude": 28.59152,
+"longitude": 77.2607,
+"kind": "park",
+"area_m2": 306900.0,
+"cycling": true
+},
+{
+"name": "Sunder Nursery",
+"latitude": 28.59685,
+"longitude": 77.24743,
+"kind": "park",
+"area_m2": 297400.0,
+"cycling": true
+},
+{
+"name": "Coronation Park",
+"latitude": 28.72247,
+"longitude": 77.19711,
+"kind": "park",
+"area_m2": 295300.0,
+"cycling": true
+},
+{
+"name": "DDA Park",
+"latitude": 28.67549,
+"longitude": 77.17312,
+"kind": "park",
+"area_m2": 288900.0,
+"cycling": true
+},
+{
+"name": "Shanti Park",
+"latitude": 28.59274,
+"longitude": 77.18834,
+"kind": "park",
+"area_m2": 269900.0,
+"cycling": true
+},
+{
+"name": "Timarpur Lake",
+"latitude": 28.71267,
+"longitude": 77.22342,
+"kind": "park",
+"area_m2": 265900.0,
+"cycling": true
+},
+{
+"name": "Colonel Prem Sahgal Park",
+"latitude": 28.72384,
+"longitude": 77.11019,
+"kind": "park",
+"area_m2": 257800.0,
+"cycling": true
+},
+{
+"name": "Dilli Chalo Park",
+"latitude": 28.65451,
+"longitude": 77.24265,
+"kind": "park",
+"area_m2": 239000.0,
+"cycling": true
+},
+{
+"name": "Medicinal Park",
+"latitude": 28.51461,
+"longitude": 77.40283,
+"kind": "park",
+"area_m2": 232200.0,
+"cycling": true
+},
+{
+"name": "Shivalik DDA Park",
+"latitude": 28.53618,
+"longitude": 77.20565,
+"kind": "park",
+"area_m2": 223000.0,
+"cycling": true
+},
+{
+"name": "Talkatora Gardens",
+"latitude": 28.62389,
+"longitude": 77.19427,
+"kind": "park",
+"area_m2": 216100.0,
+"cycling": true
+},
+{
+"name": "Tikona Park Okhla",
+"latitude": 28.55874,
+"longitude": 77.28558,
+"kind": "park",
+"area_m2": 213200.0,
+"cycling": true
+},
+{
+"name": "Central Nursery Park",
+"latitude": 28.5944,
+"longitude": 77.05746,
+"kind": "park",
+"area_m2": 204100.0,
+"cycling": true
+},
+{
+"name": "Vasant Vihar District Park",
+"latitude": 28.55763,
+"longitude": 77.16629,
+"kind": "park",
+"area_m2": 201200.0,
+"cycling": true
+},
+{
+"name": "District Park",
+"latitude": 28.59624,
+"longitude": 77.0551,
+"kind": "park",
+"area_m2": 195600.0,
+"cycling": true
+},
+{
+"name": "Leisure Valley Park",
+"latitude": 28.4692,
+"longitude": 77.06609,
+"kind": "park",
+"area_m2": 192800.0,
+"cycling": true
+},
+{
+"name": "green valley park",
+"latitude": 28.63647,
+"longitude": 77.34222,
+"kind": "park",
+"area_m2": 186500.0,
+"cycling": true
+},
+{
+"name": "Paschim Vihar District Park",
+"latitude": 28.67193,
+"longitude": 77.09561,
+"kind": "park",
+"area_m2": 178800.0,
+"cycling": true
+},
+{
+"name": "Sardar Jassa Singh Ramgarhia Park",
+"latitude": 28.63187,
+"longitude": 77.12265,
+"kind": "park",
+"area_m2": 173300.0,
+"cycling": true
+},
+{
+"name": "Shaheed Bhagat Singh Park",
+"latitude": 28.43167,
+"longitude": 77.47892,
+"kind": "park",
+"area_m2": 171700.0,
+"cycling": true
+},
+{
+"name": "Shri Maa Anandmayee Ashram Park",
+"latitude": 28.54331,
+"longitude": 77.27285,
+"kind": "park",
+"area_m2": 171000.0,
+"cycling": true
+},
+{
+"name": "Aravali Creek",
+"latitude": 28.46299,
+"longitude": 77.09884,
+"kind": "park",
+"area_m2": 170600.0,
+"cycling": true
+},
+{
+"name": "Tau Devi Lal Park",
+"latitude": 28.50211,
+"longitude": 77.05683,
+"kind": "park",
+"area_m2": 168200.0,
+"cycling": true
+},
+{
+"name": "Dr. Ram Manohar Lohia Park",
+"latitude": 28.68294,
+"longitude": 77.34913,
+"kind": "park",
+"area_m2": 155400.0,
+"cycling": true
+},
+{
+"name": "Smriti Vatika",
+"latitude": 28.58649,
+"longitude": 77.1736,
+"kind": "park",
+"area_m2": 151800.0,
+"cycling": true
+},
+{
+"name": "Tau Devi Lal Bio-Diversity and Botonical Garden",
+"latitude": 28.43274,
+"longitude": 77.09311,
+"kind": "park",
+"area_m2": 151200.0,
+"cycling": true
+},
+{
+"name": "Shyama Prasad Mukherji Park",
+"latitude": 28.64715,
+"longitude": 77.45819,
+"kind": "park",
+"area_m2": 149300.0,
+"cycling": true
+},
+{
+"name": "Roshanara Bagh",
+"latitude": 28.67347,
+"longitude": 77.19929,
+"kind": "park",
+"area_m2": 142600.0,
+"cycling": true
+},
+{
+"name": "District Park, Sector 23",
+"latitude": 28.56701,
+"longitude": 77.05168,
+"kind": "park",
+"area_m2": 136700.0,
+"cycling": true
+},
+{
+"name": "Bhagwan Mahavir Vanasthali Park",
+"latitude": 28.60349,
+"longitude": 77.17795,
+"kind": "park",
+"area_m2": 136300.0,
+"cycling": true
+},
+{
+"name": "Meghdootam Park",
+"latitude": 28.5755,
+"longitude": 77.37262,
+"kind": "park",
+"area_m2": 134100.0,
+"cycling": true
+},
+{
+"name": "Doctor Sushila Nayyar Park",
+"latitude": 28.62411,
+"longitude": 77.12204,
+"kind": "park",
+"area_m2": 133200.0,
+"cycling": true
+},
+{
+"name": "Picnic hut Ground",
+"latitude": 28.51188,
+"longitude": 77.1818,
+"kind": "park",
+"area_m2": 130800.0,
+"cycling": true
+},
+{
+"name": "Nasa Park",
+"latitude": 28.46713,
+"longitude": 77.49204,
+"kind": "park",
+"area_m2": 129600.0,
+"cycling": true
+},
+{
+"name": "Satpula Lake Park DSA",
+"latitude": 28.53348,
+"longitude": 77.22253,
+"kind": "park",
+"area_m2": 125800.0,
+"cycling": true
+},
+{
+"name": "District Park Sarita Vihar",
+"latitude": 28.52762,
+"longitude": 77.29208,
+"kind": "park",
+"area_m2": 125400.0,
+"cycling": true
+},
+{
+"name": "Ram Jas Park",
+"latitude": 28.65807,
+"longitude": 77.16729,
+"kind": "stadium",
+"area_m2": 123400.0,
+"cycling": true
+},
+{
+"name": "Hansraj Sethi Park",
+"latitude": 28.54691,
+"longitude": 77.26127,
+"kind": "park",
+"area_m2": 123100.0,
+"cycling": true
+},
+{
+"name": "Ajmal Khan Park",
+"latitude": 28.65346,
+"longitude": 77.19703,
+"kind": "park",
+"area_m2": 120400.0,
+"cycling": true
+},
+{
+"name": "Major Dhyan Chand National Stadium",
+"latitude": 28.61233,
+"longitude": 77.23733,
+"kind": "stadium",
+"area_m2": 119600.0,
+"cycling": true
+},
+{
+"name": "Salvage Park",
+"latitude": 28.61504,
+"longitude": 77.10998,
+"kind": "park",
+"area_m2": 117500.0,
+"cycling": true
+},
+{
+"name": "Chhatrapati Shivaji Park",
+"latitude": 28.65781,
+"longitude": 77.12681,
+"kind": "park",
+"area_m2": 116000.0,
+"cycling": true
+},
+{
+"name": "Shivaji Marg Park Part 1",
+"latitude": 28.6638,
+"longitude": 77.152,
+"kind": "park",
+"area_m2": 115200.0,
+"cycling": true
+},
+{
+"name": "Ashoka Park",
+"latitude": 28.56912,
+"longitude": 77.27674,
+"kind": "park",
+"area_m2": 115100.0,
+"cycling": true
+},
+{
+"name": "Ramlila Ground Ashok Vihar",
+"latitude": 28.6851,
+"longitude": 77.17063,
+"kind": "park",
+"area_m2": 113700.0,
+"cycling": true
+},
+{
+"name": "Jasola District Park",
+"latitude": 28.54046,
+"longitude": 77.28594,
+"kind": "park",
+"area_m2": 112800.0,
+"cycling": true
+},
+{
+"name": "District Park IP Extension Park",
+"latitude": 28.62703,
+"longitude": 77.3109,
+"kind": "park",
+"area_m2": 109500.0,
+"cycling": true
+},
+{
+"name": "DDA Park Sector 20",
+"latitude": 28.57382,
+"longitude": 77.06321,
+"kind": "park",
+"area_m2": 109000.0,
+"cycling": true
+},
+{
+"name": "Malabar Garden",
+"latitude": 28.63707,
+"longitude": 77.12719,
+"kind": "park",
+"area_m2": 107900.0,
+"cycling": true
+},
+{
+"name": "Railway Park",
+"latitude": 28.63813,
+"longitude": 77.29998,
+"kind": "park",
+"area_m2": 107500.0,
+"cycling": true
+},
+{
+"name": "Vikaspuri M Blocck District Park",
+"latitude": 28.63497,
+"longitude": 77.07431,
+"kind": "park",
+"area_m2": 107100.0,
+"cycling": true
+},
+{
+"name": "Silver Jubilee Park",
+"latitude": 28.4576,
+"longitude": 77.04835,
+"kind": "park",
+"area_m2": 104800.0,
+"cycling": true
+},
+{
+"name": "City Park",
+"latitude": 28.47332,
+"longitude": 77.52088,
+"kind": "park",
+"area_m2": 103200.0,
+"cycling": true
+},
+{
+"name": "Janak Vatika",
+"latitude": 28.67955,
+"longitude": 77.17698,
+"kind": "park",
+"area_m2": 100600.0,
+"cycling": true
+},
+{
+"name": "Butterfly Park Gurgaon",
+"latitude": 28.43645,
+"longitude": 77.09199,
+"kind": "park",
+"area_m2": 100500.0,
+"cycling": true
+},
+{
+"name": "The Garden of Five Senses",
+"latitude": 28.51379,
+"longitude": 77.1988,
+"kind": "park",
+"area_m2": 99400.0,
+"cycling": true
+},
+{
+"name": "Vasant Vatika",
+"latitude": 28.53435,
+"longitude": 77.1463,
+"kind": "park",
+"area_m2": 99000.0,
+"cycling": true
+},
+{
+"name": "Safdarjung's Tomb",
+"latitude": 28.58958,
+"longitude": 77.2108,
+"kind": "park",
+"area_m2": 98800.0,
+"cycling": true
+},
+{
+"name": "Rock Garden",
+"latitude": 28.64923,
+"longitude": 77.16924,
+"kind": "park",
+"area_m2": 96200.0,
+"cycling": true
+},
+{
+"name": "Nagar Van Park",
+"latitude": 28.6001,
+"longitude": 77.10089,
+"kind": "park",
+"area_m2": 95400.0,
+"cycling": true
+},
+{
+"name": "Bharat Darshan Park",
+"latitude": 28.66618,
+"longitude": 77.13487,
+"kind": "park",
+"area_m2": 90700.0,
+"cycling": true
+},
+{
+"name": "Hastal Phase || District Park",
+"latitude": 28.62898,
+"longitude": 77.06465,
+"kind": "park",
+"area_m2": 90300.0,
+"cycling": true
+},
+{
+"name": "Arpan Vihar Park",
+"latitude": 28.50638,
+"longitude": 77.33283,
+"kind": "park",
+"area_m2": 88800.0,
+"cycling": true
+},
+{
+"name": "Janakpur B Block District Park",
+"latitude": 28.62305,
+"longitude": 77.09027,
+"kind": "park",
+"area_m2": 87900.0,
+"cycling": true
+},
+{
+"name": "Ratan Wala Park",
+"latitude": 28.69937,
+"longitude": 77.19381,
+"kind": "park",
+"area_m2": 87500.0,
+"cycling": true
+},
+{
+"name": "District Park Nanakpura",
+"latitude": 28.58383,
+"longitude": 77.1708,
+"kind": "park",
+"area_m2": 87400.0,
+"cycling": true
+},
+{
+"name": "Sector 128 Park",
+"latitude": 28.51984,
+"longitude": 77.37415,
+"kind": "park",
+"area_m2": 86100.0,
+"cycling": true
+},
+{
+"name": "DDA Park Shahpur Jat",
+"latitude": 28.54566,
+"longitude": 77.21572,
+"kind": "park",
+"area_m2": 79600.0,
+"cycling": true
+},
+{
+"name": "Lala Lajpat Rai Memorial Park",
+"latitude": 28.56992,
+"longitude": 77.24847,
+"kind": "park",
+"area_m2": 78400.0,
+"cycling": true
+},
+{
+"name": "Nirankari Santokh Sarovar",
+"latitude": 28.72559,
+"longitude": 77.19967,
+"kind": "park",
+"area_m2": 76200.0,
+"cycling": true
+},
+{
+"name": "Amir Khusro Park",
+"latitude": 28.59486,
+"longitude": 77.24179,
+"kind": "park",
+"area_m2": 73900.0,
+"cycling": true
+},
+{
+"name": "HUDA Garden",
+"latitude": 28.47478,
+"longitude": 77.05327,
+"kind": "park",
+"area_m2": 73800.0,
+"cycling": true
+},
+{
+"name": "DDA \"Plus\" Park",
+"latitude": 28.59603,
+"longitude": 77.2971,
+"kind": "park",
+"area_m2": 71400.0,
+"cycling": true
+},
+{
+"name": "Asaf Ali Park",
+"latitude": 28.55043,
+"longitude": 77.2463,
+"kind": "park",
+"area_m2": 71200.0,
+"cycling": true
+},
+{
+"name": "Malibu Town Parks",
+"latitude": 28.42097,
+"longitude": 77.04257,
+"kind": "park",
+"area_m2": 71000.0,
+"cycling": true
+},
+{
+"name": "Saraswati vihar DIstrict Park",
+"latitude": 28.69758,
+"longitude": 77.12254,
+"kind": "park",
+"area_m2": 68900.0,
+"cycling": true
+},
+{
+"name": "Saheed Uddham Singh Park",
+"latitude": 28.46324,
+"longitude": 77.00122,
+"kind": "park",
+"area_m2": 68200.0,
+"cycling": true
+},
+{
+"name": "Sarvodaya Enclave Park",
+"latitude": 28.53533,
+"longitude": 77.20162,
+"kind": "park",
+"area_m2": 68000.0,
+"cycling": true
+},
+{
+"name": "Birla Mill District Park",
+"latitude": 28.67742,
+"longitude": 77.19816,
+"kind": "park",
+"area_m2": 67300.0,
+"cycling": true
+},
+{
+"name": "DDA Orchard Park",
+"latitude": 28.72899,
+"longitude": 77.13973,
+"kind": "park",
+"area_m2": 67200.0,
+"cycling": true
+},
+{
+"name": "Thyagaraj Park",
+"latitude": 28.57782,
+"longitude": 77.21525,
+"kind": "park",
+"area_m2": 66100.0,
+"cycling": true
+},
+{
+"name": "Andolan Park",
+"latitude": 28.54092,
+"longitude": 77.22178,
+"kind": "park",
+"area_m2": 65600.0,
+"cycling": true
+},
+{
+"name": "Sector 93A Park",
+"latitude": 28.52069,
+"longitude": 77.3795,
+"kind": "park",
+"area_m2": 65300.0,
+"cycling": true
+},
+{
+"name": "Bodella District Park",
+"latitude": 28.65041,
+"longitude": 77.07541,
+"kind": "park",
+"area_m2": 64800.0,
+"cycling": true
+},
+{
+"name": "Swarna Jayanti Park",
+"latitude": 28.64377,
+"longitude": 77.36835,
+"kind": "park",
+"area_m2": 64500.0,
+"cycling": true
+},
+{
+"name": "Keshopur District Park",
+"latitude": 28.6472,
+"longitude": 77.08215,
+"kind": "park",
+"area_m2": 64400.0,
+"cycling": true
+},
+{
+"name": "Rai Pithora Cultural Complex",
+"latitude": 28.52767,
+"longitude": 77.2025,
+"kind": "park",
+"area_m2": 63400.0,
+"cycling": true
+},
+{
+"name": "San Martin Park",
+"latitude": 28.59047,
+"longitude": 77.17509,
+"kind": "park",
+"area_m2": 62500.0,
+"cycling": true
+},
+{
+"name": "GULMOHAR PARK",
+"latitude": 28.55488,
+"longitude": 77.21072,
+"kind": "park",
+"area_m2": 61900.0,
+"cycling": true
+},
+{
+"name": "D Park",
+"latitude": 28.61686,
+"longitude": 77.36471,
+"kind": "park",
+"area_m2": 60300.0,
+"cycling": true
+},
+{
+"name": "Shree Atal Park",
+"latitude": 28.5539,
+"longitude": 77.23479,
+"kind": "park",
+"area_m2": 60200.0,
+"cycling": true
+},
+{
+"name": "Chiragh Dilli Nursery",
+"latitude": 28.54075,
+"longitude": 77.2297,
+"kind": "nature_reserve",
+"area_m2": 59900.0,
+"cycling": true
+},
+{
+"name": "Herbal Garden",
+"latitude": 28.66763,
+"longitude": 77.13445,
+"kind": "park",
+"area_m2": 59900.0,
+"cycling": true
+},
+{
+"name": "Indo-Korean Friendship Park",
+"latitude": 28.6016,
+"longitude": 77.13304,
+"kind": "park",
+"area_m2": 57300.0,
+"cycling": true
+},
+{
+"name": "Tughlakabad Recreational Complex",
+"latitude": 28.50931,
+"longitude": 77.26804,
+"kind": "park",
+"area_m2": 56600.0,
+"cycling": true
+},
+{
+"name": "Kargil Colony Park",
+"latitude": 28.58995,
+"longitude": 77.04113,
+"kind": "park",
+"area_m2": 56300.0,
+"cycling": true
+},
+{
+"name": "Saidulajaib Samudayik Park",
+"latitude": 28.51441,
+"longitude": 77.19994,
+"kind": "park",
+"area_m2": 56300.0,
+"cycling": true
+},
+{
+"name": "Ved Van Park",
+"latitude": 28.56074,
+"longitude": 77.38993,
+"kind": "park",
+"area_m2": 54400.0,
+"cycling": true
+},
+{
+"name": "Butterfly Park",
+"latitude": 28.52124,
+"longitude": 77.19869,
+"kind": "park",
+"area_m2": 54000.0,
+"cycling": true
+},
+{
+"name": "Chaudhary Ramkaran Solanki(Pradhan Palam 360) Memorial Park",
+"latitude": 28.59216,
+"longitude": 77.07287,
+"kind": "park",
+"area_m2": 53900.0,
+"cycling": true
+},
+{
+"name": "Sanjay Park",
+"latitude": 28.57989,
+"longitude": 77.20765,
+"kind": "park",
+"area_m2": 53900.0,
+"cycling": true
+},
+{
+"name": "Hathoda Park",
+"latitude": 28.6867,
+"longitude": 77.15702,
+"kind": "park",
+"area_m2": 53400.0,
+"cycling": true
+},
+{
+"name": "Children's Park",
+"latitude": 28.61096,
+"longitude": 77.23096,
+"kind": "park",
+"area_m2": 53000.0,
+"cycling": true
+},
+{
+"name": "Vasant Kunj Sec A Children Park",
+"latitude": 28.51214,
+"longitude": 77.16841,
+"kind": "park",
+"area_m2": 52500.0,
+"cycling": true
+},
+{
+"name": "Atal Bihari Vajpayee Sadbhavna Park",
+"latitude": 28.64292,
+"longitude": 77.2461,
+"kind": "park",
+"area_m2": 52300.0,
+"cycling": true
+},
+{
+"name": "Tugalpur Park",
+"latitude": 28.46952,
+"longitude": 77.50106,
+"kind": "park",
+"area_m2": 52200.0,
+"cycling": true
+},
+{
+"name": "Sangam Vihar DDA Park",
+"latitude": 28.51064,
+"longitude": 77.24447,
+"kind": "park",
+"area_m2": 51800.0,
+"cycling": true
+},
+{
+"name": "Maharaja Surajmal Park",
+"latitude": 28.66393,
+"longitude": 77.30197,
+"kind": "park",
+"area_m2": 51100.0,
+"cycling": true
+},
+{
+"name": "RGA FLAT POCKET-A DDA PARK RAGHUBIR NAGAR",
+"latitude": 28.65625,
+"longitude": 77.10707,
+"kind": "park",
+"area_m2": 49400.0,
+"cycling": true
+},
+{
+"name": "N Block Park",
+"latitude": 28.55896,
+"longitude": 77.23446,
+"kind": "park",
+"area_m2": 49200.0,
+"cycling": true
+},
+{
+"name": "Prasad Nagar Park",
+"latitude": 28.64708,
+"longitude": 77.17864,
+"kind": "park",
+"area_m2": 48400.0,
+"cycling": true
+},
+{
+"name": "Noida Authority Park",
+"latitude": 28.49757,
+"longitude": 77.42077,
+"kind": "park",
+"area_m2": 48400.0,
+"cycling": true
+},
+{
+"name": "Central Park B1",
+"latitude": 28.62907,
+"longitude": 77.08975,
+"kind": "park",
+"area_m2": 48000.0,
+"cycling": true
+},
+{
+"name": "Herbal Park",
+"latitude": 28.59517,
+"longitude": 77.06348,
+"kind": "park",
+"area_m2": 47900.0,
+"cycling": true
+},
+{
+"name": "Rajiv Gandhi Stadium (Bawana, Delhi)",
+"latitude": 28.80224,
+"longitude": 77.02848,
+"kind": "stadium",
+"area_m2": 47300.0,
+"cycling": true
+},
+{
+"name": "Sadiq Nagar Park",
+"latitude": 28.55712,
+"longitude": 77.22705,
+"kind": "park",
+"area_m2": 47200.0,
+"cycling": true
+},
+{
+"name": "D.D.A. Park - 4, Sector - 23",
+"latitude": 28.56186,
+"longitude": 77.05436,
+"kind": "park",
+"area_m2": 46700.0,
+"cycling": true
+},
+{
+"name": "Ansal Plaza Park",
+"latitude": 28.56214,
+"longitude": 77.22622,
+"kind": "park",
+"area_m2": 46100.0,
+"cycling": true
+},
+{
+"name": "S Block Park",
+"latitude": 28.53156,
+"longitude": 77.24198,
+"kind": "park",
+"area_m2": 45600.0,
+"cycling": true
+},
+{
+"name": "India Gate Park",
+"latitude": 28.61176,
+"longitude": 77.22919,
+"kind": "park",
+"area_m2": 45100.0,
+"cycling": true
+},
+{
+"name": "Park no 3, Sector 9 Dwarka",
+"latitude": 28.57978,
+"longitude": 77.06897,
+"kind": "park",
+"area_m2": 44100.0,
+"cycling": true
+},
+{
+"name": "A-Block Park Sector 52",
+"latitude": 28.58818,
+"longitude": 77.3717,
+"kind": "park",
+"area_m2": 43800.0,
+"cycling": true
+},
+{
+"name": "Public Park",
+"latitude": 28.60177,
+"longitude": 77.04598,
+"kind": "park",
+"area_m2": 43400.0,
+"cycling": true
+},
+{
+"name": "R K Khanna Tennis Stadium",
+"latitude": 28.55904,
+"longitude": 77.18815,
+"kind": "stadium",
+"area_m2": 43400.0,
+"cycling": true
+},
+{
+"name": "Subhash Park",
+"latitude": 28.70811,
+"longitude": 77.15822,
+"kind": "park",
+"area_m2": 43300.0,
+"cycling": true
+},
+{
+"name": "Millenium Ground",
+"latitude": 28.51062,
+"longitude": 77.30556,
+"kind": "park",
+"area_m2": 42500.0,
+"cycling": true
+},
+{
+"name": "CH Lekharam Park",
+"latitude": 28.69119,
+"longitude": 77.17117,
+"kind": "park",
+"area_m2": 41700.0,
+"cycling": true
+},
+{
+"name": "Maharaja Agersen Park",
+"latitude": 28.72745,
+"longitude": 77.08718,
+"kind": "park",
+"area_m2": 41700.0,
+"cycling": true
+},
+{
+"name": "Centennial Arboretum",
+"latitude": 28.69033,
+"longitude": 77.21354,
+"kind": "garden",
+"area_m2": 41100.0,
+"cycling": true
+},
+{
+"name": "Plaza-Park",
+"latitude": 28.59777,
+"longitude": 77.06843,
+"kind": "park",
+"area_m2": 40600.0,
+"cycling": true
+},
+{
+"name": "District Public Park",
+"latitude": 28.61552,
+"longitude": 77.02643,
+"kind": "park",
+"area_m2": 39700.0,
+"cycling": true
+},
+{
+"name": "Bahubali Park",
+"latitude": 28.65598,
+"longitude": 77.30536,
+"kind": "park",
+"area_m2": 39600.0,
+"cycling": true
+},
+{
+"name": "Town Park",
+"latitude": 28.44029,
+"longitude": 77.31652,
+"kind": "park",
+"area_m2": 39300.0,
+"cycling": true
+},
+{
+"name": "Sector 108 Noida Central Park",
+"latitude": 28.52829,
+"longitude": 77.37752,
+"kind": "park",
+"area_m2": 39200.0,
+"cycling": true
+},
+{
+"name": "eco park",
+"latitude": 28.51773,
+"longitude": 77.31863,
+"kind": "park",
+"area_m2": 38700.0,
+"cycling": true
+},
+{
+"name": "Karnail Singh Stadium",
+"latitude": 28.63814,
+"longitude": 77.21632,
+"kind": "stadium",
+"area_m2": 38600.0,
+"cycling": true
+},
+{
+"name": "Triphala Park",
+"latitude": 28.59477,
+"longitude": 77.3685,
+"kind": "park",
+"area_m2": 38300.0,
+"cycling": true
+},
+{
+"name": "shiv vatika",
+"latitude": 28.66586,
+"longitude": 77.31743,
+"kind": "park",
+"area_m2": 38000.0,
+"cycling": true
+},
+{
+"name": "Rani Laxmi Bai Park",
+"latitude": 28.73187,
+"longitude": 77.12862,
+"kind": "park",
+"area_m2": 37600.0,
+"cycling": true
+},
+{
+"name": "Tara Vala Park",
+"latitude": 28.52576,
+"longitude": 77.18907,
+"kind": "park",
+"area_m2": 37500.0,
+"cycling": true
+},
+{
+"name": "chowki wala park",
+"latitude": 28.69746,
+"longitude": 77.27301,
+"kind": "park",
+"area_m2": 37400.0,
+"cycling": true
+},
+{
+"name": "Moola Mal Bhatia Park",
+"latitude": 28.63904,
+"longitude": 77.18864,
+"kind": "park",
+"area_m2": 37300.0,
+"cycling": true
+},
+{
+"name": "E-Block Park Sector 52",
+"latitude": 28.59049,
+"longitude": 77.37125,
+"kind": "park",
+"area_m2": 36500.0,
+"cycling": true
+},
+{
+"name": "Talab Park",
+"latitude": 28.41976,
+"longitude": 77.31579,
+"kind": "park",
+"area_m2": 36200.0,
+"cycling": true
+},
+{
+"name": "Indira Gandhi Mahila Park",
+"latitude": 28.61185,
+"longitude": 77.30928,
+"kind": "park",
+"area_m2": 36100.0,
+"cycling": true
+},
+{
+"name": "Deen Dayal Upadhyay Park",
+"latitude": 28.63503,
+"longitude": 77.2297,
+"kind": "park",
+"area_m2": 36100.0,
+"cycling": true
+},
+{
+"name": "Pt Ram Keval Mishra Park",
+"latitude": 28.59718,
+"longitude": 77.37071,
+"kind": "park",
+"area_m2": 35100.0,
+"cycling": true
+},
+{
+"name": "Park",
+"latitude": 28.58916,
+"longitude": 77.06436,
+"kind": "park",
+"area_m2": 35100.0,
+"cycling": true
+},
+{
+"name": "Park 3",
+"latitude": 28.59407,
+"longitude": 77.06762,
+"kind": "park",
+"area_m2": 34700.0,
+"cycling": true
+},
+{
+"name": "Rajiv Chowk Central Park",
+"latitude": 28.63281,
+"longitude": 77.21971,
+"kind": "park",
+"area_m2": 34500.0,
+"cycling": true
+},
+{
+"name": "Shalimar Garden",
+"latitude": 28.70784,
+"longitude": 77.18963,
+"kind": "park",
+"area_m2": 34200.0,
+"cycling": true
+},
+{
+"name": "Mahavir Swami Park",
+"latitude": 28.6401,
+"longitude": 77.2969,
+"kind": "park",
+"area_m2": 34200.0,
+"cycling": true
+},
+{
+"name": "Bindra Park",
+"latitude": 28.64235,
+"longitude": 77.1252,
+"kind": "park",
+"area_m2": 34200.0,
+"cycling": true
+},
+{
+"name": "Green Strip Sarvapriya Vihar",
+"latitude": 28.54244,
+"longitude": 77.20853,
+"kind": "park",
+"area_m2": 34100.0,
+"cycling": true
+},
+{
+"name": "Machhli Park , Mehrauli , Ward No 8",
+"latitude": 28.51784,
+"longitude": 77.17151,
+"kind": "park",
+"area_m2": 33900.0,
+"cycling": true
+},
+{
+"name": "Plant Nursery",
+"latitude": 28.66073,
+"longitude": 77.44772,
+"kind": "garden",
+"area_m2": 33300.0,
+"cycling": true
+},
+{
+"name": "Swami Ramteerath",
+"latitude": 28.64421,
+"longitude": 77.46116,
+"kind": "park",
+"area_m2": 32900.0,
+"cycling": true
+},
+{
+"name": "SPG COMPLEX",
+"latitude": 28.56644,
+"longitude": 77.06986,
+"kind": "park",
+"area_m2": 31900.0,
+"cycling": true
+},
+{
+"name": "Noida Cricket Stadium",
+"latitude": 28.59002,
+"longitude": 77.33907,
+"kind": "stadium",
+"area_m2": 31600.0,
+"cycling": true
+},
+{
+"name": "Sector 45 Community park",
+"latitude": 28.44232,
+"longitude": 77.06741,
+"kind": "park",
+"area_m2": 31500.0,
+"cycling": true
+},
+{
+"name": "GDA Park",
+"latitude": 28.63308,
+"longitude": 77.34349,
+"kind": "park",
+"area_m2": 31300.0,
+"cycling": true
+},
+{
+"name": "Saket District Park",
+"latitude": 28.52715,
+"longitude": 77.20956,
+"kind": "park",
+"area_m2": 31300.0,
+"cycling": true
+},
+{
+"name": "Gaur City Stadium",
+"latitude": 28.61083,
+"longitude": 77.42582,
+"kind": "park",
+"area_m2": 30800.0,
+"cycling": true
+},
+{
+"name": "Sector 132 Park",
+"latitude": 28.51758,
+"longitude": 77.37671,
+"kind": "park",
+"area_m2": 30600.0,
+"cycling": true
+},
+{
+"name": "Kya Maya Park",
+"latitude": 28.50651,
+"longitude": 77.26943,
+"kind": "park",
+"area_m2": 30200.0,
+"cycling": true
+},
+{
+"name": "Bank Enclave Playground",
+"latitude": 28.64186,
+"longitude": 77.27165,
+"kind": "park",
+"area_m2": 29500.0,
+"cycling": true
+},
+{
+"name": "Sector 46 Central Park",
+"latitude": 28.4344,
+"longitude": 77.06073,
+"kind": "park",
+"area_m2": 29300.0,
+"cycling": true
+},
+{
+"name": "Fresco Green Point",
+"latitude": 28.51259,
+"longitude": 77.40505,
+"kind": "park",
+"area_m2": 28400.0,
+"cycling": true
+},
+{
+"name": "samadhan hub park",
+"latitude": 28.45524,
+"longitude": 77.08923,
+"kind": "park",
+"area_m2": 28300.0,
+"cycling": true
+},
+{
+"name": "Amrit Udyan",
+"latitude": 28.61444,
+"longitude": 77.1979,
+"kind": "garden",
+"area_m2": 27700.0,
+"cycling": true
+},
+{
+"name": "Bhonga Park",
+"latitude": 28.62443,
+"longitude": 77.27711,
+"kind": "park",
+"area_m2": 27600.0,
+"cycling": true
+},
+{
+"name": "Dev Ahilya Bai Park",
+"latitude": 28.64374,
+"longitude": 77.36356,
+"kind": "park",
+"area_m2": 27300.0,
+"cycling": true
+},
+{
+"name": "Krishna Vatika Park",
+"latitude": 28.64786,
+"longitude": 77.33611,
+"kind": "park",
+"area_m2": 27300.0,
+"cycling": true
+},
+{
+"name": "National Police Memorial Complex",
+"latitude": 28.60336,
+"longitude": 77.19391,
+"kind": "park",
+"area_m2": 26300.0,
+"cycling": true
+},
+{
+"name": "Char Bagh Najaf Khan Tomb",
+"latitude": 28.58087,
+"longitude": 77.21354,
+"kind": "park",
+"area_m2": 26000.0,
+"cycling": true
+},
+{
+"name": "Nahar Singh Stadium",
+"latitude": 28.38706,
+"longitude": 77.29574,
+"kind": "stadium",
+"area_m2": 25800.0,
+"cycling": true
+},
+{
+"name": "C-Block Park, Preet Vihar",
+"latitude": 28.63608,
+"longitude": 77.29119,
+"kind": "park",
+"area_m2": 25700.0,
+"cycling": true
+},
+{
+"name": "Ericsson Park",
+"latitude": 28.6307,
+"longitude": 77.36493,
+"kind": "park",
+"area_m2": 25600.0,
+"cycling": true
+},
+{
+"name": "Sector 9 Ground",
+"latitude": 28.46063,
+"longitude": 76.99899,
+"kind": "park",
+"area_m2": 25500.0,
+"cycling": true
+},
+{
+"name": "Shahid Bhagat Singh Park",
+"latitude": 28.5956,
+"longitude": 77.0905,
+"kind": "park",
+"area_m2": 25300.0,
+"cycling": true
+},
+{
+"name": "Srinagesh Garden",
+"latitude": 28.59766,
+"longitude": 77.14091,
+"kind": "park",
+"area_m2": 25200.0,
+"cycling": true
+},
+{
+"name": "Jagriti Park",
+"latitude": 28.62686,
+"longitude": 77.30681,
+"kind": "park",
+"area_m2": 25000.0,
+"cycling": true
+},
+{
+"name": "East Kidwai Nagar - Eco Park",
+"latitude": 28.57222,
+"longitude": 77.21665,
+"kind": "park",
+"area_m2": 25000.0,
+"cycling": true
+},
+{
+"name": "Udham Singh Park",
+"latitude": 28.62976,
+"longitude": 77.11461,
+"kind": "park",
+"area_m2": 24900.0,
+"cycling": true
+},
+{
+"name": "3C park",
+"latitude": 28.39359,
+"longitude": 77.29165,
+"kind": "park",
+"area_m2": 24800.0,
+"cycling": true
+},
+{
+"name": "jhilmil deer park",
+"latitude": 28.66877,
+"longitude": 77.31342,
+"kind": "park",
+"area_m2": 24800.0,
+"cycling": true
+},
+{
+"name": "Katyani Maa Park",
+"latitude": 28.71596,
+"longitude": 77.13334,
+"kind": "park",
+"area_m2": 24600.0,
+"cycling": true
+},
+{
+"name": "B Block Surajmal Vihar Park",
+"latitude": 28.6615,
+"longitude": 77.30689,
+"kind": "park",
+"area_m2": 24500.0,
+"cycling": true
+},
+{
+"name": "Central Park, Sector 4",
+"latitude": 28.64738,
+"longitude": 77.34265,
+"kind": "park",
+"area_m2": 24000.0,
+"cycling": true
+},
+{
+"name": "Shani Bazar Park",
+"latitude": 28.57939,
+"longitude": 77.32541,
+"kind": "park",
+"area_m2": 23500.0,
+"cycling": true
+},
+{
+"name": "Thyagaraj Stadium",
+"latitude": 28.57718,
+"longitude": 77.21697,
+"kind": "stadium",
+"area_m2": 23500.0,
+"cycling": true
+},
+{
+"name": "Sector 11 Park",
+"latitude": 28.5928,
+"longitude": 77.05007,
+"kind": "park",
+"area_m2": 23400.0,
+"cycling": true
+},
+{
+"name": "Delhi Development Authority Green Area",
+"latitude": 28.57174,
+"longitude": 77.24094,
+"kind": "park",
+"area_m2": 23400.0,
+"cycling": true
+},
+{
+"name": "Chhatrasal Stadium",
+"latitude": 28.70377,
+"longitude": 77.18726,
+"kind": "stadium",
+"area_m2": 23300.0,
+"cycling": true
+},
+{
+"name": "Aadarsh Park",
+"latitude": 28.66611,
+"longitude": 77.37477,
+"kind": "park",
+"area_m2": 22700.0,
+"cycling": true
+},
+{
+"name": "Fateh Nagar Public Park",
+"latitude": 28.63286,
+"longitude": 77.10238,
+"kind": "park",
+"area_m2": 22600.0,
+"cycling": true
+},
+{
+"name": "Jamun Wala Park",
+"latitude": 28.53019,
+"longitude": 77.21712,
+"kind": "park",
+"area_m2": 22500.0,
+"cycling": true
+},
+{
+"name": "indo gulf park",
+"latitude": 28.57726,
+"longitude": 77.32695,
+"kind": "park",
+"area_m2": 21800.0,
+"cycling": true
+},
+{
+"name": "Neighbourhood Park",
+"latitude": 28.60895,
+"longitude": 77.10749,
+"kind": "park",
+"area_m2": 21800.0,
+"cycling": true
+},
+{
+"name": "GGSIPU Grounds",
+"latitude": 28.59407,
+"longitude": 77.018,
+"kind": "park",
+"area_m2": 21700.0,
+"cycling": true
+},
+{
+"name": "central park",
+"latitude": 28.67127,
+"longitude": 77.18985,
+"kind": "park",
+"area_m2": 21700.0,
+"cycling": true
+},
+{
+"name": "Guitar Park",
+"latitude": 28.6733,
+"longitude": 77.08393,
+"kind": "park",
+"area_m2": 21200.0,
+"cycling": true
+},
+{
+"name": "Ram Leela ground",
+"latitude": 28.59225,
+"longitude": 77.3407,
+"kind": "park",
+"area_m2": 21000.0,
+"cycling": true
+},
+{
+"name": "Triveni DDA Park",
+"latitude": 28.53906,
+"longitude": 77.22418,
+"kind": "park",
+"area_m2": 20900.0,
+"cycling": true
+},
+{
+"name": "rajesh pilot park",
+"latitude": 28.69876,
+"longitude": 77.28272,
+"kind": "park",
+"area_m2": 20900.0,
+"cycling": true
+},
+{
+"name": "Sports Park",
+"latitude": 28.7052,
+"longitude": 77.12505,
+"kind": "park",
+"area_m2": 20900.0,
+"cycling": true
+},
+{
+"name": "HANUMAN VATIKA",
+"latitude": 28.68146,
+"longitude": 77.31615,
+"kind": "park",
+"area_m2": 20700.0,
+"cycling": true
+},
+{
+"name": "Lok Nayak Jaya Prakash Narayan Memorial Park",
+"latitude": 28.63588,
+"longitude": 77.24229,
+"kind": "park",
+"area_m2": 20600.0,
+"cycling": true
+},
+{
+"name": "80 SFS Park",
+"latitude": 28.62363,
+"longitude": 77.11775,
+"kind": "park",
+"area_m2": 20400.0,
+"cycling": true
+},
+{
+"name": "Purdah Bagh",
+"latitude": 28.64923,
+"longitude": 77.24071,
+"kind": "park",
+"area_m2": 20100.0,
+"cycling": true
+},
+{
+"name": "Janmashtami Park",
+"latitude": 28.6625,
+"longitude": 77.0929,
+"kind": "park",
+"area_m2": 20000.0,
+"cycling": true
+},
+{
+"name": "HCL open park",
+"latitude": 28.53674,
+"longitude": 77.34412,
+"kind": "park",
+"area_m2": 19800.0,
+"cycling": true
+},
+{
+"name": "RBI Enclave District Park",
+"latitude": 28.66649,
+"longitude": 77.09609,
+"kind": "park",
+"area_m2": 19400.0,
+"cycling": true
+},
+{
+"name": "Commonwealth stadium",
+"latitude": 28.61537,
+"longitude": 77.27354,
+"kind": "stadium",
+"area_m2": 19400.0,
+"cycling": true
+},
+{
+"name": "Cricket Ground",
+"latitude": 28.67713,
+"longitude": 77.38438,
+"kind": "stadium",
+"area_m2": 19300.0,
+"cycling": true
+},
+{
+"name": "Golf course",
+"latitude": 28.63872,
+"longitude": 76.99941,
+"kind": "park",
+"area_m2": 19300.0,
+"cycling": true
+},
+{
+"name": "Tikona Park",
+"latitude": 28.63498,
+"longitude": 77.36528,
+"kind": "park",
+"area_m2": 19200.0,
+"cycling": true
+},
+{
+"name": "Lalita Park",
+"latitude": 28.63216,
+"longitude": 77.27148,
+"kind": "park",
+"area_m2": 19200.0,
+"cycling": true
+},
+{
+"name": "Netaji Subhash Sports Complex",
+"latitude": 28.53904,
+"longitude": 77.29072,
+"kind": "park",
+"area_m2": 19000.0,
+"cycling": true
+},
+{
+"name": "Ajay Ahuja Park",
+"latitude": 28.5857,
+"longitude": 77.23086,
+"kind": "park",
+"area_m2": 19000.0,
+"cycling": true
+},
+{
+"name": "Chirag Delhi Park",
+"latitude": 28.53833,
+"longitude": 77.23117,
+"kind": "park",
+"area_m2": 19000.0,
+"cycling": true
+},
+{
+"name": "BK Ganjoo Memorial Park",
+"latitude": 28.63136,
+"longitude": 77.20165,
+"kind": "park",
+"area_m2": 19000.0,
+"cycling": true
+},
+{
+"name": "Mother Dairy Park",
+"latitude": 28.64583,
+"longitude": 77.34027,
+"kind": "park",
+"area_m2": 19000.0,
+"cycling": true
+},
+{
+"name": "Shri Ved Prakash Jindal Park",
+"latitude": 28.66276,
+"longitude": 77.12927,
+"kind": "park",
+"area_m2": 19000.0,
+"cycling": true
+},
+{
+"name": "Maharaja Agrasen Park",
+"latitude": 28.66787,
+"longitude": 77.22594,
+"kind": "park",
+"area_m2": 18900.0,
+"cycling": true
+},
+{
+"name": "Indira Gandhi Arena",
+"latitude": 28.63117,
+"longitude": 77.24956,
+"kind": "stadium",
+"area_m2": 18500.0,
+"cycling": true
+},
+{
+"name": "Barwala Cricket Stadium",
+"latitude": 28.76973,
+"longitude": 77.0616,
+"kind": "stadium",
+"area_m2": 18300.0,
+"cycling": true
+},
+{
+"name": "Bhagwan Shri Parshuram Park",
+"latitude": 28.62401,
+"longitude": 77.10989,
+"kind": "park",
+"area_m2": 18000.0,
+"cycling": true
+},
+{
+"name": "Sapna Park",
+"latitude": 28.55956,
+"longitude": 77.2453,
+"kind": "park",
+"area_m2": 17700.0,
+"cycling": true
+},
+{
+"name": "Kamla Nehru Park",
+"latitude": 28.66886,
+"longitude": 77.20869,
+"kind": "park",
+"area_m2": 17700.0,
+"cycling": true
+},
+{
+"name": "Guru Tegh Bahadur Park",
+"latitude": 28.64421,
+"longitude": 77.13737,
+"kind": "park",
+"area_m2": 17700.0,
+"cycling": true
+},
+{
+"name": "sarita vihar park",
+"latitude": 28.52781,
+"longitude": 77.29109,
+"kind": "park",
+"area_m2": 17600.0,
+"cycling": true
+},
+{
+"name": "Dargah Peer Banwasi Park",
+"latitude": 28.63886,
+"longitude": 77.20699,
+"kind": "park",
+"area_m2": 17600.0,
+"cycling": true
+},
+{
+"name": "Sindhi Park",
+"latitude": 28.64006,
+"longitude": 77.18698,
+"kind": "park",
+"area_m2": 17400.0,
+"cycling": true
+},
+{
+"name": "Dr. Ambedkar Stadium",
+"latitude": 28.63911,
+"longitude": 77.24227,
+"kind": "stadium",
+"area_m2": 17400.0,
+"cycling": true
+},
+{
+"name": "Company Bagh",
+"latitude": 28.6588,
+"longitude": 77.22763,
+"kind": "park",
+"area_m2": 17300.0,
+"cycling": true
+},
+{
+"name": "Mandir Park",
+"latitude": 28.57909,
+"longitude": 77.32745,
+"kind": "park",
+"area_m2": 17300.0,
+"cycling": true
+},
+{
+"name": "B-4 park",
+"latitude": 28.7,
+"longitude": 77.26656,
+"kind": "park",
+"area_m2": 17300.0,
+"cycling": true
+},
+{
+"name": "Maharaja Ranjit Singh Park",
+"latitude": 28.56138,
+"longitude": 77.21415,
+"kind": "park",
+"area_m2": 17000.0,
+"cycling": true
+},
+{
+"name": "3rd of February Park",
+"latitude": 28.68535,
+"longitude": 77.18688,
+"kind": "park",
+"area_m2": 17000.0,
+"cycling": true
+},
+{
+"name": "R-block park",
+"latitude": 28.54694,
+"longitude": 77.24231,
+"kind": "park",
+"area_m2": 16900.0,
+"cycling": true
+},
+{
+"name": "panchvati park",
+"latitude": 28.68907,
+"longitude": 77.27055,
+"kind": "park",
+"area_m2": 16900.0,
+"cycling": true
+},
+{
+"name": "BRICS Friendship Rose Garden",
+"latitude": 28.58731,
+"longitude": 77.1864,
+"kind": "park",
+"area_m2": 16900.0,
+"cycling": true
+},
+{
+"name": "DDA Park III Panchsheel Park",
+"latitude": 28.54572,
+"longitude": 77.20971,
+"kind": "park",
+"area_m2": 16800.0,
+"cycling": true
+},
+{
+"name": "Singapore Park",
+"latitude": 28.5884,
+"longitude": 77.18032,
+"kind": "park",
+"area_m2": 16700.0,
+"cycling": true
+},
+{
+"name": "Kailash Colony Park",
+"latitude": 28.55337,
+"longitude": 77.24163,
+"kind": "park",
+"area_m2": 16500.0,
+"cycling": true
+},
+{
+"name": "RK Khanna Tennis Park",
+"latitude": 28.55845,
+"longitude": 77.18789,
+"kind": "park",
+"area_m2": 16400.0,
+"cycling": true
+},
+{
+"name": "Mahendra Park",
+"latitude": 28.72168,
+"longitude": 77.1669,
+"kind": "park",
+"area_m2": 16300.0,
+"cycling": true
+},
+{
+"name": "Hayat Bakhsh",
+"latitude": 28.65775,
+"longitude": 77.24294,
+"kind": "garden",
+"area_m2": 16200.0,
+"cycling": true
+},
+{
+"name": "Loni  Gol Chakar Park",
+"latitude": 28.70201,
+"longitude": 77.29076,
+"kind": "park",
+"area_m2": 16200.0,
+"cycling": true
+},
+{
+"name": "India Africa Friendship Rose Garden",
+"latitude": 28.58793,
+"longitude": 77.18495,
+"kind": "park",
+"area_m2": 16100.0,
+"cycling": true
+},
+{
+"name": "Sector 34 Park",
+"latitude": 28.58377,
+"longitude": 77.35677,
+"kind": "park",
+"area_m2": 16100.0,
+"cycling": true
+},
+{
+"name": "Ashokan Edict",
+"latitude": 28.55844,
+"longitude": 77.25655,
+"kind": "park",
+"area_m2": 16100.0,
+"cycling": true
+},
+{
+"name": "Multi Gym Park",
+"latitude": 28.63418,
+"longitude": 77.07276,
+"kind": "park",
+"area_m2": 15900.0,
+"cycling": true
+},
+{
+"name": "Phase-1 Park",
+"latitude": 28.70184,
+"longitude": 77.43445,
+"kind": "park",
+"area_m2": 15900.0,
+"cycling": true
+},
+{
+"name": "Priyadarshani Park",
+"latitude": 28.59656,
+"longitude": 77.33887,
+"kind": "park",
+"area_m2": 15700.0,
+"cycling": true
+},
+{
+"name": "NIT 5 Park",
+"latitude": 28.39959,
+"longitude": 77.29803,
+"kind": "park",
+"area_m2": 15700.0,
+"cycling": true
+},
+{
+"name": "Dhingra Park",
+"latitude": 28.67078,
+"longitude": 77.14193,
+"kind": "park",
+"area_m2": 15700.0,
+"cycling": true
+},
+{
+"name": "Shaheed Major Sanjay Lohchub Park",
+"latitude": 28.59069,
+"longitude": 77.06099,
+"kind": "park",
+"area_m2": 15600.0,
+"cycling": true
+},
+{
+"name": "Thakur Vatika",
+"latitude": 28.52173,
+"longitude": 77.21362,
+"kind": "park",
+"area_m2": 15600.0,
+"cycling": true
+},
+{
+"name": "Arun Jaitley Park",
+"latitude": 28.55334,
+"longitude": 77.22724,
+"kind": "park",
+"area_m2": 15600.0,
+"cycling": true
+},
+{
+"name": "Senior Citizen's Park",
+"latitude": 28.60141,
+"longitude": 77.08516,
+"kind": "park",
+"area_m2": 15500.0,
+"cycling": true
+},
+{
+"name": "Munirka Village Park",
+"latitude": 28.55858,
+"longitude": 77.17217,
+"kind": "park",
+"area_m2": 15300.0,
+"cycling": true
+},
+{
+"name": "Imperia Towers Park",
+"latitude": 28.423,
+"longitude": 77.04149,
+"kind": "park",
+"area_m2": 15200.0,
+"cycling": true
+},
+{
+"name": "Shamshi park",
+"latitude": 28.51393,
+"longitude": 77.17796,
+"kind": "park",
+"area_m2": 15100.0,
+"cycling": true
+},
+{
+"name": "Delhi Cantonment Children Park 1",
+"latitude": 28.59339,
+"longitude": 77.1256,
+"kind": "park",
+"area_m2": 15000.0,
+"cycling": true
+},
+{
+"name": "Hanuman Park",
+"latitude": 28.53686,
+"longitude": 77.23106,
+"kind": "park",
+"area_m2": 14900.0,
+"cycling": true
+},
+{
+"name": "Maharishi Dayanand Saraswati Park",
+"latitude": 28.63095,
+"longitude": 77.07797,
+"kind": "park",
+"area_m2": 14800.0,
+"cycling": true
+},
+{
+"name": "Sheesham Park",
+"latitude": 28.56319,
+"longitude": 77.26758,
+"kind": "park",
+"area_m2": 14700.0,
+"cycling": true
+},
+{
+"name": "Vice Chancellor's Lawn",
+"latitude": 28.68963,
+"longitude": 77.21227,
+"kind": "park",
+"area_m2": 14700.0,
+"cycling": true
+},
+{
+"name": "dda pak",
+"latitude": 28.68244,
+"longitude": 77.27391,
+"kind": "park",
+"area_m2": 14700.0,
+"cycling": true
+},
+{
+"name": "Khajoor Wala Park",
+"latitude": 28.68688,
+"longitude": 77.30425,
+"kind": "park",
+"area_m2": 14700.0,
+"cycling": true
+},
+{
+"name": "Common running track",
+"latitude": 28.61009,
+"longitude": 77.28813,
+"kind": "track",
+"area_m2": 14700.0,
+"cycling": true
+},
+{
+"name": "Sports Complex, Sector 45",
+"latitude": 28.4413,
+"longitude": 77.06564,
+"kind": "park",
+"area_m2": 14600.0,
+"cycling": true
+},
+{
+"name": "Bindapur Park",
+"latitude": 28.60948,
+"longitude": 77.06702,
+"kind": "park",
+"area_m2": 14400.0,
+"cycling": true
+},
+{
+"name": "Central Greens",
+"latitude": 28.5129,
+"longitude": 77.02672,
+"kind": "park",
+"area_m2": 14400.0,
+"cycling": true
+},
+{
+"name": "Tree Garden",
+"latitude": 28.66392,
+"longitude": 77.43777,
+"kind": "park",
+"area_m2": 14300.0,
+"cycling": true
+},
+{
+"name": "Uma Park",
+"latitude": 28.68019,
+"longitude": 77.18765,
+"kind": "park",
+"area_m2": 14300.0,
+"cycling": true
+},
+{
+"name": "Neighborhood Park",
+"latitude": 28.67821,
+"longitude": 77.08537,
+"kind": "park",
+"area_m2": 14100.0,
+"cycling": true
+},
+{
+"name": "Shankar Garden",
+"latitude": 28.63125,
+"longitude": 77.06975,
+"kind": "park",
+"area_m2": 14100.0,
+"cycling": true
+},
+{
+"name": "Saket Park",
+"latitude": 28.52384,
+"longitude": 77.20592,
+"kind": "park",
+"area_m2": 14000.0,
+"cycling": true
+},
+{
+"name": "Park behind V3S Mall",
+"latitude": 28.63829,
+"longitude": 77.28629,
+"kind": "park",
+"area_m2": 14000.0,
+"cycling": true
+},
+{
+"name": "T-Park",
+"latitude": 28.60693,
+"longitude": 77.29252,
+"kind": "park",
+"area_m2": 14000.0,
+"cycling": true
+},
+{
+"name": "S.D.M.C. Park",
+"latitude": 28.56378,
+"longitude": 77.05259,
+"kind": "park",
+"area_m2": 13900.0,
+"cycling": true
+},
+{
+"name": "Football Park",
+"latitude": 28.57358,
+"longitude": 77.05362,
+"kind": "park",
+"area_m2": 13700.0,
+"cycling": true
+},
+{
+"name": "Aarush Garg Park",
+"latitude": 28.67722,
+"longitude": 77.18951,
+"kind": "park",
+"area_m2": 13600.0,
+"cycling": true
+},
+{
+"name": "Podium Park",
+"latitude": 28.6486,
+"longitude": 77.33734,
+"kind": "park",
+"area_m2": 13600.0,
+"cycling": true
+},
+{
+"name": "Palika Park",
+"latitude": 28.63071,
+"longitude": 77.21884,
+"kind": "park",
+"area_m2": 13500.0,
+"cycling": true
+},
+{
+"name": "Nehru Stadium Ground",
+"latitude": 28.65933,
+"longitude": 77.43954,
+"kind": "garden",
+"area_m2": 13400.0,
+"cycling": true
+},
+{
+"name": "Commonwealth Games Park",
+"latitude": 28.58028,
+"longitude": 77.19076,
+"kind": "park",
+"area_m2": 13300.0,
+"cycling": true
+},
+{
+"name": "DDA Park, Mayur Vihar",
+"latitude": 28.60375,
+"longitude": 77.29614,
+"kind": "park",
+"area_m2": 13300.0,
+"cycling": true
+},
+{
+"name": "Sports complex, Prahladpur",
+"latitude": 28.75447,
+"longitude": 77.07681,
+"kind": "track",
+"area_m2": 13300.0,
+"cycling": true
+},
+{
+"name": "Yamuna Velodrome",
+"latitude": 28.634,
+"longitude": 77.25105,
+"kind": "stadium",
+"area_m2": 13200.0,
+"cycling": true
+},
+{
+"name": "Palm Drive Gardens",
+"latitude": 28.40164,
+"longitude": 77.05259,
+"kind": "park",
+"area_m2": 13200.0,
+"cycling": true
+},
+{
+"name": "Central Park, RK Puram Sector-5",
+"latitude": 28.56148,
+"longitude": 77.17553,
+"kind": "park",
+"area_m2": 13200.0,
+"cycling": true
+},
+{
+"name": "Nescii Lawn",
+"latitude": 28.60963,
+"longitude": 77.03581,
+"kind": "park",
+"area_m2": 13200.0,
+"cycling": true
+},
+{
+"name": "C8 Fountain Park",
+"latitude": 28.69061,
+"longitude": 77.15856,
+"kind": "park",
+"area_m2": 13000.0,
+"cycling": true
+},
+{
+"name": "Children Park",
+"latitude": 28.66732,
+"longitude": 77.31425,
+"kind": "park",
+"area_m2": 13000.0,
+"cycling": true
+},
+{
+"name": "ashok vatika",
+"latitude": 28.67223,
+"longitude": 77.31785,
+"kind": "park",
+"area_m2": 12800.0,
+"cycling": true
+},
+{
+"name": "Park 1 Block D Phi ii",
+"latitude": 28.45046,
+"longitude": 77.52034,
+"kind": "park",
+"area_m2": 12800.0,
+"cycling": true
+},
+{
+"name": "400m Race Track",
+"latitude": 28.38729,
+"longitude": 77.32829,
+"kind": "track",
+"area_m2": 12700.0,
+"cycling": true
+},
+{
+"name": "Walking Track and Park",
+"latitude": 28.51704,
+"longitude": 77.16225,
+"kind": "park",
+"area_m2": 12600.0,
+"cycling": true
+},
+{
+"name": "D1 Janakpuri Park",
+"latitude": 28.61173,
+"longitude": 77.10522,
+"kind": "park",
+"area_m2": 12600.0,
+"cycling": true
+},
+{
+"name": "Chaudhary Harbansh Singh Park",
+"latitude": 28.64894,
+"longitude": 77.1583,
+"kind": "park",
+"area_m2": 12600.0,
+"cycling": true
+},
+{
+"name": "playfield",
+"latitude": 28.53338,
+"longitude": 77.29003,
+"kind": "park",
+"area_m2": 12500.0,
+"cycling": true
+},
+{
+"name": "Lt Puneet Nath Datt Park",
+"latitude": 28.57472,
+"longitude": 77.2371,
+"kind": "park",
+"area_m2": 12500.0,
+"cycling": true
+},
+{
+"name": "Sector 137 Park",
+"latitude": 28.51065,
+"longitude": 77.40942,
+"kind": "park",
+"area_m2": 12400.0,
+"cycling": true
+},
+{
+"name": "Sita Mata Park",
+"latitude": 28.6339,
+"longitude": 77.17957,
+"kind": "park",
+"area_m2": 12300.0,
+"cycling": true
+},
+{
+"name": "Doctor Swayam Prasad Mukherjee Swimming Pool Complex",
+"latitude": 28.62242,
+"longitude": 77.19301,
+"kind": "stadium",
+"area_m2": 12200.0,
+"cycling": true
+},
+{
+"name": "Shri Guru Tegh Bahadur Park",
+"latitude": 28.50204,
+"longitude": 77.18321,
+"kind": "garden",
+"area_m2": 12200.0,
+"cycling": true
+},
+{
+"name": "jungle jalebi park",
+"latitude": 28.69755,
+"longitude": 77.27606,
+"kind": "park",
+"area_m2": 12200.0,
+"cycling": true
+},
+{
+"name": "Sikanderpur Running Track",
+"latitude": 28.69566,
+"longitude": 77.34007,
+"kind": "track",
+"area_m2": 12200.0,
+"cycling": true
+},
+{
+"name": "India - ASEAN Friendship Park",
+"latitude": 28.59451,
+"longitude": 77.21155,
+"kind": "garden",
+"area_m2": 12100.0,
+"cycling": true
+},
+{
+"name": "Netaji Subhas Chandra Bose Park",
+"latitude": 28.66837,
+"longitude": 77.37922,
+"kind": "park",
+"area_m2": 12000.0,
+"cycling": true
+},
+{
+"name": "MCD PARK",
+"latitude": 28.68355,
+"longitude": 77.27858,
+"kind": "park",
+"area_m2": 12000.0,
+"cycling": true
+},
+{
+"name": "Jawahar Gulab Vatika",
+"latitude": 28.68974,
+"longitude": 77.21366,
+"kind": "garden",
+"area_m2": 11900.0,
+"cycling": true
+},
+{
+"name": "Krishna Park",
+"latitude": 28.55826,
+"longitude": 77.24058,
+"kind": "park",
+"area_m2": 11900.0,
+"cycling": true
+},
+{
+"name": "Rohini East Community Park",
+"latitude": 28.70675,
+"longitude": 77.12542,
+"kind": "park",
+"area_m2": 11800.0,
+"cycling": true
+},
+{
+"name": "6th Avenue Park",
+"latitude": 28.61231,
+"longitude": 77.42515,
+"kind": "park",
+"area_m2": 11700.0,
+"cycling": true
+},
+{
+"name": "Aravalli Forest center",
+"latitude": 28.4945,
+"longitude": 77.26667,
+"kind": "park",
+"area_m2": 11700.0,
+"cycling": true
+},
+{
+"name": "3D Park",
+"latitude": 28.39212,
+"longitude": 77.29028,
+"kind": "garden",
+"area_m2": 11500.0,
+"cycling": true
+},
+{
+"name": "Begumpur Park",
+"latitude": 28.53858,
+"longitude": 77.20944,
+"kind": "park",
+"area_m2": 11400.0,
+"cycling": true
+},
+{
+"name": "JANKI DEVI PARK",
+"latitude": 28.76547,
+"longitude": 77.26523,
+"kind": "park",
+"area_m2": 11400.0,
+"cycling": true
+},
+{
+"name": "Peera garhi Shiv Mandir Park",
+"latitude": 28.67656,
+"longitude": 77.0881,
+"kind": "park",
+"area_m2": 11300.0,
+"cycling": true
+},
+{
+"name": "Nursery Park",
+"latitude": 28.69133,
+"longitude": 77.31133,
+"kind": "park",
+"area_m2": 11300.0,
+"cycling": true
+},
+{
+"name": "NTPC Park",
+"latitude": 28.5088,
+"longitude": 77.33219,
+"kind": "park",
+"area_m2": 11300.0,
+"cycling": true
+},
+{
+"name": "Mohit Narwal Academy",
+"latitude": 28.46259,
+"longitude": 76.99712,
+"kind": "park",
+"area_m2": 11200.0,
+"cycling": true
+},
+{
+"name": "Ekta Park",
+"latitude": 28.68828,
+"longitude": 77.34597,
+"kind": "park",
+"area_m2": 11100.0,
+"cycling": true
+},
+{
+"name": "I-Pocket Park no.1",
+"latitude": 28.6797,
+"longitude": 77.32183,
+"kind": "park",
+"area_m2": 11100.0,
+"cycling": true
+},
+{
+"name": "Community Centre Park",
+"latitude": 28.51016,
+"longitude": 77.16691,
+"kind": "park",
+"area_m2": 11100.0,
+"cycling": true
+},
+{
+"name": "Shaheed Udham Singh park",
+"latitude": 28.5863,
+"longitude": 77.24923,
+"kind": "park",
+"area_m2": 11100.0,
+"cycling": true
+},
+{
+"name": "Surya Upasana Park",
+"latitude": 28.60874,
+"longitude": 77.08133,
+"kind": "park",
+"area_m2": 11100.0,
+"cycling": true
+},
+{
+"name": "Park And Open Gym",
+"latitude": 28.59279,
+"longitude": 77.04795,
+"kind": "park",
+"area_m2": 11000.0,
+"cycling": true
+},
+{
+"name": "I Block Park, Chittaranjan Park",
+"latitude": 28.53812,
+"longitude": 77.25,
+"kind": "park",
+"area_m2": 11000.0,
+"cycling": true
+},
+{
+"name": "VIP Park",
+"latitude": 28.61831,
+"longitude": 77.23826,
+"kind": "park",
+"area_m2": 10900.0,
+"cycling": true
+},
+{
+"name": "Park 132",
+"latitude": 28.46664,
+"longitude": 76.99027,
+"kind": "park",
+"area_m2": 10900.0,
+"cycling": true
+},
+{
+"name": "Maman Chand Park",
+"latitude": 28.70918,
+"longitude": 77.18469,
+"kind": "park",
+"area_m2": 10800.0,
+"cycling": true
+},
+{
+"name": "Bhagat Singh Park",
+"latitude": 28.64691,
+"longitude": 77.27529,
+"kind": "park",
+"area_m2": 10800.0,
+"cycling": true
+},
+{
+"name": "Doctor Shyama Prasad Mukherjee Park",
+"latitude": 28.70427,
+"longitude": 77.19203,
+"kind": "park",
+"area_m2": 10800.0,
+"cycling": true
+},
+{
+"name": "Fountain Park",
+"latitude": 28.58279,
+"longitude": 77.35388,
+"kind": "park",
+"area_m2": 10700.0,
+"cycling": true
+},
+{
+"name": "Inayati masjid",
+"latitude": 28.61597,
+"longitude": 77.2993,
+"kind": "park",
+"area_m2": 10600.0,
+"cycling": true
+},
+{
+"name": "Nangia Park",
+"latitude": 28.6794,
+"longitude": 77.19475,
+"kind": "park",
+"area_m2": 10600.0,
+"cycling": true
+},
+{
+"name": "Guru Nanak Dev Park",
+"latitude": 28.6458,
+"longitude": 77.19146,
+"kind": "park",
+"area_m2": 10500.0,
+"cycling": true
+},
+{
+"name": "Madhuban Park",
+"latitude": 28.63151,
+"longitude": 77.28668,
+"kind": "park",
+"area_m2": 10400.0,
+"cycling": true
+},
+{
+"name": "Dussehra Ground",
+"latitude": 28.46535,
+"longitude": 77.01494,
+"kind": "park",
+"area_m2": 10400.0,
+"cycling": true
+},
+{
+"name": "B3A Park",
+"latitude": 28.62648,
+"longitude": 77.09,
+"kind": "park",
+"area_m2": 10400.0,
+"cycling": true
+},
+{
+"name": "Anand Lok DDA Park",
+"latitude": 28.60638,
+"longitude": 77.29067,
+"kind": "park",
+"area_m2": 10300.0,
+"cycling": true
+},
+{
+"name": "Herb Garden",
+"latitude": 28.61618,
+"longitude": 77.19682,
+"kind": "garden",
+"area_m2": 10200.0,
+"cycling": true
+},
+{
+"name": "Champa Park",
+"latitude": 28.51293,
+"longitude": 77.16612,
+"kind": "park",
+"area_m2": 10100.0,
+"cycling": true
+},
+{
+"name": "Mela ground",
+"latitude": 28.53748,
+"longitude": 77.25211,
+"kind": "park",
+"area_m2": 10000.0,
+"cycling": true
+},
+{
+"name": "Kala Pathar Park",
+"latitude": 28.63311,
+"longitude": 77.35933,
+"kind": "park",
+"area_m2": 10000.0,
+"cycling": true
+},
+{
+"name": "azad park",
+"latitude": 28.66767,
+"longitude": 77.19288,
+"kind": "park",
+"area_m2": 9800.0,
+"cycling": true
+},
+{
+"name": "Ramleela Maidan",
+"latitude": 28.59237,
+"longitude": 77.11953,
+"kind": "park",
+"area_m2": 9800.0,
+"cycling": true
+},
+{
+"name": "ELEPHANT PARK",
+"latitude": 28.68914,
+"longitude": 77.32549,
+"kind": "park",
+"area_m2": 9700.0,
+"cycling": true
+},
+{
+"name": "Warizabad Ecorestoration Park",
+"latitude": 28.45533,
+"longitude": 77.08921,
+"kind": "park",
+"area_m2": 9700.0,
+"cycling": true
+},
+{
+"name": "Foot ball stadium",
+"latitude": 28.60963,
+"longitude": 77.42625,
+"kind": "park",
+"area_m2": 9700.0,
+"cycling": true
+},
+{
+"name": "Jhandewalan Extension Park",
+"latitude": 28.64556,
+"longitude": 77.2022,
+"kind": "park",
+"area_m2": 9600.0,
+"cycling": true
+},
+{
+"name": "Kotha Park",
+"latitude": 28.66082,
+"longitude": 77.09454,
+"kind": "park",
+"area_m2": 9600.0,
+"cycling": true
+},
+{
+"name": "vijay park",
+"latitude": 28.69043,
+"longitude": 77.33793,
+"kind": "park",
+"area_m2": 9500.0,
+"cycling": true
+},
+{
+"name": "Dhruv park",
+"latitude": 28.66847,
+"longitude": 77.32727,
+"kind": "park",
+"area_m2": 9500.0,
+"cycling": true
+},
+{
+"name": "Park Sector 7",
+"latitude": 28.5907,
+"longitude": 77.07401,
+"kind": "park",
+"area_m2": 9500.0,
+"cycling": true
+},
+{
+"name": "Rani Jhansi Stadium",
+"latitude": 28.68724,
+"longitude": 77.15635,
+"kind": "stadium",
+"area_m2": 9500.0,
+"cycling": true
+},
+{
+"name": "Nirman Vihar Park",
+"latitude": 28.63461,
+"longitude": 77.28748,
+"kind": "park",
+"area_m2": 9500.0,
+"cycling": true
+},
+{
+"name": "Shivpuri Park",
+"latitude": 28.65048,
+"longitude": 77.27779,
+"kind": "park",
+"area_m2": 9500.0,
+"cycling": true
+},
+{
+"name": "G-H-J block Park",
+"latitude": 28.64277,
+"longitude": 77.12139,
+"kind": "park",
+"area_m2": 9500.0,
+"cycling": true
+},
+{
+"name": "Radhe Lal Park",
+"latitude": 28.68877,
+"longitude": 77.18453,
+"kind": "park",
+"area_m2": 9400.0,
+"cycling": true
+},
+{
+"name": "Kaccha Bagh",
+"latitude": 28.65748,
+"longitude": 77.2297,
+"kind": "park",
+"area_m2": 9400.0,
+"cycling": true
+},
+{
+"name": "Apana Park",
+"latitude": 28.39112,
+"longitude": 77.29017,
+"kind": "garden",
+"area_m2": 9400.0,
+"cycling": true
+},
+{
+"name": "Nandan Van",
+"latitude": 28.5596,
+"longitude": 77.23176,
+"kind": "park",
+"area_m2": 9400.0,
+"cycling": true
+},
+{
+"name": "Shaheed Smarak Smriti Park",
+"latitude": 28.56733,
+"longitude": 77.33754,
+"kind": "park",
+"area_m2": 9300.0,
+"cycling": true
+},
+{
+"name": "D 6 Park",
+"latitude": 28.52609,
+"longitude": 77.14679,
+"kind": "park",
+"area_m2": 9300.0,
+"cycling": true
+},
+{
+"name": "Huda Community Center Park",
+"latitude": 28.46355,
+"longitude": 76.9967,
+"kind": "park",
+"area_m2": 9300.0,
+"cycling": true
+},
+{
+"name": "Sector 62 B Block Rain Water Warvesting Park",
+"latitude": 28.62069,
+"longitude": 77.37223,
+"kind": "park",
+"area_m2": 9200.0,
+"cycling": true
+},
+{
+"name": "Ram park",
+"latitude": 28.56176,
+"longitude": 77.19036,
+"kind": "park",
+"area_m2": 9200.0,
+"cycling": true
+},
+{
+"name": "West Jyoti Colony Park",
+"latitude": 28.69147,
+"longitude": 77.29016,
+"kind": "park",
+"area_m2": 9200.0,
+"cycling": true
+},
+{
+"name": "Sukun Park",
+"latitude": 28.56983,
+"longitude": 77.23084,
+"kind": "park",
+"area_m2": 9100.0,
+"cycling": true
+},
+{
+"name": "C Block Park",
+"latitude": 28.6089,
+"longitude": 77.36056,
+"kind": "park",
+"area_m2": 9000.0,
+"cycling": true
+},
+{
+"name": "laxman park",
+"latitude": 28.66615,
+"longitude": 77.31994,
+"kind": "park",
+"area_m2": 9000.0,
+"cycling": true
+},
+{
+"name": "Radha Krishna Park",
+"latitude": 28.61286,
+"longitude": 77.42615,
+"kind": "park",
+"area_m2": 9000.0,
+"cycling": true
+},
+{
+"name": "1221 Huda Park",
+"latitude": 28.46144,
+"longitude": 76.9983,
+"kind": "park",
+"area_m2": 9000.0,
+"cycling": true
+},
+{
+"name": "Shivaji Stadium",
+"latitude": 28.63262,
+"longitude": 77.21389,
+"kind": "stadium",
+"area_m2": 8900.0,
+"cycling": true
+},
+{
+"name": "Athletics grounds track",
+"latitude": 28.54364,
+"longitude": 77.19031,
+"kind": "track",
+"area_m2": 8800.0,
+"cycling": true
+},
+{
+"name": "Dayanand Park",
+"latitude": 28.69148,
+"longitude": 77.34168,
+"kind": "park",
+"area_m2": 8700.0,
+"cycling": true
+},
+{
+"name": "Teacher's Park",
+"latitude": 28.67897,
+"longitude": 77.17537,
+"kind": "park",
+"area_m2": 8700.0,
+"cycling": true
+},
+{
+"name": "Shaheed Vatika",
+"latitude": 28.60861,
+"longitude": 77.03587,
+"kind": "garden",
+"area_m2": 8700.0,
+"cycling": true
+},
+{
+"name": "Hindi Park",
+"latitude": 28.64298,
+"longitude": 77.24188,
+"kind": "park",
+"area_m2": 8600.0,
+"cycling": true
+},
+{
+"name": "E block Basket Ball park",
+"latitude": 28.55069,
+"longitude": 77.2415,
+"kind": "park",
+"area_m2": 8600.0,
+"cycling": true
+},
+{
+"name": "Mahavir Park",
+"latitude": 28.66809,
+"longitude": 77.31871,
+"kind": "park",
+"area_m2": 8600.0,
+"cycling": true
+},
+{
+"name": "Rehras Park",
+"latitude": 28.70257,
+"longitude": 77.20785,
+"kind": "park",
+"area_m2": 8600.0,
+"cycling": true
+},
+{
+"name": "chandrashekhar park",
+"latitude": 28.68719,
+"longitude": 77.34366,
+"kind": "park",
+"area_m2": 8600.0,
+"cycling": true
+},
+{
+"name": "Nice Park",
+"latitude": 28.6906,
+"longitude": 77.16957,
+"kind": "park",
+"area_m2": 8500.0,
+"cycling": true
+},
+{
+"name": "Central Park CA and CD Block",
+"latitude": 28.62624,
+"longitude": 77.10528,
+"kind": "park",
+"area_m2": 8400.0,
+"cycling": true
+},
+{
+"name": "Chaudhary Brahma Prakash Park",
+"latitude": 28.57364,
+"longitude": 77.07327,
+"kind": "park",
+"area_m2": 8400.0,
+"cycling": true
+},
+{
+"name": "Ram Sarovar",
+"latitude": 28.79964,
+"longitude": 77.1361,
+"kind": "park",
+"area_m2": 8300.0,
+"cycling": true
+},
+{
+"name": "Chotu Ram Park",
+"latitude": 28.71288,
+"longitude": 77.10963,
+"kind": "park",
+"area_m2": 8200.0,
+"cycling": true
+},
+{
+"name": "IGDTUW Playground",
+"latitude": 28.66457,
+"longitude": 77.23283,
+"kind": "park",
+"area_m2": 8200.0,
+"cycling": true
+},
+{
+"name": "Veer Savarkar Park",
+"latitude": 28.58412,
+"longitude": 77.22328,
+"kind": "park",
+"area_m2": 8200.0,
+"cycling": true
+},
+{
+"name": "Ambedkar Park",
+"latitude": 28.64908,
+"longitude": 77.30371,
+"kind": "park",
+"area_m2": 8100.0,
+"cycling": true
+},
+{
+"name": "Swasth Vihar Park 2",
+"latitude": 28.64156,
+"longitude": 77.28873,
+"kind": "park",
+"area_m2": 8100.0,
+"cycling": true
+},
+{
+"name": "neighbourhood",
+"latitude": 28.6414,
+"longitude": 77.34899,
+"kind": "park",
+"area_m2": 8000.0,
+"cycling": true
+},
+{
+"name": "Rampuri A-Block park",
+"latitude": 28.67028,
+"longitude": 77.32932,
+"kind": "park",
+"area_m2": 7900.0,
+"cycling": true
+},
+{
+"name": "Balaji Temple Park",
+"latitude": 28.73076,
+"longitude": 77.10754,
+"kind": "park",
+"area_m2": 7900.0,
+"cycling": true
+},
+{
+"name": "A Block Park",
+"latitude": 28.71208,
+"longitude": 77.22069,
+"kind": "park",
+"area_m2": 7900.0,
+"cycling": true
+},
+{
+"name": "C-6 Vasant Kunj Park",
+"latitude": 28.53705,
+"longitude": 77.14672,
+"kind": "park",
+"area_m2": 7900.0,
+"cycling": true
+},
+{
+"name": "Hasty Park",
+"latitude": 28.51531,
+"longitude": 77.16885,
+"kind": "park",
+"area_m2": 7900.0,
+"cycling": true
+},
+{
+"name": "Dwarka Park",
+"latitude": 28.59558,
+"longitude": 77.0729,
+"kind": "park",
+"area_m2": 7900.0,
+"cycling": true
+},
+{
+"name": "Childrens Park",
+"latitude": 28.52432,
+"longitude": 77.14888,
+"kind": "park",
+"area_m2": 7900.0,
+"cycling": true
+},
+{
+"name": "Flight Lieutenant Sunit Mohanty Park",
+"latitude": 28.58604,
+"longitude": 77.06658,
+"kind": "park",
+"area_m2": 7900.0,
+"cycling": true
+},
+{
+"name": "Bio-Tech Lawns",
+"latitude": 28.54517,
+"longitude": 77.19359,
+"kind": "park",
+"area_m2": 7800.0,
+"cycling": true
+},
+{
+"name": "Sri Ram Park",
+"latitude": 28.67979,
+"longitude": 77.29473,
+"kind": "park",
+"area_m2": 7800.0,
+"cycling": true
+},
+{
+"name": "Patel Park",
+"latitude": 28.6405,
+"longitude": 77.12087,
+"kind": "park",
+"area_m2": 7800.0,
+"cycling": true
+},
+{
+"name": "Najafgarh Stadium",
+"latitude": 28.6112,
+"longitude": 76.98868,
+"kind": "stadium",
+"area_m2": 7700.0,
+"cycling": true
+},
+{
+"name": "Ankur Park",
+"latitude": 28.69747,
+"longitude": 77.20577,
+"kind": "park",
+"area_m2": 7700.0,
+"cycling": true
+},
+{
+"name": "Old Dussehra Ground",
+"latitude": 28.64117,
+"longitude": 77.30052,
+"kind": "park",
+"area_m2": 7700.0,
+"cycling": true
+},
+{
+"name": "B-Block Park",
+"latitude": 28.51791,
+"longitude": 77.39451,
+"kind": "park",
+"area_m2": 7600.0,
+"cycling": true
+},
+{
+"name": "shyam park",
+"latitude": 28.69881,
+"longitude": 77.26847,
+"kind": "park",
+"area_m2": 7600.0,
+"cycling": true
+},
+{
+"name": "Football Ground",
+"latitude": 28.67372,
+"longitude": 77.50381,
+"kind": "park",
+"area_m2": 7500.0,
+"cycling": true
+},
+{
+"name": "Baba Sahib Bhimrav Ambedkar Park",
+"latitude": 28.72996,
+"longitude": 77.1714,
+"kind": "park",
+"area_m2": 7500.0,
+"cycling": true
+},
+{
+"name": "Sector 4 Public Park",
+"latitude": 28.60345,
+"longitude": 77.04909,
+"kind": "park",
+"area_m2": 7400.0,
+"cycling": true
+},
+{
+"name": "Major Som Nath Sharma Memorial Park",
+"latitude": 28.57226,
+"longitude": 77.17435,
+"kind": "park",
+"area_m2": 7400.0,
+"cycling": true
+},
+{
+"name": "Noida Indoor Stadium",
+"latitude": 28.58836,
+"longitude": 77.34092,
+"kind": "stadium",
+"area_m2": 7400.0,
+"cycling": true
+},
+{
+"name": "E-Block Park",
+"latitude": 28.56657,
+"longitude": 77.36395,
+"kind": "park",
+"area_m2": 7300.0,
+"cycling": true
+},
+{
+"name": "Banjar Park",
+"latitude": 28.63059,
+"longitude": 77.2878,
+"kind": "park",
+"area_m2": 7300.0,
+"cycling": true
+},
+{
+"name": "Eco Grove Park",
+"latitude": 28.3824,
+"longitude": 77.06352,
+"kind": "park",
+"area_m2": 7300.0,
+"cycling": true
+},
+{
+"name": "Indian Air Force Legacy Park",
+"latitude": 28.57415,
+"longitude": 77.11973,
+"kind": "park",
+"area_m2": 7300.0,
+"cycling": true
+},
+{
+"name": "agarsen park",
+"latitude": 28.701,
+"longitude": 77.26894,
+"kind": "park",
+"area_m2": 7200.0,
+"cycling": true
+},
+{
+"name": "Dahiya Badshah Park",
+"latitude": 28.74034,
+"longitude": 77.13206,
+"kind": "park",
+"area_m2": 7200.0,
+"cycling": true
+},
+{
+"name": "Hyde Park",
+"latitude": 28.38242,
+"longitude": 77.05922,
+"kind": "park",
+"area_m2": 7200.0,
+"cycling": true
+},
+{
+"name": "Swasthya Vihar Neighbourhood Park",
+"latitude": 28.64035,
+"longitude": 77.28721,
+"kind": "park",
+"area_m2": 7200.0,
+"cycling": true
+},
+{
+"name": "Huda Park 2",
+"latitude": 28.46398,
+"longitude": 76.99438,
+"kind": "park",
+"area_m2": 7200.0,
+"cycling": true
+},
+{
+"name": "Shipra Krishna Vista Park",
+"latitude": 28.64043,
+"longitude": 77.37426,
+"kind": "park",
+"area_m2": 7100.0,
+"cycling": true
+},
+{
+"name": "Dargah Gareeb Yaar Park",
+"latitude": 28.51224,
+"longitude": 77.33946,
+"kind": "park",
+"area_m2": 7100.0,
+"cycling": true
+},
+{
+"name": "Manas Appartments-Kala Vihar DDA Park",
+"latitude": 28.59876,
+"longitude": 77.2938,
+"kind": "park",
+"area_m2": 7000.0,
+"cycling": true
+},
+{
+"name": "mahila jagriti park",
+"latitude": 28.6897,
+"longitude": 77.34981,
+"kind": "park",
+"area_m2": 6900.0,
+"cycling": true
+},
+{
+"name": "B Block Park",
+"latitude": 28.71125,
+"longitude": 77.21987,
+"kind": "park",
+"area_m2": 6900.0,
+"cycling": true
+},
+{
+"name": "Shri Guru Nanak Vatika",
+"latitude": 28.66748,
+"longitude": 77.21005,
+"kind": "park",
+"area_m2": 6900.0,
+"cycling": true
+},
+{
+"name": "Model Park",
+"latitude": 28.53342,
+"longitude": 77.29221,
+"kind": "park",
+"area_m2": 6800.0,
+"cycling": true
+},
+{
+"name": "Dr. Shyam Nirmam Park",
+"latitude": 28.68315,
+"longitude": 77.36853,
+"kind": "park",
+"area_m2": 6800.0,
+"cycling": true
+},
+{
+"name": "Football/ Cricket ground",
+"latitude": 28.6376,
+"longitude": 77.00059,
+"kind": "park",
+"area_m2": 6800.0,
+"cycling": true
+},
+{
+"name": "Onix Park",
+"latitude": 28.51527,
+"longitude": 77.16704,
+"kind": "park",
+"area_m2": 6800.0,
+"cycling": true
+},
+{
+"name": "Shaheed Ashfaq Ullah Fitness Park",
+"latitude": 28.60938,
+"longitude": 77.03964,
+"kind": "park",
+"area_m2": 6800.0,
+"cycling": true
+},
+{
+"name": "Manav Rachna Playground cum C Block Main Park",
+"latitude": 28.42249,
+"longitude": 77.06121,
+"kind": "park",
+"area_m2": 6800.0,
+"cycling": true
+},
+{
+"name": "Palm Court Park",
+"latitude": 28.64536,
+"longitude": 77.33806,
+"kind": "park",
+"area_m2": 6800.0,
+"cycling": true
+},
+{
+"name": "A-Block Park",
+"latitude": 28.57043,
+"longitude": 77.36075,
+"kind": "park",
+"area_m2": 6700.0,
+"cycling": true
+},
+{
+"name": "ram vatika",
+"latitude": 28.69129,
+"longitude": 77.3466,
+"kind": "park",
+"area_m2": 6600.0,
+"cycling": true
+},
+{
+"name": "M Block Park",
+"latitude": 28.49044,
+"longitude": 77.08549,
+"kind": "garden",
+"area_m2": 6600.0,
+"cycling": true
+},
+{
+"name": "Pushpanjali Tikona Park",
+"latitude": 28.65485,
+"longitude": 77.30812,
+"kind": "park",
+"area_m2": 6600.0,
+"cycling": true
+},
+{
+"name": "Chandrashekhar Azad Park",
+"latitude": 28.68163,
+"longitude": 77.29163,
+"kind": "park",
+"area_m2": 6600.0,
+"cycling": true
+},
+{
+"name": "Om Shanti Park",
+"latitude": 28.67384,
+"longitude": 77.43521,
+"kind": "park",
+"area_m2": 6500.0,
+"cycling": true
+},
+{
+"name": "RBI Park",
+"latitude": 28.57749,
+"longitude": 77.19229,
+"kind": "park",
+"area_m2": 6500.0,
+"cycling": true
+},
+{
+"name": "Bank Enclave Park",
+"latitude": 28.64064,
+"longitude": 77.27256,
+"kind": "park",
+"area_m2": 6500.0,
+"cycling": true
+},
+{
+"name": "Jamia Hamdard Herbal Garden",
+"latitude": 28.51327,
+"longitude": 77.24761,
+"kind": "garden",
+"area_m2": 6500.0,
+"cycling": true
+},
+{
+"name": "Malviya Nagar Park",
+"latitude": 28.53642,
+"longitude": 77.21537,
+"kind": "park",
+"area_m2": 6500.0,
+"cycling": true
+},
+{
+"name": "Major Vinod Rana Park",
+"latitude": 28.51139,
+"longitude": 77.02687,
+"kind": "park",
+"area_m2": 6500.0,
+"cycling": true
+},
+{
+"name": "F-Block Park",
+"latitude": 28.56633,
+"longitude": 77.36111,
+"kind": "park",
+"area_m2": 6400.0,
+"cycling": true
+},
+{
+"name": "Sushila Mohan Park",
+"latitude": 28.65922,
+"longitude": 77.22546,
+"kind": "park",
+"area_m2": 6400.0,
+"cycling": true
+},
+{
+"name": "Dr. Sahib Singh Verma Stadium",
+"latitude": 28.61356,
+"longitude": 77.02298,
+"kind": "stadium",
+"area_m2": 6400.0,
+"cycling": true
+},
+{
+"name": "molarband village park",
+"latitude": 28.50138,
+"longitude": 77.31418,
+"kind": "park",
+"area_m2": 6400.0,
+"cycling": true
+},
+{
+"name": "Ramlila Ground",
+"latitude": 28.67173,
+"longitude": 77.29635,
+"kind": "park",
+"area_m2": 6300.0,
+"cycling": true
+},
+{
+"name": "Police park",
+"latitude": 28.54178,
+"longitude": 77.2967,
+"kind": "park",
+"area_m2": 6300.0,
+"cycling": true
+},
+{
+"name": "Water Body Park Ramphal Chowk",
+"latitude": 28.58617,
+"longitude": 77.07265,
+"kind": "park",
+"area_m2": 6300.0,
+"cycling": true
+},
+{
+"name": "B-Block Park, Sector-52",
+"latitude": 28.58797,
+"longitude": 77.36911,
+"kind": "park",
+"area_m2": 6200.0,
+"cycling": true
+},
+{
+"name": "3F Park",
+"latitude": 28.3946,
+"longitude": 77.28874,
+"kind": "park",
+"area_m2": 6200.0,
+"cycling": true
+},
+{
+"name": "D-Block Park",
+"latitude": 28.56752,
+"longitude": 77.35958,
+"kind": "park",
+"area_m2": 6200.0,
+"cycling": true
+},
+{
+"name": "Kangroo Park",
+"latitude": 28.55371,
+"longitude": 77.26805,
+"kind": "park",
+"area_m2": 6200.0,
+"cycling": true
+},
+{
+"name": "Mhila Park",
+"latitude": 28.58974,
+"longitude": 77.31777,
+"kind": "park",
+"area_m2": 6200.0,
+"cycling": true
+},
+{
+"name": "Shah Park",
+"latitude": 28.63556,
+"longitude": 77.10987,
+"kind": "park",
+"area_m2": 6200.0,
+"cycling": true
+},
+{
+"name": "Modi Vatika (Park)",
+"latitude": 28.56447,
+"longitude": 77.25937,
+"kind": "park",
+"area_m2": 6200.0,
+"cycling": true
+},
+{
+"name": "jungle park",
+"latitude": 28.49655,
+"longitude": 77.2893,
+"kind": "park",
+"area_m2": 6200.0,
+"cycling": true
+},
+{
+"name": "Vaibhav Park",
+"latitude": 28.63665,
+"longitude": 77.36319,
+"kind": "park",
+"area_m2": 6100.0,
+"cycling": true
+},
+{
+"name": "Joggers Park",
+"latitude": 28.63689,
+"longitude": 77.37162,
+"kind": "park",
+"area_m2": 6100.0,
+"cycling": true
+},
+{
+"name": "Central Park C-6",
+"latitude": 28.53674,
+"longitude": 77.14541,
+"kind": "park",
+"area_m2": 6100.0,
+"cycling": true
+},
+{
+"name": "Supertech Central Park",
+"latitude": 28.51987,
+"longitude": 77.38301,
+"kind": "park",
+"area_m2": 6000.0,
+"cycling": true
+}
+]

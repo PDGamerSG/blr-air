@@ -4,14 +4,14 @@ import subprocess
 import sys
 from pathlib import Path
 
-from blr_air.cli import initialize
+from delhi_air.cli import initialize
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def run_cli(*args):
     return subprocess.run(
-        [sys.executable, "-m", "blr_air", *args],
+        [sys.executable, "-m", "delhi_air", *args],
         cwd=ROOT,
         capture_output=True,
         text=True,
@@ -31,7 +31,7 @@ def test_demo_json_runs_the_full_service_and_labels_synthetic_data():
 
 
 def test_demo_comparison_json_ranks_places_and_returns_backups():
-    result = run_cli("compare HSR Layout and Whitefield for a run", "--demo", "--json")
+    result = run_cli("compare Hauz Khas and Noida for a run", "--demo", "--json")
     assert result.returncode == 0, result.stderr
     data = json.loads(result.stdout)
     assert data["status"] == "ok"
@@ -41,7 +41,7 @@ def test_demo_comparison_json_ranks_places_and_returns_backups():
 
 
 def test_cli_rejects_unpaired_coordinates_with_nonzero_exit():
-    result = run_cli("--latitude", "12.91", "--json")
+    result = run_cli("--latitude", "28.61", "--json")
     assert result.returncode != 0
     assert "longitude" in result.stderr.lower()
 
@@ -59,12 +59,12 @@ def test_setup_creates_private_seeds_and_never_overwrites_existing_identity(tmp_
 def test_cli_explicit_comparison_flags_and_limits():
     result = run_cli(
         "--compare",
-        "HSR Layout",
+        "Hauz Khas",
         "--compare",
-        "Whitefield",
+        "Noida",
         "--demo",
         "--max-aqi",
-        "100",
+        "250",
         "--max-rain",
         "30",
         "--json",
@@ -73,7 +73,7 @@ def test_cli_explicit_comparison_flags_and_limits():
     data = json.loads(result.stdout)
     assert len(data["places"]) == 2
     for place in data["places"]:
-        assert place["window"]["max_aqi"] <= 100
+        assert place["window"]["max_aqi"] <= 250
         assert place["window"]["rain_probability"] <= 30
 
 
@@ -84,9 +84,7 @@ def test_cli_impossible_threshold_returns_error_not_a_relaxed_window():
 
 
 def test_cli_coordinate_request_cannot_silently_discard_comparison():
-    result = run_cli(
-        "compare HSR Layout and Whitefield", "--latitude", "12.9", "--longitude", "77.6"
-    )
+    result = run_cli("compare Hauz Khas and Noida", "--latitude", "28.6", "--longitude", "77.2")
     assert result.returncode != 0
 
 

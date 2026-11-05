@@ -7,9 +7,9 @@ import pytest
 def venue():
     return {
         "id": "park-123",
-        "displayName": {"text": "Cubbon Park", "languageCode": "en"},
-        "formattedAddress": "Bengaluru, Karnataka, India",
-        "location": {"latitude": 12.9763, "longitude": 77.5929},
+        "displayName": {"text": "Lodhi Garden", "languageCode": "en"},
+        "formattedAddress": "New Delhi, Delhi, India",
+        "location": {"latitude": 28.6763, "longitude": 77.2929},
         "rating": 4.4,
         "userRatingCount": 201,
         "googleMapsUri": "https://maps.google.com/?cid=123",
@@ -37,7 +37,7 @@ def venue():
 
 
 async def test_search_uses_authenticated_fixed_host_and_preserves_real_review_attribution():
-    from blr_air.venues import GooglePlaces
+    from delhi_air.venues import GooglePlaces
 
     def respond(request):
         assert str(request.url) == "https://places.googleapis.com/v1/places:searchText"
@@ -52,19 +52,19 @@ async def test_search_uses_authenticated_fixed_host_and_preserves_real_review_at
         } <= mask
         assert "*" not in mask
         assert json.loads(request.content) == {
-            "textQuery": "Cubbon Park, Bengaluru",
+            "textQuery": "Lodhi Garden, Delhi",
             "pageSize": 3,
             "languageCode": "en",
         }
         return httpx.Response(200, json={"places": [venue()]})
 
     async with httpx.AsyncClient(transport=httpx.MockTransport(respond)) as client:
-        result = await GooglePlaces(client, "private-test-key").search(" Cubbon Park, Bengaluru ")
+        result = await GooglePlaces(client, "private-test-key").search(" Lodhi Garden, Delhi ")
     assert result["status"] == "ok"
-    assert result["latitude"] == 12.9763 and result["longitude"] == 77.5929
+    assert result["latitude"] == 28.6763 and result["longitude"] == 77.2929
     assert result["rating"] == 4.4 and result["rating_count"] == 201
-    assert result["matched_name"] == "Cubbon Park"
-    assert result["query"] == "Cubbon Park, Bengaluru"
+    assert result["matched_name"] == "Lodhi Garden"
+    assert result["query"] == "Lodhi Garden, Delhi"
     assert result["reviews"][0]["text"] == "Shaded paths. Busy at weekends."
     assert result["reviews"][0]["author"] == "Reviewer"
     assert result["reviews"][0]["author_photo_uri"] == "https://example.org/avatar.png"
@@ -75,18 +75,18 @@ async def test_search_uses_authenticated_fixed_host_and_preserves_real_review_at
 
 
 async def test_missing_key_never_calls_google():
-    from blr_air.venues import GooglePlaces
+    from delhi_air.venues import GooglePlaces
 
     async with httpx.AsyncClient(
         transport=httpx.MockTransport(lambda _: pytest.fail("network"))
     ) as client:
-        result = await GooglePlaces(client, "").search("Cubbon Park")
+        result = await GooglePlaces(client, "").search("Lodhi Garden")
     assert result["status"] == "unavailable" and "GOOGLE_PLACES_API_KEY" in result["message"]
 
 
 @pytest.mark.parametrize("payload", [{}, {"places": []}, {"places": None}])
 async def test_no_results_never_invents_a_venue(payload):
-    from blr_air.venues import GooglePlaces
+    from delhi_air.venues import GooglePlaces
 
     async with httpx.AsyncClient(
         transport=httpx.MockTransport(lambda _: httpx.Response(200, json=payload))
@@ -100,42 +100,42 @@ async def test_no_results_never_invents_a_venue(payload):
     [[], {"places": "bad"}, {"places": [None]}, {"places": [{}]}, {"error": {"message": "SECRET"}}],
 )
 async def test_malformed_response_fails_explicitly(payload):
-    from blr_air.venues import GooglePlaces
+    from delhi_air.venues import GooglePlaces
 
     async with httpx.AsyncClient(
         transport=httpx.MockTransport(lambda _: httpx.Response(200, json=payload))
     ) as client:
-        result = await GooglePlaces(client, "test-key").search("Cubbon Park")
+        result = await GooglePlaces(client, "test-key").search("Lodhi Garden")
     assert result["status"] == "unavailable"
     assert "SECRET" not in json.dumps(result)
 
 
 @pytest.mark.parametrize("status", [401, 403, 429, 500])
 async def test_http_failures_are_sanitized(status):
-    from blr_air.venues import GooglePlaces
+    from delhi_air.venues import GooglePlaces
 
     async with httpx.AsyncClient(
         transport=httpx.MockTransport(lambda _: httpx.Response(status, text="private-test-key"))
     ) as client:
-        result = await GooglePlaces(client, "private-test-key").search("Cubbon Park")
+        result = await GooglePlaces(client, "private-test-key").search("Lodhi Garden")
     assert result["status"] == "unavailable"
     assert "private-test-key" not in json.dumps(result)
 
 
 async def test_timeout_is_actionable():
-    from blr_air.venues import GooglePlaces
+    from delhi_air.venues import GooglePlaces
 
     def respond(request):
         raise httpx.ReadTimeout("secret", request=request)
 
     async with httpx.AsyncClient(transport=httpx.MockTransport(respond)) as client:
-        result = await GooglePlaces(client, "test-key").search("Cubbon Park")
+        result = await GooglePlaces(client, "test-key").search("Lodhi Garden")
     assert result["status"] == "unavailable" and "timed out" in result["message"]
     assert "secret" not in json.dumps(result)
 
 
 async def test_redirect_is_not_followed_even_if_client_allows_it():
-    from blr_air.venues import GooglePlaces
+    from delhi_air.venues import GooglePlaces
 
     def respond(request):
         assert request.url.host == "places.googleapis.com"
@@ -144,12 +144,12 @@ async def test_redirect_is_not_followed_even_if_client_allows_it():
     async with httpx.AsyncClient(
         transport=httpx.MockTransport(respond), follow_redirects=True
     ) as client:
-        result = await GooglePlaces(client, "test-key").search("Cubbon Park")
+        result = await GooglePlaces(client, "test-key").search("Lodhi Garden")
     assert result["status"] == "unavailable"
 
 
 async def test_missing_fields_remain_unknown_and_unsafe_links_are_removed():
-    from blr_air.venues import GooglePlaces
+    from delhi_air.venues import GooglePlaces
 
     item = venue()
     item.update(
@@ -162,7 +162,7 @@ async def test_missing_fields_remain_unknown_and_unsafe_links_are_removed():
     async with httpx.AsyncClient(
         transport=httpx.MockTransport(lambda _: httpx.Response(200, json={"places": [item]}))
     ) as client:
-        result = await GooglePlaces(client, "test-key").search("Cubbon Park")
+        result = await GooglePlaces(client, "test-key").search("Lodhi Garden")
     assert result["status"] == "ok"
     assert result["rating"] is None and result["rating_count"] is None
     assert result["open_now"] is None and result["accessibility"] == {}
@@ -172,7 +172,7 @@ async def test_missing_fields_remain_unknown_and_unsafe_links_are_removed():
 
 
 async def test_candidate_and_review_counts_are_bounded_and_explain_relevance_sample():
-    from blr_air.venues import GooglePlaces
+    from delhi_air.venues import GooglePlaces
 
     item = venue()
     item["reviews"] *= 10
@@ -188,7 +188,7 @@ async def test_candidate_and_review_counts_are_bounded_and_explain_relevance_sam
 
 @pytest.mark.parametrize("query", ["", "a", "x" * 501, "park\x00"])
 async def test_invalid_query_does_not_issue_paid_request(query):
-    from blr_air.venues import GooglePlaces
+    from delhi_air.venues import GooglePlaces
 
     async with httpx.AsyncClient(
         transport=httpx.MockTransport(lambda _: pytest.fail("network"))
@@ -198,31 +198,31 @@ async def test_invalid_query_does_not_issue_paid_request(query):
 
 
 async def test_unbounded_response_is_stopped():
-    from blr_air.venues import GooglePlaces
+    from delhi_air.venues import GooglePlaces
 
     async with httpx.AsyncClient(
         transport=httpx.MockTransport(
             lambda _: httpx.Response(200, content=b"x" * (2 * 1024 * 1024 + 1))
         )
     ) as client:
-        result = await GooglePlaces(client, "test-key").search("Cubbon Park")
+        result = await GooglePlaces(client, "test-key").search("Lodhi Garden")
     assert result["status"] == "unavailable"
 
 
 async def test_reviews_without_author_are_not_rendered_as_customer_evidence():
-    from blr_air.venues import GooglePlaces
+    from delhi_air.venues import GooglePlaces
 
     item = venue()
     item["reviews"][0]["authorAttribution"] = None
     async with httpx.AsyncClient(
         transport=httpx.MockTransport(lambda _: httpx.Response(200, json={"places": [item]}))
     ) as client:
-        result = await GooglePlaces(client, "test-key").search("Cubbon Park")
+        result = await GooglePlaces(client, "test-key").search("Lodhi Garden")
     assert result["status"] == "ok" and result["reviews"] == []
 
 
 async def test_google_invalid_key_400_is_actionable_without_echoing_provider_body():
-    from blr_air.venues import GooglePlaces
+    from delhi_air.venues import GooglePlaces
 
     async with httpx.AsyncClient(
         transport=httpx.MockTransport(
@@ -234,7 +234,7 @@ async def test_google_invalid_key_400_is_actionable_without_echoing_provider_bod
             )
         )
     ) as client:
-        result = await GooglePlaces(client, "private-key").search("Cubbon Park")
+        result = await GooglePlaces(client, "private-key").search("Lodhi Garden")
     assert result["status"] == "unavailable"
     assert "key" in result["message"].lower()
     assert "private-key" not in str(result)

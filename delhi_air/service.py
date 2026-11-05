@@ -7,14 +7,20 @@ from zoneinfo import ZoneInfo
 
 import httpx
 
-from blr_air.assessment import assess
-from blr_air.conversation import chat_intent, clean_message, describe_conditions
-from blr_air.domain import AirError, Forecast, Location, ProviderError, RequestSpec, Window
-from blr_air.parsing import parse_request
-from blr_air.providers import OpenMeteo
-from blr_air.scoring import aqi_category, select_windows
+from delhi_air.advisor import Advisor, search_summary, wants_place
+from delhi_air.assessment import assess
+from delhi_air.conversation import chat_intent, clean_message, describe_conditions
+from delhi_air.domain import AirError, Forecast, Location, ProviderError, RequestSpec, Window
+from delhi_air.parsing import parse_request
+from delhi_air.providers import OpenMeteo
+from delhi_air.scoring import aqi_category, select_windows
 
 SOURCE = "Open-Meteo Air Quality (CAMS) and Weather Forecast"
+AIR_MODEL_NOTE = (
+    "The air model covers about 45 km per cell. It cannot see local hotspots such as busy "
+    "junctions or industrial areas, so a nearby place ranking higher is not evidence of "
+    "cleaner air."
+)
 LIMITATION = "Model forecasts, not CPCB station readings or medical advice."
 ACTIVITIES = {
     "run": "run",
@@ -42,6 +48,7 @@ class Recommendation:
     window: Window
     backups: tuple[Window, ...] = ()
     venue: dict | None = None
+    search: dict | None = None
 
     def to_dict(self):
         current = self.forecast.current
@@ -69,6 +76,7 @@ class Recommendation:
             "fetched_at": self.forecast.fetched_at.isoformat(),
             "source": "Synthetic offline demo" if self.forecast.is_demo else SOURCE,
             "limitation": LIMITATION,
+            "search": self.search,
             "summary": describe(self),
             "assessment": assess(self),
             "venue": self.venue,
@@ -105,12 +113,27 @@ class ComparisonResult:
         ]
         return tied if len(tied) > 1 else []
 
+    @property
+    def shared_air_model(self) -> list[list[str]]:
+        """Groups of places with identical hourly air forecasts: one model cell covers them."""
+        cells: dict[tuple, list[str]] = {}
+        for item in self.items:
+            if item.recommendation is None:
+                continue
+            forecast = item.recommendation.forecast
+            cell = tuple((row.time, row.us_aqi, row.pm2_5) for row in forecast.hours)
+            cells.setdefault(cell, []).append(item.recommendation.location.name)
+        groups = (list(dict.fromkeys(names)) for names in cells.values())
+        return [names for names in groups if len(names) > 1]
+
     def to_dict(self):
         return {
             "status": "ok" if self.winner else "error",
             "winner": self.winner,
             "partial": any(item.error for item in self.items),
             "tied_places": self.tied_places,
+            "shared_air_model": self.shared_air_model,
+            "air_model_note": AIR_MODEL_NOTE,
             "request": self.request.model_dump(),
             "summary": describe_comparison(self),
             "places": [
@@ -169,7 +192,7 @@ def calendar_guidance(result: Recommendation) -> str:
     # The reminder is read on the event date, when the original "tomorrow" is "today".
     prompt = request_prompt(result.request.model_copy(update={"day": "today"}))
     details = (
-        "Recheck BLR Air before leaving. On the event date, send:\n"
+        "Recheck Delhi Air before leaving. On the event date, send:\n"
         + prompt
         + "\n\nThis event is a forecast snapshot and does not update itself. "
         + f"Forecast retrieved {forecast.fetched_at.astimezone(UTC):%d %b %Y %H:%M UTC}. "
@@ -180,7 +203,7 @@ def calendar_guidance(result: Recommendation) -> str:
     query = urlencode(
         {
             "action": "TEMPLATE",
-            "text": f"{'DEMO — ' if forecast.is_demo else ''}BLR Air: "
+            "text": f"{'DEMO — ' if forecast.is_demo else ''}Delhi Air: "
             f"{ACTIVITIES[result.request.activity]} · {result.location.name}",
             "dates": f"{window.start.astimezone(UTC):%Y%m%dT%H%M%SZ}/"
             f"{window.end.astimezone(UTC):%Y%m%dT%H%M%SZ}",
@@ -240,6 +263,13 @@ def forecast_note(forecast: Forecast) -> str:
 
 
 def describe(result: Recommendation | ComparisonResult) -> str:
+    text = describe_plan(result)
+    if isinstance(result, Recommendation) and result.search:
+        return search_summary(result) + "\n\n" + text
+    return text
+
+
+def describe_plan(result: Recommendation | ComparisonResult) -> str:
     if isinstance(result, ComparisonResult):
         return describe_comparison(result)
     w, q, forecast = result.window, result.request, result.forecast
@@ -381,6 +411,15 @@ def describe_comparison(result: ComparisonResult) -> str:
             + ", ".join(result.tied_places)
             + ". The first requested place is shown first; forecasts do not distinguish them."
         )
+    for names in result.shared_air_model:
+        lines.append(
+            "**Same air forecast:** "
+            + " and ".join(names)
+            + " fall in one air-quality model cell, so the forecast cannot say which has cleaner "
+            "air. Any ranking between them comes from weather alone."
+        )
+    if sum(item.recommendation is not None for item in result.items) > 1:
+        lines.append(AIR_MODEL_NOTE)
     if any(item.error for item in result.items):
         lines.append(
             "Some places could not be evaluated; the recommendation covers available results only."
@@ -433,6 +472,10 @@ def spoken_summary(result: Recommendation | ComparisonResult) -> str:
             prefix = "The available options are tied. First requested option: "
         if any(item.error for item in result.items):
             prefix = "Some requested places were unavailable. " + prefix
+        if result.shared_air_model:
+            prefix = (
+                "Some of these places share one air model cell, so their air is the same. " + prefix
+            )
     else:
         selected, prefix = result, "Best available option: "
     w = selected.window
@@ -468,6 +511,7 @@ class AirService:
         self.api_key = api_key
         self.base_url = base_url
         self.venues = venues
+        self.advisor = Advisor(provider, client)
 
     async def recommend(
         self, request: RequestSpec, *, location: Location | None = None, now: datetime | None = None
@@ -531,14 +575,16 @@ class AirService:
             validated, tuple(valid + [item for item in items if item.recommendation is None])
         )
 
-    async def chat(self, text: str) -> Recommendation | ComparisonResult | str:
+    async def chat(self, text: str, *, near=None) -> Recommendation | ComparisonResult | str:
         text = clean_message(text)
+        if wants_place(text):
+            return await self.advisor.suggest(text, near=near)
         intent = await chat_intent(text, self)
         if intent.kind in ("answer", "clarify"):
             return intent.text
         if intent.kind == "conditions":
             # Keep unsupported forecast dates/times out of live conditions, too.
-            from blr_air.parsing import validate_text
+            from delhi_air.parsing import validate_text
 
             validate_text(text)
             return await describe_conditions(self, intent)

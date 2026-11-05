@@ -12,7 +12,7 @@ from urllib.parse import urlsplit
 
 import httpx
 
-from blr_air.providers import number
+from delhi_air.providers import number
 
 SEARCH_URL = "https://places.googleapis.com/v1/places:searchText"
 MAX_RESPONSE_BYTES = 2 * 1024 * 1024

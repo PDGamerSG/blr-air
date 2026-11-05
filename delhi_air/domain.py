@@ -28,7 +28,7 @@ class NoWindowError(AirError):
 
 class RequestSpec(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
-    place: str = Field(default="Bengaluru", min_length=2, max_length=160)
+    place: str = Field(default="Delhi", min_length=2, max_length=160)
     activity: Activity = "walk"
     hours: int = Field(default=1, ge=1, le=2, strict=True)
     day: Day = "next48"

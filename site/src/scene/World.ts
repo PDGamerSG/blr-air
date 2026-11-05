@@ -4,7 +4,7 @@ import { City } from "./city";
 import { Haze } from "./haze";
 import { Signals } from "./signals";
 import { Sky } from "./sky";
-import { Gaali, Ufo } from "./ufo";
+import { Hawa, Ufo } from "./ufo";
 import { cloneState, mixState, SCENES, type SceneState } from "./state";
 
 interface Key {
@@ -23,7 +23,9 @@ export class World {
   haze: Haze;
   city!: City;
   ufo!: Ufo;
-  gaali!: Gaali;
+  hawa!: Hawa;
+  // Hawa only takes the mask off when the live city reading justifies it.
+  maskAllowed = 0;
   signals = new Signals();
   pointer = new THREE.Vector2();
   paused = false;
@@ -59,16 +61,16 @@ export class World {
     manager.onProgress = (_url, loaded, total) => onProgress(loaded / total);
     const loader = new GLTFLoader(manager);
     const base = import.meta.env.BASE_URL;
-    const [ufo, gaali, vidhana, tree] = (await Promise.all(
-      ["ufo", "gaali", "vidhana", "tree"].map((n) => loader.loadAsync(`${base}models/${n}.glb`)),
+    const [ufo, hawa, gate, tree] = (await Promise.all(
+      ["ufo", "hawa", "india-gate", "tree"].map((n) => loader.loadAsync(`${base}models/${n}.glb`)),
     )) as GLTF[];
-    this.city = new City({ tree, vidhana }, this.lite);
+    this.city = new City({ tree, gate }, this.lite);
     this.scene.add(this.city.group);
-    this.ufo = new Ufo(ufo, gaali);
+    this.ufo = new Ufo(ufo, hawa);
     this.ufo.add(this.scene);
-    this.gaali = new Gaali(gaali.scene, 0.6);
-    this.gaali.root.rotation.y = -0.35;
-    this.scene.add(this.gaali.root);
+    this.hawa = new Hawa(hawa.scene, 0.6);
+    this.hawa.root.rotation.y = -0.35;
+    this.scene.add(this.hawa.root);
     this.scene.add(this.signals.root);
     this.resize();
     // Compile shaders up front so the first scroll doesn't hitch.
@@ -244,12 +246,12 @@ export class World {
     this.signals.root.position.set(...s.ufo);
     this.signals.update(t, dt, s.signals, cam.position);
 
-    this.gaali.root.visible = s.gaali > 0.01;
-    this.gaali.root.position.set(s.ufo[0], -1.8 * (1 - s.gaali), s.ufo[2]);
-    this.gaali.root.scale.setScalar(Math.max(0.001, s.gaali));
-    this.gaali.maskOff = s.mask;
-    this.gaali.update(t, dt, this.pointer);
-    this.gaali.root.position.y += Math.abs(Math.sin(t * 2.4)) * 0.08 * s.mask;
+    this.hawa.root.visible = s.hawa > 0.01;
+    this.hawa.root.position.set(s.ufo[0], -1.8 * (1 - s.hawa), s.ufo[2]);
+    this.hawa.root.scale.setScalar(Math.max(0.001, s.hawa));
+    this.hawa.maskOff = s.mask * this.maskAllowed;
+    this.hawa.update(t, dt, this.pointer);
+    this.hawa.root.position.y += Math.abs(Math.sin(t * 2.4)) * 0.08 * s.mask * this.maskAllowed;
 
     this.updateHover(s);
   }

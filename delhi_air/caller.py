@@ -9,7 +9,7 @@ from uagents.communication import send_sync_message
 from uagents.resolver import RulesBasedResolver
 from uagents_core.identity import Identity
 
-from blr_air.models import WindowRequest, WindowResponse
+from delhi_air.models import WindowRequest, WindowResponse
 
 
 async def direct_call(args, seed):
@@ -37,12 +37,12 @@ def make_request(args):
 def main():
     load_dotenv()
     parser = argparse.ArgumentParser(
-        description="Day planner that hires BLR Air via a typed message"
+        description="Day planner that hires Delhi Air via a typed message"
     )
-    parser.add_argument("--address", default=os.getenv("BLR_AIR_ADDRESS"))
+    parser.add_argument("--address", default=os.getenv("DELHI_AIR_ADDRESS"))
     parser.add_argument("--endpoint", help="Direct /submit URL for the local signed-message demo")
-    parser.add_argument("--latitude", type=float, default=12.9116)
-    parser.add_argument("--longitude", type=float, default=77.6389)
+    parser.add_argument("--latitude", type=float, default=28.5494)
+    parser.add_argument("--longitude", type=float, default=77.2001)
     parser.add_argument("--hours", type=int, choices=(1, 2), default=2)
     parser.add_argument(
         "--activity", choices=("run", "cycle", "walk", "commute", "kids"), default="walk"
@@ -50,7 +50,7 @@ def main():
     args = parser.parse_args()
     seed = os.getenv("CALLER_SEED")
     if not seed or not args.address:
-        parser.error("Run python -m blr_air init and set BLR_AIR_ADDRESS or pass --address.")
+        parser.error("Run python -m delhi_air init and set DELHI_AIR_ADDRESS or pass --address.")
     if args.endpoint:
         sys.exit(asyncio.run(direct_call(args, seed)))
     planner = Agent(
@@ -66,7 +66,7 @@ def main():
     @planner.on_interval(period=30)
     async def hire(ctx: Context):
         if not state["sent"]:
-            ctx.logger.info("Hiring BLR Air at %s", args.address)
+            ctx.logger.info("Hiring Delhi Air at %s", args.address)
             status = await ctx.send(args.address, make_request(args))
             # Do not flood the agent while waiting for its reply.
             state["sent"] = True
@@ -75,6 +75,6 @@ def main():
     @planner.on_message(model=WindowResponse)
     async def hired(ctx: Context, sender: str, msg: WindowResponse):
         if sender == args.address:
-            ctx.logger.info("BLR Air reply:\n%s", msg.summary)
+            ctx.logger.info("Delhi Air reply:\n%s", msg.summary)
 
     planner.run()

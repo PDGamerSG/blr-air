@@ -1,8 +1,8 @@
 from datetime import UTC, datetime, timedelta
 from zoneinfo import ZoneInfo
 
-from blr_air.domain import CurrentAir, Forecast, Hour, LocationError
-from blr_air.localities import local_location
+from delhi_air.domain import CurrentAir, Forecast, Hour, LocationError
+from delhi_air.localities import local_location
 
 
 class DemoProvider:
@@ -11,7 +11,7 @@ class DemoProvider:
     async def locate(self, place):
         result = local_location(place)
         if result is None:
-            raise LocationError("The offline demo supports Bengaluru localities only.")
+            raise LocationError("The offline demo supports Delhi localities only.")
         return result
 
     async def forecast(self, location):
@@ -24,13 +24,14 @@ class DemoProvider:
             rows.append(
                 Hour(
                     time,
-                    45 + abs(local_hour - 9) * 5,
-                    12 + abs(local_hour - 9),
-                    10 if local_hour < 14 else 65,
-                    24 + max(0, 5 - abs(local_hour - 14)),
-                    apparent_temperature=26 + max(0, 5 - abs(local_hour - 14)),
-                    uv_index=max(0, 8 - 2 * abs(local_hour - 12)),
-                    wind_speed=8,
+                    # A smoggy Delhi winter day: cleanest mid-afternoon, worst overnight.
+                    170 + abs(local_hour - 15) * 6,
+                    90 + abs(local_hour - 15) * 7,
+                    0 if local_hour < 17 else 15,
+                    16 + max(0, 10 - abs(local_hour - 14) * 2),
+                    apparent_temperature=15 + max(0, 10 - abs(local_hour - 14) * 2),
+                    uv_index=max(0, 5 - abs(local_hour - 12)),
+                    wind_speed=6,
                 )
             )
         return Forecast(

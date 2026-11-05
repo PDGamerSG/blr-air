@@ -4,8 +4,8 @@ from zoneinfo import ZoneInfo
 
 import pytest
 
-from blr_air.domain import AirError, Forecast, Location, RequestSpec, Window
-from blr_air.service import Recommendation
+from delhi_air.domain import AirError, Forecast, Location, RequestSpec, Window
+from delhi_air.service import Recommendation
 
 
 def recommendation(name="Central Park, New York"):
@@ -32,7 +32,7 @@ def content(path):
 
 
 def test_calendar_keeps_elapsed_hour_across_dst_and_includes_recheck_context(tmp_path):
-    from blr_air.calendar_export import write_calendar
+    from delhi_air.calendar_export import write_calendar
 
     path = tmp_path / "outdoor.ics"
     assert write_calendar(recommendation(), path) == path
@@ -50,7 +50,7 @@ def test_calendar_keeps_elapsed_hour_across_dst_and_includes_recheck_context(tmp
 
 
 def test_calendar_recheck_uses_event_day_and_keeps_requested_limits(tmp_path):
-    from blr_air.calendar_export import write_calendar
+    from delhi_air.calendar_export import write_calendar
 
     selected = replace(
         recommendation(),
@@ -66,7 +66,7 @@ def test_answer_calendar_link_preserves_actual_instants_across_dst():
     import re
     from urllib.parse import parse_qs, urlsplit
 
-    from blr_air.service import describe
+    from delhi_air.service import describe
 
     answer = describe(recommendation())
     match = re.search(r"\]\((https://calendar\.google\.com/[^)]+)\)", answer)
@@ -80,18 +80,18 @@ def test_answer_calendar_link_preserves_actual_instants_across_dst():
 
 
 def test_calendar_escapes_text_instead_of_injecting_properties(tmp_path):
-    from blr_air.calendar_export import write_calendar
+    from delhi_air.calendar_export import write_calendar
 
-    place = "Park\\Gate; North, Bengaluru\r\nEND:VEVENT\r\nBEGIN:VEVENT"
+    place = "Park\\Gate; North, Delhi\r\nEND:VEVENT\r\nBEGIN:VEVENT"
     path = write_calendar(recommendation(place), tmp_path / "escaped.ics")
     text = content(path)
     assert text.split("\r\n").count("BEGIN:VEVENT") == 1
     assert text.split("\r\n").count("END:VEVENT") == 1
-    assert "LOCATION:Park\\\\Gate\\; North\\, Bengaluru\\nEND:VEVENT\\nBEGIN:VEVENT\r\n" in text
+    assert "LOCATION:Park\\\\Gate\\; North\\, Delhi\\nEND:VEVENT\\nBEGIN:VEVENT\r\n" in text
 
 
 def test_calendar_folds_utf8_lines_at_75_octets_without_losing_text(tmp_path):
-    from blr_air.calendar_export import write_calendar
+    from delhi_air.calendar_export import write_calendar
 
     place = "ಬೆಂಗಳೂರು 🌳 " * 30
     path = write_calendar(recommendation(place), tmp_path / "unicode.ics")
@@ -105,7 +105,7 @@ def test_calendar_folds_utf8_lines_at_75_octets_without_losing_text(tmp_path):
 
 
 def test_uid_remains_stable_when_forecast_refreshes_but_changes_for_activity(tmp_path):
-    from blr_air.calendar_export import write_calendar
+    from delhi_air.calendar_export import write_calendar
 
     initial = recommendation()
     refreshed = replace(
@@ -125,7 +125,7 @@ def test_uid_remains_stable_when_forecast_refreshes_but_changes_for_activity(tmp
 
 @pytest.mark.parametrize("existing", ["file", "symlink", "dangling-symlink"])
 def test_calendar_never_overwrites_files_or_follows_symlinks(tmp_path, existing):
-    from blr_air.calendar_export import write_calendar
+    from delhi_air.calendar_export import write_calendar
 
     path = tmp_path / "event.ics"
     target = tmp_path / "target.ics"
@@ -146,7 +146,7 @@ def test_calendar_never_overwrites_files_or_follows_symlinks(tmp_path, existing)
 
 
 def test_calendar_rejects_bad_suffix_and_reports_write_errors(tmp_path):
-    from blr_air.calendar_export import write_calendar
+    from delhi_air.calendar_export import write_calendar
 
     with pytest.raises(AirError, match=".ics"):
         write_calendar(recommendation(), tmp_path / "event.txt")
@@ -155,7 +155,7 @@ def test_calendar_rejects_bad_suffix_and_reports_write_errors(tmp_path):
 
 
 def test_calendar_can_omit_alarm_and_labels_synthetic_forecast(tmp_path):
-    from blr_air.calendar_export import write_calendar
+    from delhi_air.calendar_export import write_calendar
 
     initial = recommendation()
     demo = replace(initial, forecast=replace(initial.forecast, is_demo=True))
@@ -166,7 +166,7 @@ def test_calendar_can_omit_alarm_and_labels_synthetic_forecast(tmp_path):
 
 @pytest.mark.parametrize("minutes", [0, -1, True, 1.5])
 def test_calendar_rejects_invalid_reminder_before_creating_file(tmp_path, minutes):
-    from blr_air.calendar_export import write_calendar
+    from delhi_air.calendar_export import write_calendar
 
     path = tmp_path / "event.ics"
     with pytest.raises(AirError, match="reminder|Reminder"):

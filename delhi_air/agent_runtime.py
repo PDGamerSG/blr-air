@@ -18,8 +18,8 @@ from uagents_core.contrib.protocols.chat import (
 )
 from uagents_core.registration import AgentRegistrationPolicy
 
-from blr_air.domain import AirError, Location, NoWindowError, ProviderError, RequestSpec
-from blr_air.models import (
+from delhi_air.domain import AirError, Location, NoWindowError, ProviderError, RequestSpec
+from delhi_air.models import (
     ComparisonRequest,
     ComparisonResponse,
     DetailedPlaceComparison,
@@ -31,8 +31,8 @@ from blr_air.models import (
     WindowRequest,
     WindowResponse,
 )
-from blr_air.providers import OpenMeteo
-from blr_air.service import (
+from delhi_air.providers import OpenMeteo
+from delhi_air.service import (
     SOURCE,
     AirService,
     ComparisonItem,
@@ -40,13 +40,13 @@ from blr_air.service import (
     describe,
     window_dict,
 )
-from blr_air.telemetry import Usage
-from blr_air.transport import ResilientAgent
-from blr_air.venues import GooglePlaces
+from delhi_air.telemetry import Usage
+from delhi_air.transport import ResilientAgent
+from delhi_air.venues import GooglePlaces
 
 
 def chat_guidance(text: str) -> str | None:
-    command = re.sub(r"@blr-air\b", "", text, flags=re.I)
+    command = re.sub(r"@(?:blr|delhi)-air\b", "", text, flags=re.I)
     command = " ".join(command.casefold().split()).strip(" .!?")
     reminder = re.match(
         r"^(?:(?:can|could|would) you )?(?:please )?"
@@ -86,7 +86,7 @@ def chat_guidance(text: str) -> str | None:
             "description contains your event-day prompt; "
             "the saved event does not update itself.\n\n"
             "**No automatic alerts are scheduled by this chat agent.**\n\n"
-            "Try:\n\n```text\n@blr-air best 1-hour window to run in HSR Layout "
+            "Try:\n\n```text\n@blr-air best 1-hour window to run in Hauz Khas "
             "tomorrow morning\n```"
         )
     if command in {
@@ -108,16 +108,16 @@ def chat_guidance(text: str) -> str | None:
             "or outdoor planning. These examples are optional. In ASI:One, include "
             "**@blr-air** so your request reaches this agent.\n\n"
             "**Ask a question**\n\n```text\n@blr-air What does US AQI 150 mean?\n"
-            "@blr-air Will I need an umbrella in HSR tomorrow?\n```\n\n"
-            "**Plan an outing**\n\n```text\n@blr-air best 1-hour window to run in HSR Layout "
+            "@blr-air Will I need an umbrella in CP tomorrow?\n```\n\n"
+            "**Plan an outing**\n\n```text\n@blr-air best 1-hour window to run in Hauz Khas "
             "tomorrow morning\n```\n\n"
-            "**Add your preferences**\n\n```text\n@blr-air walk in Cubbon Park tomorrow "
-            "morning with AQI at most 100, rain at most 30%, daylight only\n```\n\n"
-            "**Compare places**\n\n```text\n@blr-air compare HSR Layout and Whitefield "
+            "**Add your preferences**\n\n```text\n@blr-air walk in Lodhi Garden tomorrow "
+            "morning with AQI at most 250, rain at most 30%, daylight only\n```\n\n"
+            "**Compare places**\n\n```text\n@blr-air compare Hauz Khas and Noida "
             "for a 2-hour cycle tomorrow morning\n```\n\n"
             "For outdoor plans, I return a recommended time, conditions, precautions, backup "
             "options, a calendar link and a retrieval timestamp. "
-            "Use a city and country outside Bengaluru. "
+            "Use a city and country outside Delhi. "
             "Activities: run, walk, cycle, commute or take children outside. "
             "Supported: today, tomorrow or the next 48 hours; morning, afternoon or evening."
             "\n\n**Updates:** send the same full request again. Send `@blr-air updates` "
@@ -315,32 +315,32 @@ def create_agent(
     handlers = AgentHandlers(service, Usage(data_dir / "usage.sqlite", seed))
     readme = Path(__file__).with_name("AGENT_README.md")
     agent = ResilientAgent(
-        name="BLR Air Window",
+        name="Delhi Air Window",
         seed=seed,
         port=port,
         mailbox=not local,
         endpoint=f"http://127.0.0.1:{port}/submit" if local else None,
         registration_policy=LocalRegistration() if local else None,
         resolve=resolver,
-        readme_path=str(readme),
         publish_agent_details=not local,
         enable_agent_inspector=not local,
         store_message_history=False,
         report_events=not local,
         mark_inactive_on_shutdown=not local,
         description=(
-            "Conversational help with live AQI/weather and outdoor planning "
-            "in Bengaluru or any city."
+            "Conversational help with live AQI/weather and outdoor planning in Delhi or any city."
         ),
     )
+    # uAgents opens readme_path with the locale encoding, which fails on Windows.
+    agent._readme = readme.read_text(encoding="utf-8")
     chat = Protocol(spec=chat_protocol_spec)
     chat.on_message(ChatMessage)(handlers.on_chat)
     chat.on_message(ChatAcknowledgement)(handlers.on_ack)
-    api = Protocol(name="blr-air-window", version="0.1.0")
+    api = Protocol(name="delhi-air-window", version="0.1.0")
     api.on_message(model=WindowRequest, replies=WindowResponse)(handlers.on_window)
-    planning = Protocol(name="blr-air-plan", version="0.1.0")
+    planning = Protocol(name="delhi-air-plan", version="0.1.0")
     planning.on_message(model=ComparisonRequest, replies=ComparisonResponse)(handlers.on_compare)
-    details = Protocol(name="blr-air-plan", version="0.2.0")
+    details = Protocol(name="delhi-air-plan", version="0.2.0")
     details.on_message(model=DetailedPlanRequest, replies=DetailedPlanResponse)(handlers.on_compare)
     agent.include(chat, publish_manifest=not local)
     agent.include(api, publish_manifest=not local)
@@ -358,7 +358,7 @@ def create_agent(
     @agent.on_event("startup")
     async def startup(ctx: Context):
         ctx.logger.info(
-            "BLR Air ready at %s; %s mode",
+            "Delhi Air ready at %s; %s mode",
             agent.address,
             "local" if local else "mailbox (connect Inspector to Agentverse)",
         )
@@ -368,7 +368,7 @@ def create_agent(
 
 def main():
     load_dotenv()
-    parser = argparse.ArgumentParser(description="Run the BLR Air uAgent")
+    parser = argparse.ArgumentParser(description="Run the Delhi Air uAgent")
     parser.add_argument(
         "--local", action="store_true", help="Direct local HTTP; skip public registration"
     )
@@ -376,7 +376,7 @@ def main():
     args = parser.parse_args()
     seed = os.getenv("AGENT_SEED_PHRASE")
     if not seed:
-        parser.error("Missing AGENT_SEED_PHRASE. Run python -m blr_air init first.")
+        parser.error("Missing AGENT_SEED_PHRASE. Run python -m delhi_air init first.")
     create_agent(
         seed, port=args.port, local=args.local, data_dir=Path(os.getenv("DATA_DIR", "data"))
     ).run()

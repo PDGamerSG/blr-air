@@ -2,7 +2,7 @@ from datetime import time, timedelta
 from statistics import mean
 from zoneinfo import ZoneInfo
 
-from blr_air.domain import Hour, NoWindowError, RequestSpec, Window
+from delhi_air.domain import Hour, NoWindowError, RequestSpec, Window
 
 
 def aqi_category(aqi: float) -> str:

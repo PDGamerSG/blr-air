@@ -4,10 +4,10 @@ import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js
 import { LOCALITIES } from "../config";
 import { addOutline, faceted, outlineMaterial, stylize, toon } from "./toon";
 
-// Equirectangular projection of Bengaluru onto the ground plane (1 unit ≈ 2.4 km).
-const LAT0 = 12.965;
-const LON0 = 77.655;
-const K = 46;
+// Equirectangular projection of Delhi NCR onto the ground plane (1 unit ≈ 2.8 km).
+const LAT0 = 28.575;
+const LON0 = 77.235;
+const K = 40;
 export function geo(lat: number, lon: number) {
   return new THREE.Vector2((lon - LON0) * K * Math.cos((LAT0 * Math.PI) / 180), -(lat - LAT0) * K);
 }
@@ -26,40 +26,58 @@ function rng(seed: number) {
 
 const LAKES: [number, number, number, number][] = [
   // lat, lon, radius (units), stretch
-  [12.935, 77.665, 0.42, 1.8],
-  [12.945, 77.74, 0.28, 1.3],
-  [12.982, 77.62, 0.16, 1.2],
-  [13.045, 77.59, 0.2, 1.4],
-  [12.908, 77.615, 0.2, 1.2],
-  [12.922, 77.64, 0.14, 1.1],
-  [13.01, 77.574, 0.11, 1.3],
-  [13.09, 77.583, 0.24, 1.5],
-  [12.947, 77.585, 0.08, 1],
+  [28.7395, 77.164, 0.2, 1.5], // Bhalswa
+  [28.613, 77.309, 0.13, 1.3], // Sanjay Lake
+  [28.554, 77.193, 0.08, 1.2], // Hauz Khas Lake
+  [28.415, 77.283, 0.14, 1.2], // Badkhal
 ];
 
 const PARKS: [number, number, number][] = [
-  [12.9763, 77.5929, 0.42], // Cubbon Park
-  [12.9507, 77.5848, 0.36], // Lalbagh
+  [28.5931, 77.2197, 0.13], // Lodhi Garden
+  [28.6395, 77.1815, 0.34], // Central Ridge
+  [28.536, 77.177, 0.3], // Sanjay Van
+  [28.472, 77.22, 0.72], // Asola Bhatti
+  [28.73, 77.222, 0.26], // Yamuna Biodiversity Park
+  [28.55, 77.31, 0.2], // Okhla Bird Sanctuary
 ];
 
-const VIDHANA: [number, number] = [12.9796, 77.5907];
+// The Yamuna, north to south, past Wazirabad, ITO, Nizamuddin and the Okhla barrage.
+const YAMUNA: [number, number][] = [
+  [28.87, 77.21], [28.8, 77.218], [28.74, 77.232], [28.705, 77.238], [28.67, 77.25], [28.635, 77.257],
+  [28.598, 77.265], [28.565, 77.285], [28.54, 77.305], [28.51, 77.325], [28.47, 77.345], [28.42, 77.375], [28.34, 77.41],
+];
+const RIVER_WIDTH = 0.26;
+const RIVER = new THREE.CatmullRomCurve3(
+  YAMUNA.map(([lat, lon]) => {
+    const p = geo(lat, lon);
+    return new THREE.Vector3(p.x, 0, p.y);
+  }),
+  false,
+  "centripetal",
+).getSpacedPoints(180);
+
+const INDIA_GATE: [number, number] = [28.6129, 77.2295];
 
 const ROADS: [number, number][][] = [
-  // Outer Ring Road (closed below)
+  // Ring Road (closed below)
   [
-    [13.0358, 77.597], [13.0405, 77.623], [13.025, 77.64], [13.006, 77.695], [12.956, 77.701], [12.927, 77.678],
-    [12.92, 77.65], [12.917, 77.623], [12.908, 77.6], [12.918, 77.56], [12.944, 77.523], [12.965, 77.515],
-    [13.028, 77.54], [13.04, 77.56],
+    [28.7075, 77.18], [28.705, 77.22], [28.6675, 77.228], [28.638, 77.249], [28.589, 77.257], [28.572, 77.259],
+    [28.564, 77.234], [28.567, 77.209], [28.591, 77.162], [28.63, 77.139], [28.649, 77.122], [28.672, 77.125],
   ],
-  [[12.917, 77.623], [12.845, 77.66], [12.79, 77.7]], // Hosur Road
-  [[13.0358, 77.597], [13.1005, 77.5963], [13.16, 77.63]], // Bellary Road
-  [[12.98, 77.62], [13.006, 77.695], [13.025, 77.77]], // Old Madras Road
-  [[12.956, 77.701], [12.9698, 77.75], [12.985, 77.8]], // Whitefield
-  [[12.92, 77.65], [12.86, 77.786], [12.83, 77.83]], // Sarjapur Road
-  [[12.977, 77.572], [12.944, 77.523], [12.92, 77.47]], // Mysore Road
-  [[12.977, 77.572], [13.028, 77.54], [13.07, 77.48]], // Tumkur Road
-  [[12.95, 77.585], [12.9, 77.6], [12.83, 77.6]], // Bannerghatta Road
-  [[12.977, 77.572], [12.9796, 77.5907], [12.9756, 77.6066], [12.9784, 77.6408], [12.956, 77.701]], // core
+  [
+    // Outer Ring Road
+    [28.725, 77.23], [28.734, 77.156], [28.706, 77.132], [28.679, 77.092], [28.63, 77.09], [28.584, 77.098],
+    [28.545, 77.124], [28.531, 77.217], [28.544, 77.251], [28.531, 77.29],
+  ],
+  [[28.591, 77.162], [28.545, 77.124], [28.481, 77.08], [28.4, 76.98]], // NH-48 to Gurugram
+  [[28.7075, 77.18], [28.734, 77.156], [28.85, 77.1]], // NH-44, GT Karnal Road
+  [[28.589, 77.257], [28.6128, 77.2773], [28.6469, 77.3152], [28.6692, 77.4538], [28.68, 77.55]], // NH-9 to Ghaziabad
+  [[28.572, 77.259], [28.57, 77.32], [28.5355, 77.391], [28.47, 77.5]], // DND Flyway and Noida Expressway
+  [[28.572, 77.259], [28.495, 77.303], [28.4089, 77.3178], [28.3, 77.33]], // Mathura Road to Faridabad
+  [[28.5245, 77.2066], [28.48, 77.09]], // Mehrauli-Gurugram Road
+  [[28.6514, 77.1907], [28.672, 77.125], [28.679, 77.092], [28.68, 76.95]], // Rohtak Road
+  [[28.6143, 77.1994], [28.6129, 77.2295]], // Kartavya Path
+  [[28.6514, 77.1907], [28.6315, 77.2167], [28.6129, 77.2295], [28.5931, 77.2197], [28.5494, 77.2001], [28.5245, 77.2066]], // core
 ];
 
 // Buildings: flat toon faces plus a lit-window grid that switches on at night.
@@ -234,13 +252,13 @@ export class City {
   mesas = new THREE.Group();
   beaconGroup = new THREE.Group();
 
-  constructor(models: { tree: GLTF; vidhana: GLTF }, lite: boolean) {
+  constructor(models: { tree: GLTF; gate: GLTF }, lite: boolean) {
     this.buildGround();
     this.buildLakesAndParks();
     this.buildBuildings(lite ? 1100 : 2400);
     this.buildRoads();
     this.buildTrees(models.tree, lite ? 40 : 80);
-    this.buildVidhana(models.vidhana);
+    this.buildIndiaGate(models.gate);
     this.buildMesas();
     this.buildBeacons();
     this.group.add(this.mesas, this.beaconGroup);
@@ -278,9 +296,32 @@ export class City {
     return new THREE.ShapeGeometry(shape).rotateX(-Math.PI / 2);
   }
 
+  private ribbon(points: THREE.Vector3[], width: number) {
+    const position: number[] = [];
+    const index: number[] = [];
+    points.forEach((p, i) => {
+      const next = points[Math.min(i + 1, points.length - 1)];
+      const prev = points[Math.max(i - 1, 0)];
+      const dir = next.clone().sub(prev).normalize();
+      // Vary the channel a little so the river doesn't read as a drawn line.
+      const half = (width / 2) * (1 + 0.28 * Math.sin(i * 0.31) + 0.14 * Math.sin(i * 0.83));
+      position.push(p.x - dir.z * half, 0, p.z + dir.x * half, p.x + dir.z * half, 0, p.z - dir.x * half);
+      if (i) index.push(i * 2 - 2, i * 2 - 1, i * 2, i * 2 - 1, i * 2 + 1, i * 2);
+    });
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.Float32BufferAttribute(position, 3));
+    geometry.setIndex(index);
+    return geometry;
+  }
+
   private buildLakesAndParks() {
-    const water = new THREE.MeshBasicMaterial({ color: "#1f6670", fog: true });
-    const shore = new THREE.MeshBasicMaterial({ color: "#8be9ed", fog: true });
+    const water = new THREE.MeshBasicMaterial({ color: "#1f6670", fog: true, side: THREE.DoubleSide });
+    const shore = new THREE.MeshBasicMaterial({ color: "#8be9ed", fog: true, side: THREE.DoubleSide });
+    const bank = new THREE.Mesh(this.ribbon(RIVER, RIVER_WIDTH * 1.3), shore);
+    const river = new THREE.Mesh(this.ribbon(RIVER, RIVER_WIDTH), water);
+    bank.position.y = 0.006;
+    river.position.y = 0.012;
+    this.group.add(bank, river);
     LAKES.forEach(([lat, lon, r, s], i) => {
       const p = geo(lat, lon);
       const edge = new THREE.Mesh(this.blob(r * 1.12, s, i + 1), shore);
@@ -300,6 +341,9 @@ export class City {
   }
 
   private blocked(x: number, z: number, pad = 0.05) {
+    for (const p of RIVER) {
+      if (Math.hypot(x - p.x, z - p.z) < RIVER_WIDTH * 0.65 + pad) return true;
+    }
     for (const [lat, lon, r, s] of LAKES) {
       const p = geo(lat, lon);
       if (Math.hypot((x - p.x) / s, z - p.y) < r * 1.2 + pad) return true;
@@ -308,8 +352,8 @@ export class City {
       const p = geo(lat, lon);
       if (Math.hypot(x - p.x, z - p.y) < r * 1.1 + pad) return true;
     }
-    const v = geo(...VIDHANA);
-    return Math.hypot(x - v.x, z - v.y) < 0.42;
+    const v = geo(...INDIA_GATE);
+    return Math.hypot(x - v.x, z - v.y) < 0.3;
   }
 
   private buildBuildings(count: number) {
@@ -328,11 +372,11 @@ export class City {
     );
     const accents = ["#ff5b9e", "#ead9c8", "#8be9ed", "#ff6a2a"].map((c) => new THREE.Color(c));
     const hubs = LOCALITIES.map((l) => geo(l.lat, l.lon));
-    const towers = ["Whitefield", "Electronic City", "Bellandur", "Marathahalli", "Hebbal", "Koramangala"].map((n) => {
+    const towers = ["Gurugram", "Noida", "Connaught Place", "Saket", "Okhla", "Ghaziabad"].map((n) => {
       const l = LOCALITIES.find((x) => x.name === n)!;
       return geo(l.lat, l.lon);
     });
-    const cbd = geo(12.9716, 77.6);
+    const cbd = geo(28.6315, 77.2167); // Connaught Place
     const m = new THREE.Matrix4();
     const q = new THREE.Quaternion();
     const s = new THREE.Vector3();
@@ -410,7 +454,7 @@ export class City {
     const spots: THREE.Vector3[] = [];
     PARKS.forEach(([lat, lon, rad]) => {
       const c = geo(lat, lon);
-      for (let i = 0; i < count * 0.32; i++) {
+      for (let i = 0; i < (count * 0.64) / PARKS.length; i++) {
         const a = r() * Math.PI * 2;
         const d = Math.sqrt(r()) * rad * 0.95;
         spots.push(new THREE.Vector3(c.x + Math.cos(a) * d * 1.1, 0, c.y + Math.sin(a) * d));
@@ -448,30 +492,30 @@ export class City {
     }
   }
 
-  private buildVidhana(model: GLTF) {
+  private buildIndiaGate(model: GLTF) {
     const v = model.scene;
     stylize(v, { outline: 0.35 });
-    const p = geo(...VIDHANA);
-    v.scale.setScalar(0.085);
+    const p = geo(...INDIA_GATE);
+    v.scale.setScalar(0.12);
     v.position.set(p.x, 0, p.y);
-    v.rotation.y = Math.PI * 0.08;
+    v.rotation.y = Math.PI / 2; // The arch faces west, down Kartavya Path.
     this.group.add(v);
   }
 
-  // Deccan-plateau buttes ringing the city, merged into a single draw (plus ink).
+  // Low, weathered ridges in the spirit of the Aravallis, merged into a single draw (plus ink).
   private buildMesas() {
     const r = rng(99);
-    const colors = ["#b94a7d", "#8a3466", "#cf5f55", "#a54a6a", "#6d2c5a"].map((c) => new THREE.Color(c));
+    const colors = ["#a8566f", "#7f3f62", "#b9695a", "#935069", "#633058"].map((c) => new THREE.Color(c));
     const flat: THREE.BufferGeometry[] = [];
     const smooth: THREE.BufferGeometry[] = [];
     const m = new THREE.Matrix4();
     for (let i = 0; i < 26; i++) {
       const a = (i / 26) * Math.PI * 2 + r() * 0.2;
       const d = 24 + r() * 26;
-      const h = 2 + r() * 7;
+      const h = 1.6 + r() * 5;
       const rt = 1.5 + r() * 4;
       const base =
-        r() < 0.3
+        r() < 0.7
           ? new THREE.IcosahedronGeometry(1, 1).scale(rt * 0.9, h * 0.55, rt * 0.8).translate(0, h * 0.2, 0)
           : new THREE.CylinderGeometry(rt, rt * (1.25 + r() * 0.4), h, 6 + Math.floor(r() * 3), 1).translate(0, h / 2, 0);
       m.makeRotationY(r() * Math.PI).setPosition(Math.cos(a) * d, 0, Math.sin(a) * d);
@@ -499,7 +543,7 @@ export class City {
     const capGeo = new THREE.SphereGeometry(0.07, 16, 8);
     const pickGeo = new THREE.CylinderGeometry(0.3, 0.3, 1, 8).translate(0, 0.5, 0);
     const pickMat = new THREE.MeshBasicMaterial({ visible: false });
-    LOCALITIES.filter((l) => l.name !== "Bengaluru").forEach((l, i) => {
+    LOCALITIES.filter((l) => l.name !== "Delhi").forEach((l, i) => {
       const p = geo(l.lat, l.lon);
       const group = new THREE.Group();
       group.position.set(p.x, 0, p.y);
@@ -536,7 +580,7 @@ export class City {
       b.pillar.material.uniforms.color.value.copy(c);
       b.cap.material.color.copy(c);
       b.ring.material.color.copy(c);
-      b.target = 0.45 + v.aqi / 45;
+      b.target = 0.45 + Math.min(v.aqi, 500) / 150;
     });
   }
 

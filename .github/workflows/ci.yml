@@ -17,9 +17,9 @@ jobs:
           enable-cache: true
       - run: uv sync --frozen --extra dev
       - run: uv run pytest -q
-      - run: uv run ruff check blr_air tests scripts agent.py caller.py models.py
-      - run: uv run ruff format --check blr_air tests scripts agent.py caller.py models.py
-      - run: uv run blr-air --demo --json
+      - run: uv run ruff check delhi_air tests scripts agent.py caller.py models.py
+      - run: uv run ruff format --check delhi_air tests scripts agent.py caller.py models.py
+      - run: uv run delhi-air --demo --json
       - run: uv build
   website:
     runs-on: ubuntu-latest

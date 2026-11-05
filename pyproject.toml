@@ -3,7 +3,7 @@ requires = ["setuptools>=75"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "blr-air"
+name = "delhi-air"
 version = "0.1.0"
 description = "Find an outdoor window using live air quality, rain and heat forecasts."
 readme = "README.md"
@@ -14,16 +14,16 @@ dependencies = ["uagents==0.26.1", "httpx==0.28.1", "python-dotenv==1.2.1", "aio
 dev = ["pytest==8.4.2", "pytest-asyncio==1.2.0", "ruff==0.14.3"]
 
 [project.scripts]
-blr-air = "blr_air.cli:main"
-blr-air-agent = "blr_air.agent_runtime:main"
-blr-air-caller = "blr_air.caller:main"
-blr-air-web = "blr_air.web:main"
+delhi-air = "delhi_air.cli:main"
+delhi-air-agent = "delhi_air.agent_runtime:main"
+delhi-air-caller = "delhi_air.caller:main"
+delhi-air-web = "delhi_air.web:main"
 
 [tool.setuptools.packages.find]
-include = ["blr_air*"]
+include = ["delhi_air*"]
 
 [tool.setuptools.package-data]
-blr_air = ["AGENT_README.md"]
+delhi_air = ["AGENT_README.md", "spots.json"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

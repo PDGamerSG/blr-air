@@ -39,7 +39,7 @@ export class Ufo {
   lights?: THREE.Object3D;
   beam: THREE.Mesh<THREE.CylinderGeometry, THREE.ShaderMaterial>;
   spot: THREE.Mesh<THREE.RingGeometry, THREE.MeshBasicMaterial>;
-  pilot: Gaali;
+  pilot: Hawa;
   beamUniforms = {
     color: { value: new THREE.Color("#ffe62b") },
     intensity: { value: 0 },
@@ -48,11 +48,11 @@ export class Ufo {
   tilt = new THREE.Vector2();
   zap = 0;
 
-  constructor(ufo: GLTF, gaali: GLTF) {
+  constructor(ufo: GLTF, hawa: GLTF) {
     const model = stylize(ufo.scene, { outline: 0.5 });
     this.lights = model.getObjectByName("UfoLights") ?? undefined;
     this.craft.add(model);
-    this.pilot = new Gaali(gaali.scene.clone(true), 0.4);
+    this.pilot = new Hawa(hawa.scene.clone(true), 0.4);
     this.pilot.root.position.set(0, 0.5, 0.05);
     this.craft.add(this.pilot.root);
     this.root.add(this.craft);
@@ -114,7 +114,7 @@ export class Ufo {
 }
 
 // The mascot. Eye follows the pointer, blinks, antennae sway, mask can come off.
-export class Gaali {
+export class Hawa {
   root = new THREE.Group();
   model: THREE.Object3D;
   eye: THREE.Object3D[] = [];
@@ -130,15 +130,15 @@ export class Gaali {
     this.model = stylize(model, { outline: 0.45 });
     this.model.scale.setScalar(scale);
     this.root.add(this.model);
-    for (const n of ["GaaliEye", "GaaliPupil", "GaaliShine"]) {
+    for (const n of ["HawaEye", "HawaPupil", "HawaShine"]) {
       const o = this.model.getObjectByName(n);
       if (o) this.eye.push(o);
     }
-    this.pupil = this.model.getObjectByName("GaaliPupil") ?? undefined;
+    this.pupil = this.model.getObjectByName("HawaPupil") ?? undefined;
     if (this.pupil) this.pupilHome.copy(this.pupil.position);
-    this.mask = this.model.getObjectByName("GaaliMask") ?? undefined;
+    this.mask = this.model.getObjectByName("HawaMask") ?? undefined;
     if (this.mask) this.maskHome.copy(this.mask.position);
-    this.antennae = this.model.getObjectByName("GaaliAntennae") ?? undefined;
+    this.antennae = this.model.getObjectByName("HawaAntennae") ?? undefined;
   }
 
   update(time: number, dt: number, pointer: THREE.Vector2) {
