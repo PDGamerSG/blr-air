@@ -7,7 +7,7 @@ from zoneinfo import ZoneInfo
 
 import httpx
 
-from delhi_air.advisor import Advisor, search_summary, wants_place
+from delhi_air.advisor import Advisor, search_summary, wants_place, wants_suggestion
 from delhi_air.assessment import assess
 from delhi_air.conversation import chat_intent, clean_message, describe_conditions
 from delhi_air.domain import AirError, Forecast, Location, ProviderError, RequestSpec, Window
@@ -49,6 +49,7 @@ class Recommendation:
     backups: tuple[Window, ...] = ()
     venue: dict | None = None
     search: dict | None = None
+    suggestion: dict | None = None
 
     def to_dict(self):
         current = self.forecast.current
@@ -77,6 +78,7 @@ class Recommendation:
             "source": "Synthetic offline demo" if self.forecast.is_demo else SOURCE,
             "limitation": LIMITATION,
             "search": self.search,
+            "suggestion": self.suggestion,
             "summary": describe(self),
             "assessment": assess(self),
             "venue": self.venue,
@@ -577,6 +579,8 @@ class AirService:
 
     async def chat(self, text: str, *, near=None) -> Recommendation | ComparisonResult | str:
         text = clean_message(text)
+        if wants_suggestion(text):
+            return await self.advisor.auto(text=text, near=near)
         if wants_place(text):
             return await self.advisor.suggest(text, near=near)
         intent = await chat_intent(text, self)

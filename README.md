@@ -48,6 +48,10 @@ python -m delhi_air --latitude 28.5494 --longitude 77.2001 --hours 2
 python -m delhi_air --place 'New York, US' --day tomorrow --period morning
 ```
 
+## The agent decides for you
+
+The agent doesn't have to be asked. Say "what should I do near Rohini", or let the watch check in by itself, and it picks the activity, the time and the place, and explains why. It downgrades hard exercise when the air is too bad and says to stay in when that's the honest answer. `POST /api/recommend` accepts a position plus preferred activities and usual hours, and stores none of them.
+
 ## Ask where and when
 
 Say what you want to do and roughly where. The agent searches real places, checks each one's forecast and nearest monitor, and picks a place and a time:

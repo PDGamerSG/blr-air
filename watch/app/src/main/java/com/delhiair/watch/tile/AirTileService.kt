@@ -3,6 +3,7 @@ package com.delhiair.watch.tile
 import androidx.concurrent.futures.ResolvableFuture
 import androidx.wear.protolayout.ActionBuilders
 import androidx.wear.protolayout.ColorBuilders.argb
+import androidx.wear.protolayout.DimensionBuilders
 import androidx.wear.protolayout.DimensionBuilders.dp
 import androidx.wear.protolayout.DimensionBuilders.expand
 import androidx.wear.protolayout.DimensionBuilders.sp
@@ -25,6 +26,7 @@ import com.delhiair.watch.core.dayLabel
 import com.delhiair.watch.core.fixed
 import com.delhiair.watch.core.recommend
 import com.delhiair.watch.data.AirRepository
+import com.delhiair.watch.data.HabitStore
 import com.delhiair.watch.data.Snapshot
 import com.delhiair.watch.data.headlineAqi
 import com.delhiair.watch.data.localStation
@@ -57,6 +59,19 @@ private fun label(value: String, size: Float, color: Int, bold: Boolean = false)
     )
     .build()
 
+/** The app's ring: a 270 degree scale opening at the bottom, anchored at its start. */
+private fun ring(sweep: Float, color: Int) = LayoutElementBuilders.Arc.Builder()
+    .setAnchorAngle(DimensionBuilders.degrees(225f))
+    .setAnchorType(LayoutElementBuilders.ARC_ANCHOR_START)
+    .addContent(
+        LayoutElementBuilders.ArcLine.Builder()
+            .setLength(DimensionBuilders.degrees(sweep))
+            .setThickness(dp(7f))
+            .setColor(argb(color))
+            .build(),
+    )
+    .build()
+
 /** The glanceable summary: current air, then the next window worth planning around. */
 class AirTileService : TileService() {
     private fun bestLine(snapshot: Snapshot, request: PlanRequest): Pair<String, String> = try {
@@ -79,7 +94,9 @@ class AirTileService : TileService() {
             column.addContent(label("Delhi Air", 16f, 0xFFFFE62B.toInt(), bold = true))
             column.addContent(label("Tap to refresh", 13f, 0xFFFFF7EF.toInt()))
         } else {
-            val (best, detail) = bestLine(snapshot, request)
+                val agent = HabitStore(this).surface.split("\n")
+            val fresh = agent.size == 3 && nowSeconds() - (agent[2].toLongOrNull() ?: 0) < 3 * 3600
+            val (best, detail) = if (fresh) agent[0] to agent[1] else bestLine(snapshot, request)
             val source = if (snapshot.localStation != null) "Station" else "Model"
             column.addContent(label(snapshot.location.name.substringBefore(","), 13f, 0xFF8BE9ED.toInt()))
             column.addContent(label(fixed(aqi, 0), 42f, colorFor(aqi), bold = true))
@@ -103,12 +120,15 @@ class AirTileService : TileService() {
                     .build(),
             )
             .build()
-        return LayoutElementBuilders.Box.Builder()
+        val box = LayoutElementBuilders.Box.Builder()
             .setWidth(expand())
             .setHeight(expand())
             .setModifiers(ModifiersBuilders.Modifiers.Builder().setClickable(open).build())
-            .addContent(column.build())
-            .build()
+        if (aqi != null) {
+            box.addContent(ring(360f * 0.75f, 0x1FFFFFFF))
+            box.addContent(ring((270f * (aqi / 500.0).coerceIn(0.02, 1.0)).toFloat(), colorFor(aqi)))
+        }
+        return box.addContent(column.build()).build()
     }
 
     override fun onTileRequest(requestParams: RequestBuilders.TileRequest): ListenableFuture<TileBuilders.Tile> {

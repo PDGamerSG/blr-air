@@ -10,7 +10,15 @@ import android.os.Handler
 import android.os.Looper
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -19,46 +27,53 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.wear.compose.material3.Button
-import androidx.wear.compose.material3.Card
 import androidx.wear.compose.material3.CircularProgressIndicator
-import androidx.wear.compose.material3.FilledTonalButton
-import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.SwitchButton
 import androidx.wear.compose.material3.Text
+import com.delhiair.watch.R
+import com.delhiair.watch.data.HabitStore
 import com.delhiair.watch.core.AIR_MODEL_NOTE
 import com.delhiair.watch.core.Activity
 import com.delhiair.watch.core.Day
 import com.delhiair.watch.core.LOCALITIES
 import com.delhiair.watch.core.Period
 import com.delhiair.watch.core.PlanRequest
+import com.delhiair.watch.core.clock
+import com.delhiair.watch.core.dayLabel
 import com.delhiair.watch.core.fixed
-import com.delhiair.watch.core.windowLabel
 
 /** Tap to step through the options; a watch has no room for a form. */
 private fun <T> List<T>.after(value: T): T = this[(indexOf(value) + 1) % size]
 
 @Composable
-private fun Cycle(label: String, value: String, onClick: () -> Unit) {
-    FilledTonalButton(
-        onClick = onClick,
-        label = { Text(label) },
-        secondaryLabel = { Text(value) },
-        modifier = Modifier.fillMaxWidth(),
-    )
+private fun Cycle(label: String, value: String, icon: Int = R.drawable.ic_tune, onClick: () -> Unit) {
+    MenuRow(icon, label, value, onClick = onClick)
+}
+
+private fun activityIcon(activity: Activity) = when (activity) {
+    Activity.RUN -> R.drawable.ic_run
+    Activity.CYCLE -> R.drawable.ic_bike
+    Activity.KIDS -> R.drawable.ic_kids
+    Activity.COMMUTE -> R.drawable.ic_commute
+    Activity.WALK -> R.drawable.ic_walk
 }
 
 @Composable
 fun PlanScreen(request: PlanRequest, onChange: (PlanRequest) -> Unit, onLimits: () -> Unit) {
     Scroller {
-        item { ListHeader { Text("Plan") } }
+        item { SectionTitle("Plan") }
         item {
-            Cycle("Activity", request.activity.label) {
+            Cycle("Activity", request.activity.label, activityIcon(request.activity)) {
                 onChange(request.copy(activity = Activity.entries.toList().after(request.activity)))
             }
         }
@@ -86,15 +101,30 @@ fun PlanScreen(request: PlanRequest, onChange: (PlanRequest) -> Unit, onLimits: 
             )
         }
         item {
+            val context = LocalContext.current
+            val store = remember { HabitStore(context) }
+            var auto by remember { mutableStateOf(store.autoSuggestions) }
+            val agentAccess = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {}
+            SwitchButton(
+                checked = auto,
+                onCheckedChange = {
+                    auto = it
+                    store.autoSuggestions = it
+                    val missing = AGENT_PERMISSIONS.filter { name ->
+                        ContextCompat.checkSelfPermission(context, name) != PackageManager.PERMISSION_GRANTED
+                    }
+                    if (it && missing.isNotEmpty()) agentAccess.launch(missing.toTypedArray())
+                },
+                label = { Text("Agent suggestions") },
+                secondaryLabel = { Text("Learns your routine") },
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        item {
             val count = listOf(
                 request.maxAqi, request.maxRain, request.maxTemperature, request.maxUv, request.maxWind,
             ).count { it != null }
-            FilledTonalButton(
-                onClick = onLimits,
-                label = { Text("Limits") },
-                secondaryLabel = { Text(if (count == 0) "None set" else "$count set") },
-                modifier = Modifier.fillMaxWidth(),
-            )
+            MenuRow(R.drawable.ic_tune, "Limits", if (count == 0) "None set" else "$count set", onClick = onLimits)
         }
     }
 }
@@ -111,30 +141,30 @@ private fun show(value: Double?, unit: String) =
 @Composable
 fun LimitsScreen(request: PlanRequest, onChange: (PlanRequest) -> Unit) {
     Scroller {
-        item { ListHeader { Text("Limits") } }
+        item { SectionTitle("Limits") }
         item { Centered("Every hour must pass. Limits are never relaxed.", color = Muted, size = 12) }
         item {
-            Cycle("US AQI", show(request.maxAqi, "")) {
+            Cycle("US AQI", show(request.maxAqi, ""), R.drawable.ic_air) {
                 onChange(request.copy(maxAqi = AQI_STEPS.after(request.maxAqi)))
             }
         }
         item {
-            Cycle("Rain chance", show(request.maxRain, "%")) {
+            Cycle("Rain chance", show(request.maxRain, "%"), R.drawable.ic_rain) {
                 onChange(request.copy(maxRain = RAIN_STEPS.after(request.maxRain)))
             }
         }
         item {
-            Cycle("Feels like", show(request.maxTemperature, "°C")) {
+            Cycle("Feels like", show(request.maxTemperature, "°C"), R.drawable.ic_heat) {
                 onChange(request.copy(maxTemperature = HEAT_STEPS.after(request.maxTemperature)))
             }
         }
         item {
-            Cycle("UV index", show(request.maxUv, "")) {
+            Cycle("UV index", show(request.maxUv, ""), R.drawable.ic_sun) {
                 onChange(request.copy(maxUv = UV_STEPS.after(request.maxUv)))
             }
         }
         item {
-            Cycle("Wind", show(request.maxWind, " km/h")) {
+            Cycle("Wind", show(request.maxWind, " km/h"), R.drawable.ic_air) {
                 onChange(request.copy(maxWind = WIND_STEPS.after(request.maxWind)))
             }
         }
@@ -203,9 +233,10 @@ fun PlacesScreen(
         if (granted) locate() else status = "Location permission is off."
     }
     Scroller {
-        item { ListHeader { Text("Place") } }
+        item { SectionTitle("Place") }
         item {
             Button(
+                icon = { SmallIcon(R.drawable.ic_locate, Ink, 22.dp) },
                 onClick = {
                     val state = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
                     if (state == PackageManager.PERMISSION_GRANTED) {
@@ -221,12 +252,11 @@ fun PlacesScreen(
         }
         items(LOCALITIES.size) { index ->
             val locality = LOCALITIES[index]
-            FilledTonalButton(
-                onClick = { onPick(locality.name) },
-                label = { Text(locality.name) },
-                secondaryLabel = if (locality.name.equals(selected, true)) ({ Text("Selected") }) else null,
-                modifier = Modifier.fillMaxWidth(),
-            )
+            MenuRow(
+                R.drawable.ic_pin,
+                locality.name,
+                if (locality.name.equals(selected, true)) "Selected" else null,
+            ) { onPick(locality.name) }
         }
     }
 }
@@ -235,7 +265,7 @@ fun PlacesScreen(
 fun ComparePickScreen(onCompare: (List<String>) -> Unit) {
     val picked = remember { mutableStateListOf<String>() }
     Scroller {
-        item { ListHeader { Text("Pick 2 or 3") } }
+        item { SectionTitle("Pick 2 or 3") }
         item {
             Button(
                 onClick = { onCompare(picked.toList()) },
@@ -262,57 +292,76 @@ fun ComparePickScreen(onCompare: (List<String>) -> Unit) {
 fun CompareScreen(state: AirUiState) {
     val comparison = state.comparison
     Scroller {
-        item { ListHeader { Text("Compare") } }
+        item { SectionTitle("Compare") }
         if (state.comparing || comparison == null) {
-            item { CircularProgressIndicator(modifier = Modifier.padding(16.dp)) }
+            item { CircularProgressIndicator(modifier = Modifier.padding(16.dp).size(48.dp)) }
             return@Scroller
         }
         comparison.cleanerNow?.let { place ->
             item {
-                Centered(
-                    "Monitors show $place is cleaner right now than ${comparison.winner}. " +
-                        "The ranking below is forecast only.",
-                    color = Sun,
-                    size = 12,
-                )
+                Panel {
+                    Centered(
+                        "Monitors show $place is cleaner right now. The ranking is forecast only.",
+                        color = Sun,
+                    )
+                }
             }
         }
         comparison.sharedAirModel.forEach { names ->
             item {
                 Centered(
-                    "Same air forecast: ${names.joinToString(" and ") { it.substringBefore(",") }} share one " +
-                        "model cell, so it can't say which is cleaner.",
-                    color = Sun,
+                    "${names.joinToString(" and ") { it.substringBefore(",") }} share one forecast cell.",
+                    color = Muted,
                     size = 12,
                 )
             }
         }
         if (comparison.tiedPlaces.isNotEmpty()) {
-            item { Centered("Forecast score tie. Your order breaks it.", color = Sun, size = 12) }
+            item { Centered("Forecast tie. Your order breaks it.", color = Muted, size = 12) }
         }
         comparison.items.forEachIndexed { index, entry ->
             item {
                 val recommendation = entry.recommendation
-                Card(onClick = {}, modifier = Modifier.fillMaxWidth()) {
+                Panel {
                     if (recommendation == null) {
-                        Text(entry.place, fontSize = 14.sp, color = Paper)
-                        Text("Unavailable: ${entry.error}", fontSize = 12.sp, color = Sun)
+                        Column {
+                            Text(entry.place, fontSize = 15.sp, color = Paper, fontWeight = FontWeight.Bold)
+                            Text("Unavailable: ${entry.error}", fontSize = 12.sp, color = Sun)
+                        }
                     } else {
                         val window = recommendation.window
-                        Text("${index + 1}. ${entry.place}", fontSize = 14.sp, color = Paper)
-                        Text(windowLabel(window, recommendation.forecast.timezone), fontSize = 12.sp, color = Muted)
-                        Text(
-                            "AQI ${fixed(window.usAqi, 0)} · PM2.5 ${fixed(window.pm25, 0)}",
-                            fontSize = 13.sp,
-                            color = aqiColor(window.maxAqi),
-                        )
-                        entry.measuredAqi?.let {
-                            Text("Measured now ${fixed(it, 0)}", fontSize = 12.sp, color = aqiColor(it))
+                        val timezone = recommendation.forecast.timezone
+                        val shownAqi = entry.measuredAqi ?: window.usAqi
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.size(30.dp).clip(CircleShape)
+                                    .background(if (index == 0) Sun else Color.White.copy(alpha = 0.14f)),
+                            ) {
+                                Text("${index + 1}", color = if (index == 0) Ink else Paper, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            }
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(entry.place.substringBefore(","), fontSize = 15.sp, color = Paper, fontWeight = FontWeight.Bold, maxLines = 1)
+                                Text(
+                                    "${dayLabel(window.start, timezone)} · ${clock(window.start, timezone)}",
+                                    fontSize = 12.sp,
+                                    color = Muted,
+                                    maxLines = 1,
+                                )
+                                Text(
+                                    "AQI ${fixed(window.usAqi, 0)}" + (entry.measuredAqi?.let { " · now ${fixed(it, 0)}" } ?: ""),
+                                    fontSize = 13.sp,
+                                    color = aqiColor(shownAqi),
+                                    fontWeight = FontWeight.SemiBold,
+                                    maxLines = 1,
+                                )
+                            }
                         }
                     }
                 }
             }
         }
-        item { Centered(AIR_MODEL_NOTE, color = Muted, size = 12) }
+        item { Centered(AIR_MODEL_NOTE, color = Muted, size = 11) }
+        item { Box(Modifier.height(24.dp)) }
     }
 }

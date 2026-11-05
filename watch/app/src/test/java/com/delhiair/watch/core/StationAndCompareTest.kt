@@ -168,6 +168,21 @@ class StationAndCompareTest {
     }
 
     @Test
+    fun theVerdictIsStricterForChildrenAndHardExercise() {
+        fun window(aqi: Double, rain: Double = 0.0, heat: Double = 25.0) =
+            Window(0, 3600, aqi, 50.0, rain, heat, aqi, 0.0)
+        val walk = PlanRequest()
+        val run = PlanRequest(activity = Activity.RUN)
+        assertEquals(Verdict.GO, verdictFor(window(80.0), walk))
+        assertEquals(Verdict.CARE, verdictFor(window(130.0), walk))
+        assertEquals(Verdict.SHORT, verdictFor(window(180.0), walk))
+        assertEquals(Verdict.STAY, verdictFor(window(180.0), run))
+        assertEquals(Verdict.STAY, verdictFor(window(260.0), walk))
+        assertEquals(Verdict.RAIN, verdictFor(window(80.0, rain = 80.0), walk))
+        assertEquals(Verdict.HEAT, verdictFor(window(80.0, heat = 38.0), walk))
+    }
+
+    @Test
     fun spokenAnswerNamesRiskAndSource() {
         val text = spokenSummary(item("Saket, Delhi", 220.0).recommendation!!)
         assertTrue(text, text.startsWith("Saket,"))

@@ -13,6 +13,9 @@ Requires Wear OS 3 or newer (Android 11, API 30): Galaxy Watch 4 onwards, Pixel 
 | Best window | Best time in the next 48 hours, with up to 2 backups |
 | Planning | Activity, 1 or 2 hours, day, time of day, daylight only |
 | Limits | AQI, rain, feels-like, UV and wind. Never relaxed automatically |
+| For You | The agent suggests what to do, when, where and why without being asked, and explains its reasoning |
+| Learns your routine | Which activities you choose or decline, hours you're active, and your usual area. Kept on the watch |
+| Speaks up by itself | An hourly check that notifies you of a good window soon or a stay-in warning, at most twice a day and never at night |
 | Where and when | Ask "a walk near Rohini" or "a bike ride near Dwarka" and the agent picks a real place and time, with alternatives |
 | Places | 22 Delhi NCR localities, your location, or any city by asking |
 | Compare | 2 or 3 places, with measured readings, disclosing shared model cells and contradictions |
@@ -58,6 +61,12 @@ adb reverse tcp:8080 tcp:8080
 ```
 
 Then set `AGENT_URL=http://127.0.0.1:8080`. Plain HTTP is allowed only for that address. The forward stops when adb disconnects, and Ask then falls back to the watch's own planner.
+
+## The agent acts by itself
+
+Every hour the background job asks the agent what you should do next, using your position, usual hours and favourite activities. If the agent has something worth saying, the watch notifies you with what, when, where and why. It also fills the For You card and the tile.
+
+The watch learns from what you plan, when you ask, your step count and the suggestions you turn down. That history stays on the watch. It notifies you at most twice a day, with at least 3 hours between alerts, and never from 22:00 to 07:00. Turn it off with Plan > Agent suggestions.
 
 ## Build
 

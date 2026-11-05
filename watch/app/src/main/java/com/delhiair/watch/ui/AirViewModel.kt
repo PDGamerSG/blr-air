@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.delhiair.watch.BuildConfig
+import com.delhiair.watch.core.Activity
 import com.delhiair.watch.core.AirException
 import com.delhiair.watch.core.Comparison
 import com.delhiair.watch.core.ComparisonItem
@@ -15,6 +16,8 @@ import com.delhiair.watch.data.AgentClient
 import com.delhiair.watch.data.AgentReply
 import com.delhiair.watch.data.AgentUnavailable
 import com.delhiair.watch.data.AirRepository
+import com.delhiair.watch.data.Autopilot
+import com.delhiair.watch.data.HabitStore
 import com.delhiair.watch.data.MAX_OFFLINE_SECONDS
 import com.delhiair.watch.data.Snapshot
 import com.delhiair.watch.data.localStation
@@ -51,12 +54,16 @@ data class AirUiState(
     val fromAgent: Boolean = false,
     /** The words the agent was given, so a mishearing is visible. */
     val heard: String? = null,
+    /** What the agent recommends without being asked. */
+    val forYou: Recommendation? = null,
     val message: String? = null,
 )
 
 class AirViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = AirRepository(application)
     private val agent = AgentClient(BuildConfig.AGENT_URL)
+    private val habits = HabitStore(application)
+    private val autopilot = Autopilot(application, repository)
     private val _state = MutableStateFlow(AirUiState(request = repository.loadRequest()))
     val state: StateFlow<AirUiState> = _state.asStateFlow()
 
@@ -72,6 +79,34 @@ class AirViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         refresh()
+        loadForYou()
+    }
+
+    private fun loadForYou() {
+        viewModelScope.launch {
+            val plan = autopilot.suggest()
+            _state.update { it.copy(forYou = plan) }
+        }
+    }
+
+    /** Opening the agent's own suggestion shows it without changing the home place. */
+    fun openForYou(open: (String) -> Unit) {
+        val plan = _state.value.forYou ?: return
+        _state.update { it.copy(recommendation = plan, fromAgent = true, heard = null) }
+        open(Routes.WINDOW)
+    }
+
+    /** "Not for me" teaches the agent, then it thinks again. */
+    fun notForMe() {
+        val activity = _state.value.forYou?.request?.activity ?: return
+        habits.update { it.declined(activity) }
+        _state.update { it.copy(forYou = null) }
+        loadForYou()
+    }
+
+    private fun learn(activity: Activity) {
+        val hour = java.time.LocalTime.now().hour
+        habits.update { it.chose(activity, hour) }
     }
 
     fun refresh(force: Boolean = false) = load(_state.value.request, force)
@@ -81,7 +116,10 @@ class AirViewModel(application: Application) : AndroidViewModel(application) {
         val current = _state.value
         if (current.asking || current.loading) return
         val fetched = current.snapshot?.forecast?.fetchedAt
-        if (fetched == null || nowSeconds() - fetched >= STALE_AFTER_SECONDS) refresh()
+        if (fetched == null || nowSeconds() - fetched >= STALE_AFTER_SECONDS) {
+            refresh()
+            loadForYou()
+        }
     }
 
     fun update(request: PlanRequest, then: (() -> Unit)? = null) =
@@ -112,6 +150,22 @@ class AirViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /** One tap: find a place for this activity around wherever the watch is set to. */
+    fun quickAsk(activity: Activity, open: (String) -> Unit) {
+        val phrase = when (activity) {
+            Activity.RUN -> "a run near me"
+            Activity.CYCLE -> "a bike ride near me"
+            Activity.KIDS -> "take my kids out near me"
+            else -> "a walk near me"
+        }
+        if (agent.configured) {
+            ask(phrase, open)
+        } else {
+            learn(activity)
+            update(_state.value.request.copy(activity = activity)) { open(Routes.WINDOW) }
+        }
+    }
+
     private fun showReply(reply: AgentReply, open: (String) -> Unit) {
         when (reply) {
             is AgentReply.Answer -> {
@@ -120,6 +174,7 @@ class AirViewModel(application: Application) : AndroidViewModel(application) {
             }
             is AgentReply.Plan -> {
                 val plan = reply.recommendation
+                learn(plan.request.activity)
                 // The agent resolved this place, so the watch must not guess it again.
                 repository.remember(plan.request.place, plan.location)
                 repository.saveRequest(plan.request)
@@ -157,7 +212,10 @@ class AirViewModel(application: Application) : AndroidViewModel(application) {
     private fun askLocally(text: String, open: (String) -> Unit) {
         val notice = "Agent unreachable, so the watch planned this itself."
         try {
-            val parsed = parseLocal(text)
+            // "Near me" means the watch's current place to the local parser.
+            val parsed = parseLocal(text.replace(" near me", "")).let {
+                if (" near me" in text) it.copy(place = _state.value.request.place) else it
+            }
             if (parsed.places.size > 1) {
                 compare(parsed.places, parsed)
                 open(Routes.COMPARE)

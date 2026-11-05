@@ -13,6 +13,7 @@ from collections import OrderedDict, deque
 from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from typing import Annotated, Literal
 from urllib.parse import urlsplit
 
 import httpx
@@ -52,6 +53,20 @@ class AskInput(BaseModel):
     # Where the asker is, for "near me" and requests that name no area.
     latitude: float | None = Field(default=None, ge=-90, le=90, allow_inf_nan=False)
     longitude: float | None = Field(default=None, ge=-180, le=180, allow_inf_nan=False)
+
+
+class RecommendInput(BaseModel):
+    """What a client has learnt about its user; none of it is stored here."""
+
+    model_config = ConfigDict(extra="forbid")
+    latitude: float = Field(ge=-90, le=90, allow_inf_nan=False)
+    longitude: float = Field(ge=-180, le=180, allow_inf_nan=False)
+    activities: list[Literal["run", "cycle", "walk", "kids"]] = Field(
+        default_factory=list, max_length=4
+    )
+    usual_hours: list[Annotated[int, Field(ge=0, le=23)]] = Field(
+        default_factory=list, max_length=24
+    )
 
 
 class Selection(BaseModel):
@@ -290,6 +305,21 @@ def create_app(*, service=None, voice=None, static_dir=None, rate_limit=30, venu
                 data.update(plan_id=token, expires_at=expires.isoformat())
             return web.json_response(data, status=200 if data["status"] == "ok" else 422)
 
+    async def recommend(request):
+        """The agent's own suggestion: what to do, when, where and why."""
+        payload = RecommendInput.model_validate(await json_body(request))
+        if slots.locked():
+            return error("The agent is busy. Please retry shortly.", 503, {"Retry-After": "5"})
+        async with slots, asyncio.timeout(50):
+            result = await service.advisor.auto(
+                near=(payload.latitude, payload.longitude),
+                activities=tuple(payload.activities),
+                usual_hours=frozenset(payload.usual_hours),
+            )
+            data = result.to_dict()
+            data["kind"] = "plan"
+            return web.json_response(data)
+
     def selected(selection):
         try:
             result = store.get(selection.plan_id)
@@ -392,6 +422,7 @@ def create_app(*, service=None, voice=None, static_dir=None, rate_limit=30, venu
             web.get("/api/status", status),
             web.post("/api/plan", plan),
             web.post("/api/ask", ask),
+            web.post("/api/recommend", recommend),
             web.get("/api/calendar/{token}", calendar),
             web.post("/api/transcribe", transcribe),
             web.post("/api/speech", speech),

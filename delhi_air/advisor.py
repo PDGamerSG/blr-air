@@ -8,7 +8,7 @@ import asyncio
 import json
 import math
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from pathlib import Path
 from urllib.parse import urlencode
@@ -45,6 +45,40 @@ ANCHOR = re.compile(
     r"|[?.!,]|$)",
     re.I,
 )
+
+
+SUGGEST = re.compile(
+    r"\b(?:what (?:can|should|could|shall) i do|what to do|suggest something|"
+    r"recommend something|surprise me|anything (?:good )?to do|plan my (?:day|morning|evening)|"
+    r"should i go out)\b",
+    re.I,
+)
+ACTIVITY_NAMES = {
+    "walk": "walk",
+    "run": "run",
+    "cycle": "bike ride",
+    "kids": "outing with the kids",
+}
+LEVELS = {
+    "go": "Good to go",
+    "care": "Go with care",
+    "short": "Keep it short",
+    "stay": "Better to stay in",
+}
+
+
+def wants_suggestion(text: str) -> bool:
+    """A request with nothing chosen yet, so the agent decides what to do as well."""
+    return bool(SUGGEST.search(text))
+
+
+def level(activity: str, aqi: float) -> str:
+    """Children and hard exercise get the stricter reading, as the AQI guidance advises."""
+    if aqi > 200 or (activity in ("run", "cycle", "kids") and aqi > 150):
+        return "stay"
+    if aqi > 150:
+        return "short"
+    return "care" if aqi > 100 else "go"
 
 
 def wants_place(text: str) -> bool:
@@ -95,6 +129,7 @@ class Candidate:
     forecast: object
     measured: object
     score: float
+    activity: str = "walk"
 
 
 class Advisor:
@@ -164,6 +199,57 @@ class Advisor:
             search=findings(best, ranked, anchor, total, request),
         )
 
+    async def auto(self, *, text="", near=None, activities=(), usual_hours=(), now=None):
+        """Decide unprompted: what to do, when, where and why, from live air and known habits."""
+        from delhi_air.service import Recommendation
+
+        anchor = await self.anchor(text, near)
+        if anchor is None:
+            return "Which area should I plan around? Try 'what should I do near Rohini'."
+        now = now or datetime.now(UTC)
+        order = list(dict.fromkeys([*activities, "walk", "run", "cycle"]))[:3]
+        plans = []
+        try:
+            async with asyncio.timeout(30):
+                for activity in order:
+                    request = RequestSpec(activity=activity)
+                    found, total, _ = self.search(anchor, activity)
+                    ranked = await self.analyse(found, request, now) if found else []
+                    if ranked:
+                        plans.append((request, ranked, total))
+                here = await self.stations.near(anchor.latitude, anchor.longitude)
+        except TimeoutError as exc:
+            raise ProviderError("The search took too long. Please try again.") from exc
+        if not plans:
+            raise NoWindowError("No complete outdoor window is available in the next 48 hours.")
+        options = [
+            (request, ranked, total, *pick_time(ranked[0], usual_hours, now))
+            for request, ranked, total in plans
+        ]
+        chosen = next((item for item in options if item[5] != "stay"), None)
+        stay_in = chosen is None
+        # When nothing is advisable, the gentlest outing is still worth knowing about.
+        chosen = chosen or next((i for i in options if i[0].activity == "walk"), options[0])
+        request, ranked, total, window, backups, kind = chosen
+        best = replace(ranked[0], window=window, backups=backups)
+        name = f"{best.spot['name']}, near {anchor.name.split(',')[0]}"
+        location = Location(
+            name, best.spot["latitude"], best.spot["longitude"], best.forecast.timezone
+        )
+        current = best.forecast.current
+        now_aqi = here.aqi if here else (current.us_aqi if current else None)
+        return Recommendation(
+            request.model_copy(update={"place": name}),
+            location,
+            best.forecast,
+            window,
+            backups,
+            search=findings(best, ranked, anchor, total, request),
+            suggestion=explain(
+                best, request, kind, stay_in, activities, usual_hours, now_aqi, bool(here), now
+            ),
+        )
+
     async def analyse(self, found, request: RequestSpec, now) -> list[Candidate]:
         # Nearby parks share a model cell, so each cell is fetched once.
         cells = {(round(spot["latitude"], 1), round(spot["longitude"], 1)) for _, _, spot in found}
@@ -198,9 +284,90 @@ class Advisor:
                 excess = max(0.0, measured.aqi - forecast.current.us_aqi)
             score = windows[0].score + 0.5 * excess + fit
             ranked.append(
-                Candidate(spot, km, windows[0], tuple(windows[1:]), forecast, measured, score)
+                Candidate(
+                    spot,
+                    km,
+                    windows[0],
+                    tuple(windows[1:]),
+                    forecast,
+                    measured,
+                    score,
+                    request.activity,
+                )
             )
         return sorted(ranked, key=lambda item: item.score)
+
+
+def pick_time(best: Candidate, usual_hours, now):
+    """The best time for this person: clean air, soon, and in their usual hours if possible."""
+    zone = ZoneInfo(best.forecast.timezone)
+
+    def cost(window):
+        wait = (window.start - now).total_seconds() / 3600
+        usual = window.start.astimezone(zone).hour in usual_hours
+        return window.score + 0.5 * wait - (25 if usual else 0)
+
+    windows = sorted((best.window, *best.backups), key=cost)
+    excess = 0.0
+    if best.measured and best.forecast.current:
+        excess = max(0.0, best.measured.aqi - best.forecast.current.us_aqi)
+    # Part of a monitor's excess over the model is expected to persist into the window.
+    expected = windows[0].max_aqi + 0.5 * excess
+    return windows[0], tuple(windows[1:]), level_for(best, expected)
+
+
+def level_for(best: Candidate, aqi: float) -> str:
+    return level(best.activity, aqi)
+
+
+def explain(best, request, kind, stay_in, liked, usual_hours, now_aqi, measured, now) -> dict:
+    window = best.window
+    zone = ZoneInfo(best.forecast.timezone)
+    start = window.start.astimezone(zone)
+    activity = request.activity
+    label = ACTIVITY_NAMES.get(activity, "outing")
+    place = best.spot["name"]
+    reasons = []
+    today = now.astimezone(zone).date() == start.date()
+    moment = f"{start:%H:%M}" if today else f"{start:%a} {start:%H:%M}"
+    if now_aqi is not None:
+        source = "monitors read" if measured else "the forecast says"
+        reasons.append(
+            f"Right now {source} AQI {now_aqi:.0f}. The forecast's cleanest time is {moment}, "
+            f"at about {window.us_aqi:.0f}."
+        )
+        forecast_now = best.forecast.current
+        if measured and forecast_now and now_aqi - forecast_now.us_aqi >= 50:
+            reasons.append("Monitors here are reading well above the forecast, so expect worse.")
+    if liked and activity != liked[0]:
+        reasons.append(
+            f"A {ACTIVITY_NAMES.get(liked[0], liked[0])} isn't advised in this air, "
+            f"so I picked a {label} instead."
+        )
+    elif liked:
+        reasons.append(f"You go for a {label} most often.")
+    if start.hour in usual_hours:
+        reasons.append(f"It fits your usual {start:%H}:00 routine.")
+    if best.km >= 0.1:
+        reasons.append(f"{place} is {best.km:.1f} km away.")
+    if stay_in:
+        headline = "Better to stay in"
+        detail = f"If you must go: {label}, {moment}, {place}"
+    else:
+        headline = (
+            f"{label.capitalize()}, {moment}" if not today else f"{label.capitalize()} at {moment}"
+        )
+        detail = place
+    return {
+        "kind": "stay" if stay_in else kind,
+        "label": LEVELS["stay" if stay_in else kind],
+        "headline": headline,
+        "detail": detail,
+        "reasons": reasons,
+        "activity": activity,
+        "now_aqi": round(now_aqi) if now_aqi is not None else None,
+        "window_aqi": round(window.us_aqi),
+    }
 
 
 def when(window, timezone: str) -> str:
@@ -253,7 +420,13 @@ def findings(best: Candidate, ranked, anchor: Location, total: int, request) -> 
 def search_summary(result) -> str:
     """The where-and-when answer that leads the agent's reply."""
     found, forecast = result.search, result.forecast
-    lines = [
+    advice = result.suggestion
+    lines = []
+    if advice:
+        lines.append(f"**{advice['headline']}**")
+        lines.append(advice["detail"])
+        lines.append("\n".join("- " + reason for reason in advice["reasons"]))
+    lines += [
         f"**Best place: {found['place']}**",
         f"**Best time: {when(result.window, forecast.timezone)}**",
         f"{found['why']}",

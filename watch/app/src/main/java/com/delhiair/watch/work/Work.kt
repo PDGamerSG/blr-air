@@ -30,6 +30,7 @@ import com.delhiair.watch.core.clock
 import com.delhiair.watch.core.Location
 import com.delhiair.watch.core.fixed
 import com.delhiair.watch.data.AirRepository
+import com.delhiair.watch.data.Autopilot
 import com.delhiair.watch.data.nowSeconds
 import com.delhiair.watch.tile.AirTileService
 import com.delhiair.watch.ui.MainActivity
@@ -47,14 +48,20 @@ fun refreshSurfaces(context: Context) {
 class RefreshWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
         val repository = AirRepository(applicationContext)
-        return try {
+        val refreshed = try {
             val location = repository.resolve(repository.loadRequest().place)
             repository.snapshot(location, force = true)
-            refreshSurfaces(applicationContext)
-            Result.success()
+            true
         } catch (_: AirException) {
-            Result.retry()
+            false
         }
+        // The agent's own turn. A failed refresh mustn't silence it: it has its own data.
+        Autopilot(applicationContext, repository).check()?.let { message ->
+            val (title, text) = message.split("\n", limit = 2).let { it[0] to it.getOrElse(1) { "" } }
+            Reminders.show(applicationContext, title, text, id = 2)
+        }
+        refreshSurfaces(applicationContext)
+        return if (refreshed) Result.success() else Result.retry()
     }
 
     companion object {
@@ -98,7 +105,7 @@ object Reminders {
         }
     }
 
-    fun show(context: Context, title: String, text: String) {
+    fun show(context: Context, title: String, text: String, id: Int = 1) {
         val manager = context.getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(
             NotificationChannel(CHANNEL, "Recheck reminders", NotificationManager.IMPORTANCE_DEFAULT),
@@ -119,7 +126,7 @@ object Reminders {
             .setContentIntent(open)
             .setAutoCancel(true)
             .build()
-        manager.notify(1, notification)
+        manager.notify(id, notification)
     }
 }
 

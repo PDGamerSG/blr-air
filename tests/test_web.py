@@ -301,3 +301,25 @@ async def test_ask_runs_the_agents_commands_and_respects_the_venue_budget(tmp_pa
             ]
     assert codes.count(429) == 2
     assert Venues.calls == 2
+
+
+async def test_recommend_takes_habits_and_returns_the_agents_decision(browser):
+    body = {"latitude": 28.73, "longitude": 77.11, "activities": ["walk"], "usual_hours": [15]}
+    response = await browser.post("/api/recommend", json=body)
+    assert response.status == 200
+    data = await response.json()
+    assert data["kind"] == "plan"
+    assert data["suggestion"]["headline"] and data["search"]["place"]
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        {},
+        {"latitude": 95, "longitude": 77},
+        {"latitude": 28, "longitude": 77, "usual_hours": [25]},
+        {"latitude": 28, "longitude": 77, "activities": ["swim"]},
+    ],
+)
+async def test_recommend_rejects_invalid_input(browser, body):
+    assert (await browser.post("/api/recommend", json=body)).status == 400

@@ -62,6 +62,14 @@ Voice works end to end: a person said "go for a bike ride near Dwarka" to the wa
 
 Not checked on the watch: the complication, internet through a phone over Bluetooth, or battery use.
 
+## The agent acting by itself
+
+Tested on the emulator on 5 Nov 2026, with its clock moved to a few hours before the recommended window. Nobody touched the app. The background job asked the agent, then posted: "Walk, Sat 13:00. Central Ridge Reserve Forest. Right now monitors read AQI 273. The forecast's cleanest time is Sat 13:00, at about 167."
+
+A fresh install asks for notification and activity permission on first launch. Without that, the agent could not speak up by itself.
+
+The new interface was also reviewed on a Galaxy Watch (SM-L315F), including the AQI ring against the bezel. There, the background job ran and succeeded, but the agent was out of reach at that moment, so it used its own plan for a time more than 6 hours away and correctly sent no alert. The notification itself has only been seen on the emulator. The redesigned tile has not been seen running.
+
 ## Independent audit
 
 Two separate reviews covered the port and the watch code. Their must-fix findings were fixed, including a race that could replace an agent plan, misheard places breaking the home screen, reminders rechecking the wrong place, stale data on the tile, Delhi place names refused by the geocoder, and `/api/ask` bypassing the paid venue budget.

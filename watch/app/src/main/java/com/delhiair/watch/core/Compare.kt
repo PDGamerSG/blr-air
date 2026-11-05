@@ -23,6 +23,18 @@ data class Recommendation(
     val backups: List<Window>,
     /** What the agent found when it chose the place itself. */
     val search: PlaceSearch? = null,
+    /** Present when the agent chose this by itself, rather than being asked. */
+    val suggestion: AutoSuggestion? = null,
+)
+
+data class AutoSuggestion(
+    val kind: String,
+    val label: String,
+    val headline: String,
+    val detail: String,
+    val reasons: List<String>,
+    /** The air around the wearer now, as the agent read it. */
+    val nowAqi: Int? = null,
 )
 
 data class PlaceSearch(
@@ -31,8 +43,32 @@ data class PlaceSearch(
     val checked: Int,
     val searched: Int,
     val area: String,
+    val distanceKm: Double,
+    val measuredAqi: Int?,
     val others: List<OtherPlace>,
 )
+
+enum class Verdict(val label: String) {
+    GO("Good to go"),
+    CARE("Go with care"),
+    SHORT("Keep it short"),
+    STAY("Better to stay in"),
+    RAIN("Rain likely"),
+    HEAT("Very hot"),
+}
+
+/** Children and hard exercise get the stricter reading, as in the assessment's guidance. */
+fun verdictFor(window: Window, request: PlanRequest): Verdict {
+    val sensitive = request.activity in setOf(Activity.RUN, Activity.CYCLE, Activity.KIDS)
+    return when {
+        window.maxAqi > 200 || (sensitive && window.maxAqi > 150) -> Verdict.STAY
+        window.maxAqi > 150 -> Verdict.SHORT
+        window.maxAqi > 100 -> Verdict.CARE
+        window.temperature >= 35 -> Verdict.HEAT
+        window.rain >= 70 -> Verdict.RAIN
+        else -> Verdict.GO
+    }
+}
 
 data class OtherPlace(val place: String, val distanceKm: Double, val time: String, val aqi: Int, val measured: Int?)
 

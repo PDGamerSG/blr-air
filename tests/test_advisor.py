@@ -5,7 +5,15 @@ from datetime import UTC, datetime, timedelta
 import httpx
 import pytest
 
-from delhi_air.advisor import SPOTS, find_anchor, fits, understand, wants_place
+from delhi_air.advisor import (
+    SPOTS,
+    find_anchor,
+    fits,
+    level,
+    understand,
+    wants_place,
+    wants_suggestion,
+)
 from delhi_air.demo import DemoProvider
 from delhi_air.localities import closest_location, local_location
 from delhi_air.service import AirService, Recommendation, describe
@@ -206,3 +214,70 @@ async def test_a_misheard_area_still_finds_a_place(service):
 
 def test_the_planner_keeps_real_towns_with_similar_names():
     assert local_location("Okha") is None
+
+
+@pytest.mark.parametrize(
+    "text",
+    ["what should i do today", "what can i do near Saket", "suggest something", "surprise me"],
+)
+def test_open_ended_requests_leave_the_choice_to_the_agent(text):
+    assert wants_suggestion(text)
+
+
+@pytest.mark.parametrize(
+    "activity,aqi,expected",
+    [
+        ("walk", 80, "go"),
+        ("walk", 130, "care"),
+        ("walk", 180, "short"),
+        ("run", 180, "stay"),
+        ("kids", 180, "stay"),
+        ("walk", 260, "stay"),
+    ],
+)
+def test_levels_are_stricter_for_hard_exercise_and_children(activity, aqi, expected):
+    assert level(activity, aqi) == expected
+
+
+async def test_the_agent_decides_what_when_where_and_why(service):
+    result = await service.advisor.auto(near=(28.7366, 77.1132), activities=("walk",))
+    advice = result.suggestion
+    assert advice["kind"] in ("short", "care", "go", "stay")
+    assert advice["reasons"] and advice["headline"]
+    assert result.search["place"] in advice["detail"]
+    assert result.to_dict()["suggestion"] == advice
+    assert describe(result).startswith(f"**{advice['headline']}**")
+
+
+async def test_a_favourite_run_is_downgraded_when_the_air_is_too_bad(service):
+    # The demo's cleanest air is about AQI 170: too high for running, fine for a short walk.
+    result = await service.advisor.auto(near=(28.7366, 77.1132), activities=("run",))
+    assert result.request.activity == "walk"
+    assert any("isn't advised" in reason for reason in result.suggestion["reasons"])
+
+
+async def test_usual_hours_pull_the_time_towards_the_routine(service):
+    near = (28.7366, 77.1132)
+    plain = await service.advisor.auto(near=near, activities=("walk",))
+    wanted = (plain.backups[0].start.hour,)
+    routine = await service.advisor.auto(near=near, activities=("walk",), usual_hours=wanted)
+    assert routine.window.start.hour == wanted[0]
+    assert any("usual" in reason for reason in routine.suggestion["reasons"])
+
+
+async def test_bad_air_everywhere_says_stay_in_but_still_gives_the_least_bad_option(service):
+    class Stations:
+        async def near(self, latitude, longitude):
+            return StationReading("Test", 600, 1.0)
+
+    service.advisor.stations = Stations()
+    result = await service.advisor.auto(near=(28.7366, 77.1132))
+    assert result.suggestion["kind"] == "stay"
+    assert result.suggestion["headline"] == "Better to stay in"
+    assert result.request.activity == "walk"
+
+
+async def test_chat_can_ask_the_agent_to_decide(service):
+    result = await service.chat("what should i do near Rohini")
+    assert isinstance(result, Recommendation) and result.suggestion
+    assert "Which area" in await service.chat("what should i do")
