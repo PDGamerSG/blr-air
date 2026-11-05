@@ -15,6 +15,7 @@ from delhi_air.advisor import (
     wants_suggestion,
 )
 from delhi_air.demo import DemoProvider
+from delhi_air.domain import AirError, Location
 from delhi_air.localities import closest_location, local_location
 from delhi_air.service import AirService, Recommendation, describe
 from delhi_air.stations import StationReading, parse_station
@@ -196,6 +197,8 @@ def test_only_near_fresh_stations_count(payload, usable):
         ("dwarika", "Dwarka, Delhi"),
         ("noyda", "Noida, Delhi NCR"),
         ("mayor vihar", "Mayur Vihar, Delhi"),
+        ("bhavana", "Bawana, Delhi"),
+        ("Havana", "Bawana, Delhi"),
     ],
 )
 def test_misheard_delhi_names_are_corrected(heard, name):
@@ -281,3 +284,57 @@ async def test_chat_can_ask_the_agent_to_decide(service):
     result = await service.chat("what should i do near Rohini")
     assert isinstance(result, Recommendation) and result.suggestion
     assert "Which area" in await service.chat("what should i do")
+
+
+class Abroad(DemoProvider):
+    """Finds one city outside Delhi NCR, where there is no place data."""
+
+    async def locate(self, place):
+        if place.casefold().startswith("lisbon"):
+            return Location("Lisbon, Portugal", 38.722, -9.139, "Europe/Lisbon")
+        return await super().locate(place)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "I actually want to go around Lisbon area and tell me what is best for me",
+        "go for a walk near Lisbon",
+    ],
+)
+async def test_outside_delhi_gives_the_best_time_and_says_why_no_place(text):
+    async with httpx.AsyncClient() as client:
+        result = await AirService(Abroad(), client).chat(text)
+    assert isinstance(result, Recommendation)
+    assert result.location.name == "Lisbon, Portugal"
+    assert result.search is None
+    assert result.suggestion["detail"] == "Lisbon"
+    assert any("only know specific places" in reason for reason in result.suggestion["reasons"])
+
+
+async def test_bawana_is_found_however_the_watch_hears_it(service):
+    for heard in ("Bhavana", "Havana", "Bawana"):
+        result = await service.chat(f"I want to go around {heard} area, what is best for me")
+        assert isinstance(result, Recommendation)
+        assert result.location.name.endswith(", near Bawana")
+
+
+def test_an_area_ends_where_the_rest_of_the_sentence_begins():
+    assert find_anchor("go around Saket area and tell me what is best for me") == "Saket"
+
+
+async def test_going_around_a_delhi_area_gets_a_real_place(service):
+    result = await service.chat("I want to go around Saket area and tell me what is best for me")
+    assert isinstance(result, Recommendation)
+    assert result.search["place"] in {spot["name"] for spot in SPOTS}
+
+
+async def test_a_named_activity_is_kept_when_asking_what_is_best(service):
+    result = await service.chat("a run near Saket, what is best for me")
+    assert result.request.activity == "run"
+
+
+async def test_no_places_near_the_wearer_stays_an_error():
+    async with httpx.AsyncClient() as client:
+        with pytest.raises(AirError, match="suitable place"):
+            await AirService(Abroad(), client).chat("what should i do", near=(38.722, -9.139))

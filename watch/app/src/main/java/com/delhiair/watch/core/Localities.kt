@@ -9,6 +9,7 @@ val LOCALITIES: List<Locality> = listOf(
     Locality("chandni chowk", "Chandni Chowk", 28.6506, 77.2303),
     Locality("karol bagh", "Karol Bagh", 28.6514, 77.1907),
     Locality("civil lines", "Civil Lines", 28.6796, 77.2244),
+    Locality("bawana", "Bawana", 28.7990, 77.0330),
     Locality("rohini", "Rohini", 28.7366, 77.1132),
     Locality("punjabi bagh", "Punjabi Bagh", 28.6683, 77.1313),
     Locality("janakpuri", "Janakpuri", 28.6219, 77.0878),

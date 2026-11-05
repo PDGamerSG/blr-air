@@ -11,6 +11,7 @@ LOCALITIES = {
     "karol bagh": ("Karol Bagh", 28.6514, 77.1907),
     "civil lines": ("Civil Lines", 28.6796, 77.2244),
     "rohini": ("Rohini", 28.7366, 77.1132),
+    "bawana": ("Bawana", 28.7990, 77.0330),
     "punjabi bagh": ("Punjabi Bagh", 28.6683, 77.1313),
     "janakpuri": ("Janakpuri", 28.6219, 77.0878),
     "dwarka": ("Dwarka", 28.5921, 77.0460),
@@ -57,6 +58,9 @@ MISHEARD = {
     "hose khas": "hauz khas",
     "house khas": "hauz khas",
     "how's cause": "hauz khas",
+    "bhavana": "bawana",
+    "bhawana": "bawana",
+    "havana": "bawana",
 }
 
 _SECTOR = r"(?:sector|sec)\s*-?\s*\d+[a-z]?"

@@ -7,7 +7,15 @@ from zoneinfo import ZoneInfo
 
 import httpx
 
-from delhi_air.advisor import Advisor, search_summary, wants_place, wants_suggestion
+from delhi_air.advisor import (
+    Advisor,
+    NoSpotsNearby,
+    area_only,
+    search_summary,
+    understand,
+    wants_place,
+    wants_suggestion,
+)
 from delhi_air.assessment import assess
 from delhi_air.conversation import chat_intent, clean_message, describe_conditions
 from delhi_air.domain import AirError, Forecast, Location, ProviderError, RequestSpec, Window
@@ -577,12 +585,23 @@ class AirService:
             validated, tuple(valid + [item for item in items if item.recommendation is None])
         )
 
+    async def _area_advice(self, text: str, near) -> Recommendation | str:
+        try:
+            if wants_place(text):
+                return await self.advisor.suggest(text, near=near)
+            return await self.advisor.auto(text=text, near=near)
+        except NoSpotsNearby as exc:
+            if exc.anchor.name == "your area":
+                raise
+            # No places to name there, but the forecast still knows the best time.
+            request = understand(text).model_copy(update={"place": exc.anchor.name})
+            plan = await self.recommend(request)
+            return replace(plan, suggestion=area_only(plan, datetime.now(UTC)))
+
     async def chat(self, text: str, *, near=None) -> Recommendation | ComparisonResult | str:
         text = clean_message(text)
-        if wants_suggestion(text):
-            return await self.advisor.auto(text=text, near=near)
-        if wants_place(text):
-            return await self.advisor.suggest(text, near=near)
+        if wants_place(text) or wants_suggestion(text):
+            return await self._area_advice(text, near)
         intent = await chat_intent(text, self)
         if intent.kind in ("answer", "clarify"):
             return intent.text

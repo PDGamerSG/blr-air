@@ -33,6 +33,7 @@ export const LOCALITIES: Locality[] = [
   { name: "Karol Bagh", lat: 28.6514, lon: 77.1907 },
   { name: "Civil Lines", lat: 28.6796, lon: 77.2244 },
   { name: "Rohini", lat: 28.7366, lon: 77.1132 },
+  { name: "Bawana", lat: 28.799, lon: 77.033 },
   { name: "Punjabi Bagh", lat: 28.6683, lon: 77.1313 },
   { name: "Janakpuri", lat: 28.6219, lon: 77.0878 },
   { name: "Dwarka", lat: 28.5921, lon: 77.046 },

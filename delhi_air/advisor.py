@@ -41,7 +41,8 @@ NOT_A_SEARCH = re.compile(r"\b(?:window|compare|versus|vs|reviews?|ratings?|comm
 ANCHOR = re.compile(
     r"\b(?:near|around|close to|in|at|by)\s+(?:the\s+)?(.+?)"
     r"(?:\s+(?:area|region|side|locality|neighbou?rhood))?"
-    r"(?=\s+(?:today|tomorrow|tonight|this|for|during|with|morning|afternoon|evening|in|at|near|around|close)\b"
+    r"(?=\s+(?:today|tomorrow|tonight|this|for|during|with|morning|afternoon|evening|in|at|near|around|close"
+    r"|and|then|please|tell|what|where|when|which)\b"
     r"|[?.!,]|$)",
     re.I,
 )
@@ -50,7 +51,7 @@ ANCHOR = re.compile(
 SUGGEST = re.compile(
     r"\b(?:what (?:can|should|could|shall) i do|what to do|suggest something|"
     r"recommend something|surprise me|anything (?:good )?to do|plan my (?:day|morning|evening)|"
-    r"should i go out)\b",
+    r"should i go out|best for me|what do you (?:suggest|recommend)|go (?:out )?around)\b",
     re.I,
 )
 ACTIVITY_NAMES = {
@@ -65,6 +66,17 @@ LEVELS = {
     "short": "Keep it short",
     "stay": "Better to stay in",
 }
+
+
+class NoSpotsNearby(AirError):
+    """The place data stops at Delhi NCR, though forecasts don't."""
+
+    def __init__(self, anchor: Location, radius: int):
+        super().__init__(
+            f"I couldn't find a suitable place within {radius} km of "
+            f"{anchor.name}. I know Delhi NCR best; try another area."
+        )
+        self.anchor = anchor
 
 
 def wants_suggestion(text: str) -> bool:
@@ -170,10 +182,7 @@ class Advisor:
             return "Which area should I search? Try 'a walk near Rohini'."
         found, total, radius = self.search(anchor, request.activity)
         if not found:
-            raise AirError(
-                f"I couldn't find a suitable place within {radius} km of "
-                f"{anchor.name}. I know Delhi NCR best; try another area."
-            )
+            raise NoSpotsNearby(anchor, radius)
         now = now or datetime.now(UTC)
         try:
             async with asyncio.timeout(30):
@@ -221,6 +230,8 @@ class Advisor:
         except TimeoutError as exc:
             raise ProviderError("The search took too long. Please try again.") from exc
         if not plans:
+            if not any(self.search(anchor, activity)[0] for activity in order):
+                raise NoSpotsNearby(anchor, RADII_KM[-1])
             raise NoWindowError("No complete outdoor window is available in the next 48 hours.")
         options = [
             (request, ranked, total, *pick_time(ranked[0], usual_hours, now))
@@ -314,6 +325,34 @@ def pick_time(best: Candidate, usual_hours, now):
     # Part of a monitor's excess over the model is expected to persist into the window.
     expected = windows[0].max_aqi + 0.5 * excess
     return windows[0], tuple(windows[1:]), level_for(best, expected)
+
+
+def area_only(plan, now) -> dict:
+    """Advice for somewhere without place data: the best time, and honesty about the gap."""
+    window, activity = plan.window, plan.request.activity
+    zone = ZoneInfo(plan.forecast.timezone)
+    start = window.start.astimezone(zone)
+    label = ACTIVITY_NAMES.get(activity, "outing")
+    today = now.astimezone(zone).date() == start.date()
+    moment = f"{start:%H:%M}" if today else f"{start:%a} {start:%H:%M}"
+    kind = level(activity, window.max_aqi)
+    area = plan.location.name.split(",")[0]
+    current = plan.forecast.current
+    return {
+        "kind": kind,
+        "label": LEVELS[kind],
+        "headline": f"{label.capitalize()} at {moment}"
+        if today
+        else f"{label.capitalize()}, {moment}",
+        "detail": area,
+        "reasons": [
+            f"The cleanest time ahead is {moment}, at about AQI {window.us_aqi:.0f}.",
+            f"I only know specific places in Delhi NCR, so this covers {area} as a whole.",
+        ],
+        "activity": activity,
+        "now_aqi": round(current.us_aqi) if current else None,
+        "window_aqi": round(window.us_aqi),
+    }
 
 
 def level_for(best: Candidate, aqi: float) -> str:
