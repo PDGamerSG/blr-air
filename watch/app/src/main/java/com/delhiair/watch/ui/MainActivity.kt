@@ -93,7 +93,7 @@ class MainActivity : ComponentActivity() {
                             AboutScreen(state, viewModel.stationsConfigured, viewModel.agentConfigured)
                         }
                         composable(Routes.ANSWER) {
-                            AnswerScreen(state.agentAnswer.orEmpty())
+                            AnswerScreen(state.agentAnswer.orEmpty(), state.heard)
                         }
                     }
                 }

@@ -15,6 +15,7 @@ from urllib.parse import urlencode
 from zoneinfo import ZoneInfo
 
 from delhi_air.domain import AirError, Location, NoWindowError, ProviderError, RequestSpec
+from delhi_air.localities import closest_location, local_location
 from delhi_air.parsing import parse_local
 from delhi_air.scoring import select_windows
 from delhi_air.stations import StationFeed, distance_km
@@ -104,7 +105,8 @@ class Advisor:
     async def anchor(self, text: str, near) -> Location | None:
         named = find_anchor(text)
         if named and named.casefold() not in HERE:
-            return await self.provider.locate(named)
+            known = local_location(named) or closest_location(named)
+            return known or await self.provider.locate(named)
         if near:
             return Location("your area", near[0], near[1])
         return None

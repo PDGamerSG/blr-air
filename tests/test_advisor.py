@@ -7,6 +7,7 @@ import pytest
 
 from delhi_air.advisor import SPOTS, find_anchor, fits, understand, wants_place
 from delhi_air.demo import DemoProvider
+from delhi_air.localities import closest_location, local_location
 from delhi_air.service import AirService, Recommendation, describe
 from delhi_air.stations import StationReading, parse_station
 
@@ -176,3 +177,32 @@ def station_payload(aqi=300, age_hours=0.5, geo=(28.73, 77.11)):
 def test_only_near_fresh_stations_count(payload, usable):
     now = datetime(2026, 11, 5, 12, tzinfo=UTC)
     assert (parse_station(payload, 28.7366, 77.1132, now) is not None) is usable
+
+
+@pytest.mark.parametrize(
+    "heard,name",
+    [
+        ("socket", "Saket, Delhi"),
+        ("house cause", "Hauz Khas, Delhi"),
+        ("rohani", "Rohini, Delhi"),
+        ("dwarika", "Dwarka, Delhi"),
+        ("noyda", "Noida, Delhi NCR"),
+        ("mayor vihar", "Mayur Vihar, Delhi"),
+    ],
+)
+def test_misheard_delhi_names_are_corrected(heard, name):
+    assert closest_location(heard).name == name
+
+
+@pytest.mark.parametrize("word", ["Paris", "Tokyo", "Melbourne", "Mumbai"])
+def test_other_cities_are_not_bent_into_delhi_names(word):
+    assert closest_location(word) is None
+
+
+async def test_a_misheard_area_still_finds_a_place(service):
+    result = await service.chat("i want to go for a walk near socket")
+    assert result.location.name.endswith(", near Saket")
+
+
+def test_the_planner_keeps_real_towns_with_similar_names():
+    assert local_location("Okha") is None

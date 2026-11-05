@@ -49,6 +49,8 @@ data class AirUiState(
     val agentAnswer: String? = null,
     /** True when the shown plan came from the agent rather than the watch. */
     val fromAgent: Boolean = false,
+    /** The words the agent was given, so a mishearing is visible. */
+    val heard: String? = null,
     val message: String? = null,
 )
 
@@ -94,7 +96,7 @@ class AirViewModel(application: Application) : AndroidViewModel(application) {
     /** Requests go to the agent; the watch only plans for itself when it can't reach it. */
     fun ask(text: String, open: (String) -> Unit) {
         if (_state.value.asking) return
-        _state.update { it.copy(asking = true) }
+        _state.update { it.copy(asking = true, heard = text) }
         viewModelScope.launch {
             try {
                 val near = _state.value.snapshot?.location

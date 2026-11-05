@@ -1,3 +1,4 @@
+import difflib
 import re
 
 from delhi_air.domain import Location
@@ -48,6 +49,16 @@ NCR_CITIES = {"noida", "gurugram", "ghaziabad", "faridabad"}
 # Upper-case forms for abbreviations when a place is recovered from free text.
 ACRONYMS = {"cp", "ncr", "hkv", "ggn"}
 
+# Speech recognisers often turn Delhi names into English words.
+MISHEARD = {
+    "socket": "saket",
+    "sake it": "saket",
+    "house cause": "hauz khas",
+    "hose khas": "hauz khas",
+    "house khas": "hauz khas",
+    "how's cause": "hauz khas",
+}
+
 _SECTOR = r"(?:sector|sec)\s*-?\s*\d+[a-z]?"
 
 
@@ -75,3 +86,16 @@ def local_location(place: str) -> Location | None:
     if found != "delhi":
         name = f"{name}, {'Delhi NCR' if found in NCR_CITIES else 'Delhi'}"
     return Location(name, latitude, longitude, "Asia/Kolkata")
+
+
+def closest_location(place: str) -> Location | None:
+    """The Delhi NCR name a misheard or misspelt word most likely means.
+
+    Only for area searches, which cover Delhi NCR alone: a planner request must stay free to
+    name a real town elsewhere, such as Okha, whose spelling is close to Okhla.
+    """
+    key = re.sub(r"\s+", " ", place.casefold()).strip(" .,?!")
+    if key in MISHEARD:
+        return local_location(MISHEARD[key])
+    match = difflib.get_close_matches(key, [*LOCALITIES, *ALIASES], n=1, cutoff=0.72)
+    return local_location(match[0]) if match else None

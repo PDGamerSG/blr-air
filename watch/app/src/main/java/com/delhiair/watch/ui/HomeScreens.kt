@@ -360,6 +360,7 @@ fun WindowScreen(
         item { ListHeader { Text(if (selected != 0) "Backup $selected" else if (found != null) "Best place" else "Best available") } }
         if (found != null) item { Centered(found.place, color = Sun, size = 17) }
         if (state.fromAgent) item { Centered("From the Delhi Air agent", color = Sky, size = 12) }
+        if (state.fromAgent) state.heard?.let { words -> item { Centered("You said: $words", color = Muted, size = 12) } }
         item { Centered(windowLabel(window, timezone), size = 15) }
         if (found != null) {
             item { Centered(found.why, size = 12) }
@@ -493,9 +494,10 @@ private fun Fact(label: String, value: String) {
 }
 
 @Composable
-fun AnswerScreen(text: String) {
+fun AnswerScreen(text: String, heard: String? = null) {
     Scroller {
         item { ListHeader { Text("Delhi Air agent") } }
+        heard?.let { words -> item { Centered("You said: $words", color = Muted, size = 12) } }
         text.split("\n\n").filter { it.isNotBlank() }.forEach { part ->
             item { Centered(part.trim()) }
         }

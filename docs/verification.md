@@ -6,7 +6,7 @@ Checks run on this Delhi port on 4 November 2026, on Windows 11 with Python 3.12
 
 | Check | Result |
 | --- | --- |
-| `pytest` | 365 passed, 5 failed. All 5 failures also occur on the untouched Bengaluru code on this machine: 3 need Windows symlink privileges and 2 assert POSIX file modes. |
+| `pytest` | 377 passed, 5 failed on Windows. GitHub CI on Linux passed on Python 3.12 and 3.13, with the website job, on the commit before the misheard-name fix. All 5 failures also occur on the untouched Bengaluru code on this machine: 3 need Windows symlink privileges and 2 assert POSIX file modes. |
 | `ruff check` | Clean |
 | Site tests, typecheck, production build | 8 of 8 passed; clean; builds |
 | CLI on live Open-Meteo data | Plans, comparison and no-window refusal for Delhi NCR places |
@@ -58,7 +58,9 @@ The final build ran on the real watch over Wi-Fi, with the agent reached through
 | Reminder, notification permission | Passed on an earlier build; the reminder recheck has changed since |
 | Crashes | None logged during these tests |
 
-Not checked on the watch: speaking a request aloud, the complication, internet through a phone over Bluetooth, or battery use.
+Voice is only partly checked. The recogniser opened on the watch and a person watching saw it capture a request played through PC speakers, apart from the word "Saket". No spoken request has yet produced a finished plan. A typed "near socket" does resolve to Saket through the agent.
+
+Not checked on the watch: the complication, internet through a phone over Bluetooth, or battery use.
 
 ## Independent audit
 
